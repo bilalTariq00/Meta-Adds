@@ -10,7 +10,7 @@ export default function TabSection({
   onRemoveTab,
 }) {
   return (
-    <div className="flex items-end pl-1 pt-1 h-fit relative z-10 overflow-y-hidden">
+    <div className="flex items-end pl-1 pt-1  h-fit relative z-10 overflow-y-hidden">
       {tabs.map((tab) => (
         <Tab
           key={tab.id}

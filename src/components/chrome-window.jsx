@@ -109,7 +109,7 @@ export default function ChromeWindow({ onClose, onMinimize }) {
       />
 
       {/* Row 2: Navigation Bar */}
-      <div className="flex items-center  px-3 py-2 gap-2">
+      <div className="flex items-center  px-3 py-2 gap-2 border-b border-gray-200 shadow-xs">
         <div className="flex gap-1">
           <button className="p-1.5 hover:bg-black/5 rounded-lg transition-colors">
             <ArrowLeft size={16} className="text-gray-600" />
