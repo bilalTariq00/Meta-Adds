@@ -1,13 +1,16 @@
-"use client"
-import Tab from "./tab"
-import { Plus } from "lucide-react"
+"use client";
+import Tab from "./tab";
+import { Plus } from "lucide-react";
 
-
-
-export default function TabSection({ tabs, activeTabId, onTabClick, onAddTab, onRemoveTab }
-) {
+export default function TabSection({
+  tabs,
+  activeTabId,
+  onTabClick,
+  onAddTab,
+  onRemoveTab,
+}) {
   return (
-    <div className="flex items-end pl-1 h-10 relative z-10">
+    <div className="flex items-end pl-1 pt-1 h-fit relative z-10 overflow-y-hidden">
       {tabs.map((tab) => (
         <Tab
           key={tab.id}
@@ -18,9 +21,12 @@ export default function TabSection({ tabs, activeTabId, onTabClick, onAddTab, on
           onClose={onRemoveTab}
         />
       ))}
-      <button className="p-1.5 hover:bg-black/5 rounded-full transition-colors ml-1" onClick={onAddTab}>
+      <button
+        className="p-1.5 hover:bg-black/5 rounded-full transition-colors ml-1"
+        onClick={onAddTab}
+      >
         <Plus size={16} className="text-gray-600" />
       </button>
     </div>
-  )
+  );
 }

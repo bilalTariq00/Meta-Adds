@@ -1,39 +1,42 @@
-import { Search, Mic, Camera, Plus } from "lucide-react"
-import { BrowserRouter, Routes, Route } from "react-router-dom"
-import AppLayout from "@/layouts/AppLayout"
-import { LoadingProvider } from '@/components/LoadingContext'
+import { Search, Mic, Camera, Plus } from "lucide-react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import AppLayout from "@/layouts/AppLayout";
+import { LoadingProvider } from "@/components/LoadingContext";
 
 // Import all page components
-import AccountOverview from "@/pages/AccountOverview"
-import Campaigns from "@/pages/Campaigns"
-import AdsReporting from "@/pages/AdsReporting"
-import Audiences from "@/pages/Audiences"
-import AdvertisingSettings from "@/pages/AdvertisingSettings"
-import BillingPayments from "@/pages/BillingPayments"
-import EventsManager from "@/pages/EventsManager"
+import AccountOverview from "@/pages/AccountOverview";
+import Campaigns from "@/pages/Campaigns";
+import AdsReporting from "@/pages/AdsReporting";
+import Audiences from "@/pages/Audiences";
+import AdvertisingSettings from "@/pages/AdvertisingSettings";
+import BillingPayments from "@/pages/BillingPayments";
+import EventsManager from "@/pages/EventsManager";
 
 export default function ChromeContent({ activeTab }) {
   if (activeTab.title === "Meta Ads Manager" || activeTab.type === "meta-ads") {
     return (
       <div className="h-full w-full">
         <BrowserRouter>
-        <LoadingProvider>
-          <Routes>
-            <Route path="/*" element={<AppLayout />}>
-              <Route index element={<AccountOverview />} />
-              <Route path="account-overview" element={<AccountOverview />} />
-              <Route path="campaigns" element={<Campaigns />} />
-              <Route path="ads-reporting" element={<AdsReporting />} />
-              <Route path="audiences" element={<Audiences />} />
-              <Route path="advertising-settings" element={<AdvertisingSettings />} />
-              <Route path="billing-payments" element={<BillingPayments />} />
-              <Route path="events-manager" element={<EventsManager />} />
-            </Route>
-          </Routes>
+          <LoadingProvider>
+            <Routes>
+              <Route path="/*" element={<AppLayout />}>
+                <Route index element={<AccountOverview />} />
+                <Route path="account-overview" element={<AccountOverview />} />
+                <Route path="campaigns" element={<Campaigns />} />
+                <Route path="ads-reporting" element={<AdsReporting />} />
+                <Route path="audiences" element={<Audiences />} />
+                <Route
+                  path="advertising-settings"
+                  element={<AdvertisingSettings />}
+                />
+                <Route path="billing-payments" element={<BillingPayments />} />
+                <Route path="events-manager" element={<EventsManager />} />
+              </Route>
+            </Routes>
           </LoadingProvider>
         </BrowserRouter>
       </div>
-    )
+    );
   }
 
   if (activeTab.type === "google") {
@@ -53,7 +56,13 @@ export default function ChromeContent({ activeTab }) {
 
           <svg width="0" height="0">
             <defs>
-              <linearGradient id="googleGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+              <linearGradient
+                id="googleGradient"
+                x1="0%"
+                y1="0%"
+                x2="100%"
+                y2="0%"
+              >
                 <stop stopColor="#4285F4" offset="0%" />
                 <stop stopColor="#EA4335" offset="25%" />
                 <stop stopColor="#FBBC05" offset="50%" />
@@ -62,12 +71,22 @@ export default function ChromeContent({ activeTab }) {
             </defs>
           </svg>
 
-          <Mic size={19} strokeWidth={2} style={{ stroke: "url(#googleGradient)" }} className="mx-2" />
-          <Camera size={18} strokeWidth={2} style={{ stroke: "url(#googleGradient)" }} className="mx-2" />
+          <Mic
+            size={19}
+            strokeWidth={2}
+            style={{ stroke: "url(#googleGradient)" }}
+            className="mx-2"
+          />
+          <Camera
+            size={18}
+            strokeWidth={2}
+            style={{ stroke: "url(#googleGradient)" }}
+            className="mx-2"
+          />
 
-          <button className="bg-gray-100 hover:bg-gray-200 rounded-2xl px-3 py-1.5 text-sm flex items-center gap-2 ml-2 transition-colors">
+          {/* <button className="bg-gray-100 hover:bg-gray-200 rounded-2xl px-3 py-1.5 text-sm flex items-center gap-2 ml-2 transition-colors">
             <Search size={15} strokeWidth={2} /> AI Mode
-          </button>
+          </button> */}
         </div>
 
         <div className="flex gap-5 mt-8">
@@ -95,15 +114,17 @@ export default function ChromeContent({ activeTab }) {
           </div>
         </div>
       </div>
-    )
+    );
   } else {
     return (
       <div className="flex flex-col items-center justify-center h-full">
         <div className="mt-5 p-5 border border-dashed border-gray-300 bg-gray-50 text-gray-500 italic text-center w-4/5 rounded-lg">
-          <h2 className="text-lg font-medium text-gray-700 mb-2">{activeTab.title}</h2>
+          <h2 className="text-lg font-medium text-gray-700 mb-2">
+            {activeTab.title}
+          </h2>
           <p>{activeTab.content}</p>
         </div>
       </div>
-    )
+    );
   }
 }
