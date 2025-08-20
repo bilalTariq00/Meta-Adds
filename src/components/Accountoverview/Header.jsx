@@ -448,7 +448,7 @@ export default function Header() {
                     cy="50"
                     r={radius}
                     fill="none"
-                    stroke="#e5e7eb"
+                    stroke="#E5E8F0"
                     strokeWidth="8"
                     strokeDasharray={arcLength}
                     strokeDashoffset="0"
@@ -460,7 +460,7 @@ export default function Header() {
                     cy="50"
                     r={radius}
                     fill="none"
-                    stroke="#2563eb"
+                    stroke="#1771ED"
                     strokeWidth="8"
                     strokeDasharray={strokeDasharray}
                     strokeDashoffset={strokeDashoffset}
@@ -509,7 +509,7 @@ export default function Header() {
                               cy="50"
                               r={radius}
                               fill="none"
-                              stroke="#e5e7eb"
+                              stroke="#E5E8F0"
                               strokeWidth="8"
                               strokeDasharray={arcLength}
                               strokeDashoffset="0"
@@ -521,7 +521,7 @@ export default function Header() {
                               cy="50"
                               r={radius}
                               fill="none"
-                              stroke="#2563eb"
+                              stroke="#1771ED"
                               strokeWidth="8"
                               strokeDasharray={strokeDasharray}
                               strokeDashoffset={strokeDashoffset}
@@ -1099,7 +1099,7 @@ export default function Header() {
                       cy="50"
                       r={radius}
                       fill="none"
-                      stroke="#e5e7eb"
+                      stroke="#E5E8F0"
                       strokeWidth="8"
                       strokeDasharray={arcLength}
                       strokeDashoffset="0"
@@ -1110,7 +1110,7 @@ export default function Header() {
                       cy="50"
                       r={radius}
                       fill="none"
-                      stroke="#2563eb"
+                      stroke="#1771ED"
                       strokeWidth="8"
                       strokeDasharray={strokeDasharray}
                       strokeDashoffset={strokeDashoffset}

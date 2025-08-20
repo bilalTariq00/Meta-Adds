@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Home,
   BarChart3,
@@ -19,7 +19,7 @@ import {
   BookOpen,
   CircleHelp,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 // Import smaller components
 import SidebarItem from "../SideBar/SidebarItem";
@@ -54,6 +54,8 @@ import { useLoading } from "@/components/LoadingContext";
 
 // Main Sidebar Component
 export default function Sidebar() {
+  const location = useLocation();
+
   // const { isLoading, startLoading } = useLoading();
   const [sidebarExpanded, setSidebarExpanded] = useState(false);
   const [activeItem, setActiveItem] = useState("Account overview");
@@ -65,6 +67,7 @@ export default function Sidebar() {
   const [showReportBug, setShowReportBug] = useState(false);
   const navigate = useNavigate();
   const { startLoading } = useLoading();
+
   const sidebarItems = [
     {
       icon: { light: overviewIcon, dark: overviewDarkIcon },
@@ -200,15 +203,20 @@ export default function Sidebar() {
       if (showSearch && !event.target.closest(".search-dialog")) {
         setShowSearch(false);
       }
-      if (showReportBug && !event.target.closest(".report-bug-dialog")) {
-        setShowReportBug(false);
-      }
+      // Removed ReportBugDialog handling - it manages its own closing
     };
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [showSearch, showReportBug]);
-
+  }, [showSearch]); // Also remove showReportBug from dependencies
+  useEffect(() => {
+    const current = sidebarItems.find(
+      (item) => item.path === location.pathname
+    );
+    if (current) {
+      setActiveItem(current.id);
+    }
+  }, [location.pathname]);
   return (
     <>
       <div className="relative bg-white ">
@@ -395,15 +403,15 @@ export default function Sidebar() {
             onClose={() => setShowAllTools(false)}
             sidebarExpanded={sidebarExpanded}
           />
+          <AddAccountUpdateSidebar
+            isOpen={showAddAccount}
+            onClose={() => setShowAddAccount(false)}
+          />
         </div>
 
         {/* Overlay Sidebars and Dialogs - All positioned relative to parent container */}
       </div>
       <HelpSidebar isOpen={showHelp} onClose={() => setShowHelp(false)} />
-      <AddAccountUpdateSidebar
-        isOpen={showAddAccount}
-        onClose={() => setShowAddAccount(false)}
-      />
 
       <SearchDialog isOpen={showSearch} onClose={() => setShowSearch(false)} />
       <ReportBugDialog

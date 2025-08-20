@@ -170,7 +170,7 @@ export function LatestResultsSection() {
             </div>
 
             <button
-              className="text-sm text-blue-600 hover:underline"
+              className="text-sm text-[#0A78BE] hover:underline"
               onClick={() => {
                 setDialogType(metric);
                 setOpenDialog(true);

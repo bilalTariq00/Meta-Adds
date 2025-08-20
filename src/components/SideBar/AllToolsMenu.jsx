@@ -35,19 +35,20 @@ import overviewDarkIcon from "@/assets/icons/overviewdark.png";
 import campaignIcon from "@/assets/icons/campaign.png";
 import campaignDarkIcon from "@/assets/icons/campaigndark.png";
 import AdsReportIcon from "@/assets/icons/AdsReport.png";
+import whiteAds from "@/assets/icons/whiteAds.png";
 import AdsReportDarkIcon from "@/assets/icons/AdsReportdark.png";
-import AudienceIcon from "@/assets/icons/Audience.png";
+import WhiteAudienceIcon from "@/assets/icons/whiteuser.png";
 import AudienceDarkIcon from "@/assets/icons/Audiencedark.png";
 import ADSettingsIcon from "@/assets/icons/ADSettings.png";
 import ADSettingsDarkIcon from "@/assets/icons/ADSettingdark.png";
 import BillsIcon from "@/assets/icons/Bills.png";
-import BillsDarkIcon from "@/assets/icons/Billsdark.png";
-import EventIcon from "@/assets/icons/Event.png";
+import darkcontent from "@/assets/icons/darkcontent.png";
+import whiteEvent from "@/assets/icons/whiteevent.png";
 import EventDarkIcon from "@/assets/icons/Eventdark.png";
-import AlltoolsDarkIcon from "@/assets/icons/Alltoolsdark.png";
+import darkmsg from "@/assets/icons/darkmsg.png";
 import NotificationIcon from "@/assets/icons/notification.png";
-import NotificationDarkIcon from "@/assets/icons/Notificationdark.png";
-import helpIcon from "@/assets/icons/help.png";
+import darknav from "@/assets/icons/darknav.png";
+import whitenav from "@/assets/icons/whitenav.png";
 import { useLoading } from "@/components/LoadingContext";
 import { useRef, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -70,34 +71,37 @@ const Heart = ({ size = 16 }) => (
 const AllToolsMenu = ({ isOpen, onClose, sidebarExpanded }) => {
   const [shortcuts, setShortcuts] = useState([
     {
-      icon: { light: AdsReportIcon, dark: AdsReportDarkIcon },
+      icon: { light: whiteAds, dark: AdsReportDarkIcon },
       label: "Ads Reporting",
       color: "bg-gray-100",
     },
     {
-      icon: { light: EventIcon, dark: EventDarkIcon },
+      icon: { light: whiteEvent, dark: EventDarkIcon },
       label: "Events Manager",
       color: "bg-gray-100",
     },
     {
-      icon: { light: Navigation, dark: Navigation2 },
+      icon: { light: whitenav, dark: darknav },
       label: "Ads Manager",
       color: "bg-gray-100",
     },
     {
-      icon: { light: AudienceIcon, dark: AudienceDarkIcon },
+      icon: { light: WhiteAudienceIcon, dark: AudienceDarkIcon },
       label: "Audiences",
       color: "bg-gray-100",
+      size: "h-11 w-12",
     },
     {
-      icon: { light: AudienceIcon, dark: AudienceDarkIcon },
+      icon: { light: darkcontent, dark: darkcontent },
       label: "Content",
       color: "bg-gray-100",
+      size: "h-11 w-11",
     },
     {
-      icon: { light: AudienceIcon, dark: AudienceDarkIcon },
+      icon: { light: darkmsg, dark: darkmsg },
       label: "Inbox",
       color: "bg-gray-100",
+      size: "h-11 w-11",
     },
   ]);
   const location = useLocation();
@@ -283,16 +287,22 @@ const AllToolsMenu = ({ isOpen, onClose, sidebarExpanded }) => {
               }`}
             >
               <div
-                className={`w-12 h-12 ${
-                  item.color
-                } rounded-lg flex items-center justify-center ${
-                  isActive ? "bg-blue-500 text-[#0A78BE]" : "text-gray-600"
+                className={`w-12 h-12  rounded-lg flex items-center justify-center ${
+                  isActive
+                    ? "bg-[#E1EDF7] text-[#0A78BE]"
+                    : "text-gray-600 bg-gray-100"
                 }`}
               >
-                <img src={iconSrc} alt={item.label} className="p-3" />
+                <img
+                  src={iconSrc}
+                  alt={item.label}
+                  className={`p-3 transition-colors ${
+                    item.size ? item.size : "h-12 w-12"
+                  }`}
+                />
               </div>
               <span
-                className={`text-xs text-center leading-tight ${
+                className={`text-xs text-center leading-tight pt-1 ${
                   isActive ? "text-[#0A78BE] font-bold" : "text-gray-700"
                 }`}
               >

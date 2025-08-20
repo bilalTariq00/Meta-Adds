@@ -3,10 +3,12 @@
 import { Info } from "lucide-react";
 import Tooltip from "../Tooltip";
 import userInfo from "@/assets/icons/userOverview.png";
+import { useNavigate } from "react-router-dom";
 
 export function AccountHeader() {
+  const navigate = useNavigate();
   return (
-    <div className="flex items-center justify-between mb-6">
+    <div className="flex items-center justify-between mb-4">
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-2">
           <div className="w-10 h-10 rounded-full bg-gray flex items-center justify-center">
@@ -20,14 +22,19 @@ export function AccountHeader() {
             <h1 className="text-xl font-semibold text-gray-900">
               Adkin Digital
             </h1>
-            <p className="text-sm text-blue-600">1 active campaign</p>
+            <p
+              className="text-sm font-light text-[#0A78BE] cursor-pointer hover:underline"
+              onClick={() => navigate("/campaigns")}
+            >
+              1 active campaign
+            </p>
           </div>
         </div>
       </div>
       <div className="flex items-center gap-6">
-        <div className="text-right text-sm text-gray-600">
+        <div className="text-right text-xs text-[#1C2B33A6]">
           Amount spent in last seven days:{" "}
-          <span className="font-semibold">$9.33</span>{" "}
+          <span className="font-semibold text-black">$9.33</span>{" "}
           <Tooltip content="Information about spending" id="spending-info">
             <Info size={14} className="inline text-gray-400 " />
           </Tooltip>{" "}
