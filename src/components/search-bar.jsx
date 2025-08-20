@@ -1,21 +1,39 @@
 import React, { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { Star } from "lucide-react";
 import google from "/images/google.png";
 
 export default function SearchBar() {
-  const [url, setUrl] = useState(window.location.href);
+  const location = useLocation();
+  const [displayUrl, setDisplayUrl] = useState("");
 
   useEffect(() => {
-    const updateUrl = () => setUrl(window.location.href);
+    // Create a more realistic URL display based on the current route
+    const baseUrl = "https://business.facebook.com/adsmanager";
 
-    window.addEventListener("popstate", updateUrl);
-    window.addEventListener("hashchange", updateUrl);
-
-    return () => {
-      window.removeEventListener("popstate", updateUrl);
-      window.removeEventListener("hashchange", updateUrl);
+    // Map your routes to more realistic URLs
+    const routeToUrl = {
+      "/": `${baseUrl}/manage/campaigns`,
+      "/account-overview": `${baseUrl}/manage/overview`,
+      "/campaigns": `${baseUrl}/manage/campaigns`,
+      "/ads-reporting": `${baseUrl}/manage/ads/reports`,
+      "/audiences": `${baseUrl}/manage/audiences`,
+      "/advertising-settings": `${baseUrl}/settings`,
+      "/billing-payments": `${baseUrl}/billing`,
+      "/events-manager": `${baseUrl}/events`,
     };
-  }, []);
+
+    // Get the mapped URL or use the current path as fallback
+    const mappedUrl =
+      routeToUrl[location.pathname] || `${baseUrl}${location.pathname}`;
+
+    // Add query parameters if they exist
+    const fullUrl = location.search
+      ? `${mappedUrl}${location.search}`
+      : mappedUrl;
+
+    setDisplayUrl(fullUrl);
+  }, [location]);
 
   return (
     <div className="flex-1 px-2">
@@ -28,7 +46,7 @@ export default function SearchBar() {
         <input
           type="text"
           className="flex-1 bg-transparent outline-none text-sm text-gray-700 px-2"
-          value={url}
+          value={displayUrl}
           readOnly
         />
         <Star size={16} className="text-gray-500" />

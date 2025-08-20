@@ -1,35 +1,37 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Desktop from "./components/desktop"
-import ChromeWindow from "./components/chrome-window"
-import Taskbar from "./components/taskbar"
+import { useState } from "react";
+import { BrowserRouter } from "react-router-dom";
+import Desktop from "./components/desktop";
+import ChromeWindow from "./components/chrome-window";
+import Taskbar from "./components/taskbar";
+import { LoadingProvider } from "@/components/LoadingContext";
 
 function App() {
-  const [isChromeOpen, setIsChromeOpen] = useState(false)
-  const [isMinimized, setIsMinimized] = useState(false)
+  const [isChromeOpen, setIsChromeOpen] = useState(false);
+  const [isMinimized, setIsMinimized] = useState(false);
 
   const handleChromeOpen = () => {
-    setIsChromeOpen(true)
-    setIsMinimized(false)
-  }
+    setIsChromeOpen(true);
+    setIsMinimized(false);
+  };
 
   const handleChromeClose = () => {
-    setIsChromeOpen(false)
-    setIsMinimized(false)
-  }
+    setIsChromeOpen(false);
+    setIsMinimized(false);
+  };
 
   const handleChromeMinimize = () => {
-    setIsMinimized(true)
-  }
+    setIsMinimized(true);
+  };
 
   const handleTaskbarChromeClick = () => {
     if (isMinimized) {
-      setIsMinimized(false)
+      setIsMinimized(false);
     } else if (isChromeOpen) {
-      setIsMinimized(true)
+      setIsMinimized(true);
     }
-  }
+  };
 
   return (
     <main className="h-screen w-screen relative overflow-hidden">
@@ -44,13 +46,24 @@ function App() {
 
       {isChromeOpen && (
         <div className={`${isMinimized ? "hidden" : "block"}`}>
-          <ChromeWindow onClose={handleChromeClose} onMinimize={handleChromeMinimize} />
+          <BrowserRouter>
+            <LoadingProvider>
+              <ChromeWindow
+                onClose={handleChromeClose}
+                onMinimize={handleChromeMinimize}
+              />
+            </LoadingProvider>
+          </BrowserRouter>
         </div>
       )}
 
-      <Taskbar isChromeOpen={isChromeOpen} isMinimized={isMinimized} onChromeClick={handleTaskbarChromeClick} />
+      <Taskbar
+        isChromeOpen={isChromeOpen}
+        isMinimized={isMinimized}
+        onChromeClick={handleTaskbarChromeClick}
+      />
     </main>
-  )
+  );
 }
 
-export default App
+export default App;

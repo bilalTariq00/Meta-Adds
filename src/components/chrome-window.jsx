@@ -1,13 +1,12 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import TabSection from "./tab-section";
 import SearchBar from "./search-bar";
 import VerticalMenu from "./vertical-menu";
 import ChromeContent from "./chrome-content";
 import AppLayout from "@/layouts/AppLayout";
-import { LoadingProvider } from "@/components/LoadingContext";
 
 // Import all page components
 import AccountOverview from "@/pages/AccountOverview";
@@ -164,31 +163,21 @@ export default function ChromeWindow({ onClose, onMinimize }) {
         {activeTab.title === "Meta Ads Manager" ||
         activeTab.type === "meta-ads" ? (
           <div className="h-full w-full">
-            <BrowserRouter>
-              <LoadingProvider>
-                <Routes>
-                  <Route path="/*" element={<AppLayout />}>
-                    <Route index element={<AccountOverview />} />
-                    <Route
-                      path="account-overview"
-                      element={<AccountOverview />}
-                    />
-                    <Route path="campaigns" element={<Campaigns />} />
-                    <Route path="ads-reporting" element={<AdsReporting />} />
-                    <Route path="audiences" element={<Audiences />} />
-                    <Route
-                      path="advertising-settings"
-                      element={<AdvertisingSettings />}
-                    />
-                    <Route
-                      path="billing-payments"
-                      element={<BillingPayments />}
-                    />
-                    <Route path="events-manager" element={<EventsManager />} />
-                  </Route>
-                </Routes>
-              </LoadingProvider>
-            </BrowserRouter>
+            <Routes>
+              <Route path="/*" element={<AppLayout />}>
+                <Route index element={<AccountOverview />} />
+                <Route path="account-overview" element={<AccountOverview />} />
+                <Route path="campaigns" element={<Campaigns />} />
+                <Route path="ads-reporting" element={<AdsReporting />} />
+                <Route path="audiences" element={<Audiences />} />
+                <Route
+                  path="advertising-settings"
+                  element={<AdvertisingSettings />}
+                />
+                <Route path="billing-payments" element={<BillingPayments />} />
+                <Route path="events-manager" element={<EventsManager />} />
+              </Route>
+            </Routes>
           </div>
         ) : (
           <ChromeContent activeTab={activeTab} />
