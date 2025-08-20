@@ -52,7 +52,11 @@ const AddAccountUpdateSidebar = ({ isOpen, onClose }) => {
             ))}
           </div> */}
           <div className="flex flex-col justify-center items-center h-full">
-            <Lightbulb size={50} className="text-gray-400" />
+            <img
+              src="/images/footer/Bulb.png"
+              alt="lightbulb"
+              className="w-40 h-40 mt-10 object-contain text-gray-400"
+            />
             <h1 className="font-bold text-sm ">No updates </h1>
             <p className="text-xs text-[#1C2B33A6]">
               When there are updates you will find them here.{" "}

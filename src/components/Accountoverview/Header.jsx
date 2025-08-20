@@ -613,7 +613,11 @@ export default function Header() {
                     <div className="text-center bg-gray-100 rounded-lg px-4 py-2">
                       <div className="flex justify-center mb-4">
                         <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
-                          <Lightbulb size={32} className="text-gray-400" />
+                          <img
+                            src="/images/footer/Bulb.png"
+                            alt="lightbulb"
+                            className="w-16 h-16 object-contain text-gray-400"
+                          />
                         </div>
                       </div>
 

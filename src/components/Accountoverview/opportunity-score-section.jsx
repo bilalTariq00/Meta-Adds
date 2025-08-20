@@ -145,7 +145,11 @@ export function OpportunityScoreSection({
         ) : (
           <div className="text-center py-6 bg-gray-100 rounded-lg">
             <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
-              <Lightbulb size={32} className="text-gray-400" />
+              <img
+                src="/images/footer/Bulb.png"
+                alt="lightbulb"
+                className="w-20 h-20 object-contain text-gray-400"
+              />
             </div>
             <h4 className="text-lg font-medium text-gray-900 mb-2">
               {activeTab === "available"

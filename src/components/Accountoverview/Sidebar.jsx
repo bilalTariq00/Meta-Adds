@@ -127,31 +127,47 @@ export default function Sidebar() {
     activeItem === "Events Manager"
       ? [
           {
-            icon: <Settings size={40} />,
+            icon: (
+              <img
+                src="/images/footer/BSetting.png"
+                alt="Business Setting"
+                className=""
+              />
+            ),
             label: "Business Setting",
             action: () => {},
             tooltip: "Business Setting",
           },
           {
-            icon: <Bell size={40} />,
+            icon: (
+              <img
+                src="/images/footer/Bell.png"
+                alt="Notifications"
+                className=""
+              />
+            ),
             label: "Notifications",
             action: () => setShowNotifications(true),
             tooltip: "Notifications",
           },
           {
-            icon: <Search size={40} />,
+            icon: (
+              <img src="/images/footer/Search.png" alt="Search" className="" />
+            ),
             label: "Search",
             action: () => setShowSearch(true),
             tooltip: "Search",
           },
           {
-            icon: <HelpCircle size={40} />,
+            icon: <img src="/images/footer/Help.png" alt="Help" className="" />,
             label: "Help",
             action: () => setShowHelp(true),
             tooltip: "Help",
           },
           {
-            icon: <Bug size={40} />,
+            icon: (
+              <img src="/images/footer/Bug.png" alt="Report Bug" className="" />
+            ),
             label: "Report Bug",
             action: () => setShowReportBug(true),
             tooltip: "Report Bug",
@@ -159,25 +175,41 @@ export default function Sidebar() {
         ]
       : [
           {
-            icon: <BookOpen size={40} />,
+            icon: (
+              <img
+                src="/images/footer/Ad.png"
+                alt="Add Account Update"
+                className=""
+              />
+            ),
             label: "Add Account Update",
             action: () => setShowAddAccount(true),
             tooltip: "Add Account Update",
           },
           {
-            icon: <Settings size={40} />,
+            icon: (
+              <img
+                src="/images/footer/BSetting.png"
+                alt="Business Setting"
+                className=""
+              />
+            ),
             label: "Business Setting",
             action: () => {},
             tooltip: "Business Setting",
           },
           {
-            icon: <Search size={40} />,
+            icon: (
+              <img src="/images/footer/Search.png" alt="Search" className="" />
+            ),
             label: "Search",
             action: () => setShowSearch(true),
             tooltip: "Search",
           },
           {
-            icon: <Bug size={40} />,
+            icon: (
+              <img src="/images/footer/Bug.png" alt="Report Bug" className="" />
+            ),
             label: "Report Bug",
             action: () => setShowReportBug(true),
             tooltip: "Report Bug",
