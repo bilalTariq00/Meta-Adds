@@ -1,23 +1,21 @@
-"use client";
-
-import React, { useState } from "react";
-import {
-  Chrome,
-  RectangleGoggles,
-  Search,
-  Star,
-  TowerControl,
-} from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { Star } from "lucide-react";
 import google from "/images/google.png";
 
 export default function SearchBar() {
-  const [inputValue, setInputValue] = useState(
-    "https://adsmanager.facebook.com/adsmanager/manage/accounts?nav_source=fb4b&act=24223661240661184"
-  );
+  const [url, setUrl] = useState(window.location.href);
 
-  const handleChange = (e) => {
-    setInputValue(e.target.value);
-  };
+  useEffect(() => {
+    const updateUrl = () => setUrl(window.location.href);
+
+    window.addEventListener("popstate", updateUrl);
+    window.addEventListener("hashchange", updateUrl);
+
+    return () => {
+      window.removeEventListener("popstate", updateUrl);
+      window.removeEventListener("hashchange", updateUrl);
+    };
+  }, []);
 
   return (
     <div className="flex-1 px-2">
@@ -25,14 +23,13 @@ export default function SearchBar() {
         <img
           src={google}
           alt="icon"
-          className="text-gray-500 bg-white rounded-full p-1 w-6 h-6"
+          className="bg-white rounded-full p-1 w-6 h-6"
         />
         <input
           type="text"
-          placeholder="Search Google or type a URL"
           className="flex-1 bg-transparent outline-none text-sm text-gray-700 px-2"
-          value={inputValue}
-          onChange={handleChange}
+          value={url}
+          readOnly
         />
         <Star size={16} className="text-gray-500" />
       </div>

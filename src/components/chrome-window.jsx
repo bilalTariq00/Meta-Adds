@@ -1,10 +1,23 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import TabSection from "./tab-section";
 import SearchBar from "./search-bar";
 import VerticalMenu from "./vertical-menu";
 import ChromeContent from "./chrome-content";
+import AppLayout from "@/layouts/AppLayout";
+import { LoadingProvider } from "@/components/LoadingContext";
+
+// Import all page components
+import AccountOverview from "@/pages/AccountOverview";
+import Campaigns from "@/pages/Campaigns";
+import AdsReporting from "@/pages/AdsReporting";
+import Audiences from "@/pages/Audiences";
+import AdvertisingSettings from "@/pages/AdvertisingSettings";
+import BillingPayments from "@/pages/BillingPayments";
+import EventsManager from "@/pages/EventsManager";
+
 import {
   Minus,
   Square,
@@ -95,7 +108,6 @@ export default function ChromeWindow({ onClose, onMinimize }) {
       style={{ minWidth: "600px", minHeight: "400px" }}
     >
       {/* Row 1: Tabs + Window Controls */}
-
       <TitleBar
         isMaximized={isMaximized}
         onMinimize={onMinimize}
@@ -125,10 +137,6 @@ export default function ChromeWindow({ onClose, onMinimize }) {
         <SearchBar />
 
         <div className="flex items-center gap-1">
-          {/* <button className="p-1.5 hover:bg-black/5 rounded-lg transition-colors">
-            <BlocksIcon size={16} className="text-gray-600" />
-          </button>
-          <div className="w-px h-6 bg-gray-300 mx-1"></div> */}
           <button className="p-1.5 hover:bg-black/5 rounded-lg transition-colors">
             <Avatar className="w-6 h-6 bg-blue-400">
               <AvatarFallback className="text-gray-100 text-xs">
@@ -146,43 +154,45 @@ export default function ChromeWindow({ onClose, onMinimize }) {
         </div>
       </div>
 
-      {/* Row 3: Top Bar */}
-      {/* <div className="flex justify-end items-center px-4 py-2 text-sm text-gray-600">
-        <div className="flex gap-4 mr-4">
-          <a href="#" className="hover:underline rounded-md px-2 py-1 hover:bg-gray-50 transition-colors">
-            Gmail
-          </a>
-          <a href="#" className="hover:underline rounded-md px-2 py-1 hover:bg-gray-50 transition-colors">
-            Images
-          </a>
-        </div>
-        <div className="flex items-center gap-2">
-          <button className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
-            <FlaskConical size={18} className="text-gray-600" />
-          </button>
-          <button className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" height="20" width="20" fill="currentColor" viewBox="0 0 24 24">
-              <circle cx="5" cy="5" r="2" />
-              <circle cx="12" cy="5" r="2" />
-              <circle cx="19" cy="5" r="2" />
-              <circle cx="5" cy="12" r="2" />
-              <circle cx="12" cy="12" r="2" />
-              <circle cx="19" cy="12" r="2" />
-              <circle cx="5" cy="19" r="2" />
-              <circle cx="12" cy="19" r="2" />
-              <circle cx="19" cy="19" r="2" />
-            </svg>
-          </button>
-        </div>
-      </div> */}
-
       {/* Row 4: Page Content */}
       <div
         className={`flex-1 overflow-auto relative ${
           !isMaximized ? "rounded-b-xl" : ""
         }`}
       >
-        <ChromeContent activeTab={activeTab} />
+        {/* Handle routing here based on active tab */}
+        {activeTab.title === "Meta Ads Manager" ||
+        activeTab.type === "meta-ads" ? (
+          <div className="h-full w-full">
+            <BrowserRouter>
+              <LoadingProvider>
+                <Routes>
+                  <Route path="/*" element={<AppLayout />}>
+                    <Route index element={<AccountOverview />} />
+                    <Route
+                      path="account-overview"
+                      element={<AccountOverview />}
+                    />
+                    <Route path="campaigns" element={<Campaigns />} />
+                    <Route path="ads-reporting" element={<AdsReporting />} />
+                    <Route path="audiences" element={<Audiences />} />
+                    <Route
+                      path="advertising-settings"
+                      element={<AdvertisingSettings />}
+                    />
+                    <Route
+                      path="billing-payments"
+                      element={<BillingPayments />}
+                    />
+                    <Route path="events-manager" element={<EventsManager />} />
+                  </Route>
+                </Routes>
+              </LoadingProvider>
+            </BrowserRouter>
+          </div>
+        ) : (
+          <ChromeContent activeTab={activeTab} />
+        )}
       </div>
     </div>
   );
