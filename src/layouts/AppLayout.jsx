@@ -15,7 +15,7 @@ export default function AppLayout() {
   const [isActivitySidebarOpen, setIsActivitySidebarOpen] = useState(false);
 
   return (
-    <div className="h-full w-full flex bg-gradient-to-b from-[#f8fafc] to-[#e2e8f0] relative overflow-hidden">
+    <div className="h-full w-full flex bg-gradient-to-tl from-green-50 via-blue-50 to-pink-50 relative overflow-hidden">
       {/* Sidebar */}
       <Sidebar />
 

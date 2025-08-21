@@ -1,10 +1,14 @@
+import CampaignsView from "@/components/campaigns/CampaignsView";
+
 export default function Campaigns() {
   return (
-    <div className="p-6">
-      <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
-        <h2 className="text-2xl font-semibold text-gray-900 mb-4">Campaigns</h2>
-        <p className="text-gray-600">This is the Campaigns page. Content will be added here.</p>
+    <div className="h-full overflow-y-auto  mr-6">
+      <div
+        className="h-full flex flex-col  pt-2 pb-2 overflow-y-auto mx-auto relative rounded-lg bg-[#f1f4f7] border border-[#0000001a]"
+        style={{ width: "calc(100vw - 120px)" }}
+      >
+        <CampaignsView />
       </div>
     </div>
-  )
+  );
 }
