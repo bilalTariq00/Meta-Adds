@@ -98,7 +98,13 @@ export default function Toolbar({
           {/* Duplicate Button */}
           <button
             onClick={onDuplicate}
-            className="px-3 py-1.75 bg-white hover:bg-gray-50 text-gray-700 text-sm font-medium flex items-center gap-1.5 transition-colors"
+            disabled={selectedCount === 0}
+            className={`px-3 py-1.75 flex items-center gap-1.5 text-sm font-medium transition-colors
+    ${
+      selectedCount === 0
+        ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+        : "bg-white hover:bg-gray-50 text-gray-700"
+    }`}
           >
             <Copy className="w-4 h-4" />
             Duplicate

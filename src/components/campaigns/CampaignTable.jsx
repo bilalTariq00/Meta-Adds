@@ -202,8 +202,8 @@ const adsSeed = [
     amountSpent: 20.17,
     ends: "Ongoing",
     resultType: "Website view content",
-    // thumbnail:
-    // "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=60&h=60&fit=crop&crop=center",
+    thumbnail:
+      "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=60&h=60&fit=crop&crop=center",
     on: false,
   },
   {
@@ -224,8 +224,8 @@ const adsSeed = [
     amountSpent: 8.74,
     ends: "Ongoing",
     resultType: "Website lead",
-    // thumbnail:
-    // "https://images.unsplash.com/photo-1509391366360-2e959784a276?w=60&h=60&fit=crop&crop=center",
+    thumbnail:
+      "https://images.unsplash.com/photo-1509391366360-2e959784a276?w=60&h=60&fit=crop&crop=center",
     on: false,
   },
   {
@@ -246,8 +246,8 @@ const adsSeed = [
     amountSpent: 0.75,
     ends: "Ongoing",
     resultType: "Website view content",
-    // thumbnail:
-    // "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=60&h=60&fit=crop&crop=center",
+    thumbnail:
+      "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=60&h=60&fit=crop&crop=center",
     on: false,
   },
   {
@@ -268,8 +268,8 @@ const adsSeed = [
     amountSpent: 2.1,
     ends: "Ongoing",
     resultType: "Website lead",
-    // thumbnail:
-    // "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=60&h=60&fit=crop&crop=center",
+    thumbnail:
+      "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=60&h=60&fit=crop&crop=center",
     on: false,
   },
 ];
@@ -311,20 +311,47 @@ export default function CampaignTable({
 
   const toggleSelect = (id) => {
     const exists = selectedIds.includes(id);
-    onSelectionChange(
-      exists ? selectedIds.filter((x) => x !== id) : [...selectedIds, id]
-    );
+    const newIds = exists
+      ? selectedIds.filter((x) => x !== id)
+      : [...selectedIds, id];
+
+    // Find the actual rows that are selected
+    const selectedRows = data.filter((row) => newIds.includes(row.id));
+
+    // Check if ANY selected row has toggle on
+    const anyToggleOn = selectedRows.some((row) => row.on);
+
+    onSelectionChange(newIds, anyToggleOn);
   };
 
   const toggleOn = (id) => {
+    const updateAndNotify = (updateFn) => {
+      updateFn((prev) => {
+        const updated = prev.map((r) =>
+          r.id === id ? { ...r, on: !r.on } : r
+        );
+
+        // After updating, check if any selected rows have toggle on
+        if (selectedIds.length > 0) {
+          const selectedRows = updated.filter((row) =>
+            selectedIds.includes(row.id)
+          );
+          const anyToggleOn = selectedRows.some((row) => row.on);
+
+          // Trigger selection change to update modal state
+          onSelectionChange(selectedIds, anyToggleOn);
+        }
+
+        return updated;
+      });
+    };
+
     if (query.activeTab === "campaigns") {
-      setCampaigns(
-        campaigns.map((r) => (r.id === id ? { ...r, on: !r.on } : r))
-      );
+      updateAndNotify(setCampaigns);
     } else if (query.activeTab === "adsets") {
-      setAdsets(adsets.map((r) => (r.id === id ? { ...r, on: !r.on } : r)));
+      updateAndNotify(setAdsets);
     } else if (query.activeTab === "ads") {
-      setAds(ads.map((r) => (r.id === id ? { ...r, on: !r.on } : r)));
+      updateAndNotify(setAds);
     }
   };
 
@@ -622,9 +649,34 @@ export default function CampaignTable({
                 <div className="w-12 px-3 py-2 flex items-center justify-center  border-r  border-table-border border-gray-200">
                   <input
                     type="checkbox"
-                    className="rounded border-fb-gray-300 "
+                    className="rounded border-fb-gray-300"
                     checked={selectedIds.includes(item.id)}
-                    onChange={() => toggleSelect(item.id)}
+                    onChange={() => {
+                      const exists = selectedIds.includes(item.id);
+                      const newIds = exists
+                        ? selectedIds.filter((x) => x !== item.id)
+                        : [...selectedIds, item.id];
+
+                      // Find the actual rows that are selected
+                      const selectedRows = data.filter((row) =>
+                        newIds.includes(row.id)
+                      );
+
+                      // Check if ANY selected row has toggle on
+                      const anyToggleOn = selectedRows.some((row) => row.on);
+
+                      // console.log("Selection Debug:", {
+                      //   newIds,
+                      //   selectedRows: selectedRows.map((r) => ({
+                      //     id: r.id,
+                      //     name: r.name,
+                      //     on: r.on,
+                      //   })),
+                      //   anyToggleOn,
+                      // });
+
+                      onSelectionChange(newIds, anyToggleOn);
+                    }}
                   />
                 </div>
                 <div className="w-16 px-3 py-2 flex items-center  border-r  border-table-border border-gray-200 ">

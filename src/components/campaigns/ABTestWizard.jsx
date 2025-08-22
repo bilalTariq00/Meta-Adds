@@ -6,6 +6,7 @@ import {
   ChevronDown,
   Calendar,
   Info,
+  Blocks,
 } from "lucide-react";
 
 const ABTestWizard = ({ open = true, onClose = () => {} }) => {
@@ -116,36 +117,44 @@ const ABTestWizard = ({ open = true, onClose = () => {} }) => {
       case 1:
         return (
           <>
-            <div className="px-6 py-4 border-b bg-gray-50"></div>
-            <div className="p-8">
+            <div className="">
               {/* Hero illustration placeholder */}
-              <div className="w-full h-32 bg-gradient-to-r from-pink-100 via-blue-100 to-cyan-100 rounded-lg mb-8 flex items-center justify-center relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-pink-200/50 via-blue-200/50 to-cyan-200/50"></div>
-                <div className="relative text-4xl">📊 🧪 📈</div>
-              </div>
+              <div className="relative z-10 w-full h-full bg-gradient-to-r from-pink-100 via-blue-100 to-cyan-100 rounded-lg mb-8 flex items-center justify-center overflow-hidden">
+                <img
+                  src="/images/campaigns/ABTest1.png"
+                  className="w-full h-full object-cover rounded-lg"
+                />
 
-              <div className="text-center">
-                <h2 className="text-2xl font-semibold mb-3 text-gray-900">
+                {/* Close Button */}
+                <button
+                  onClick={close}
+                  className="absolute top-9 right-3  hover:bg-white rounded-full p-1  z-20"
+                >
+                  <X className="w-5 h-5 text-gray-700" />
+                </button>
+              </div>
+              <div className="text-center p-8">
+                <h2 className="text-lg font-semibold mb-3 text-gray-900">
                   Help improve ad performance with A/B testing
                 </h2>
-                <p className="text-gray-600 mb-8 max-w-2xl mx-auto">
+                <p className="text-gray-600 mb-8 text-sm max-w-2xl mx-auto">
                   Compare versions with different images, text, audiences or
                   other settings to see what works best. We'll make sure that
                   nobody sees more than one version for better accuracy.
                 </p>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-left px-36">
                   <div className="flex items-start gap-4">
-                    <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 mt-1">
-                      <span className="text-blue-600 font-semibold text-sm">
+                    <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 mt-1">
+                      <span className="text-blue-600 font-semibold text-xs">
                         1
                       </span>
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-900 mb-2">
+                      <h3 className="font-semibold text-gray-900 text-sm mb-2">
                         Choose what to test
                       </h3>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-xs text-gray-600">
                         You can copy an existing campaign or ad set or compare
                         published ones.
                       </p>
@@ -153,16 +162,16 @@ const ABTestWizard = ({ open = true, onClose = () => {} }) => {
                   </div>
 
                   <div className="flex items-start gap-4">
-                    <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 mt-1">
-                      <span className="text-blue-600 font-semibold text-sm">
+                    <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 mt-1">
+                      <span className="text-blue-600 font-semibold text-xs">
                         2
                       </span>
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-900 mb-2">
+                      <h3 className="font-semibold text-sm text-gray-900 mb-2">
                         Select test settings
                       </h3>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-xs text-gray-600">
                         This includes duration and key metrics, which are what
                         we'll use to determine a winner.
                       </p>
@@ -170,16 +179,16 @@ const ABTestWizard = ({ open = true, onClose = () => {} }) => {
                   </div>
 
                   <div className="flex items-start gap-4">
-                    <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 mt-1">
-                      <span className="text-blue-600 font-semibold text-sm">
+                    <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 mt-1">
+                      <span className="text-blue-600 font-semibold text-xs">
                         3
                       </span>
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-900 mb-2">
+                      <h3 className="font-semibold text-gray-900 text-sm mb-2">
                         Get results
                       </h3>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-xs text-gray-600">
                         You'll get an email with results. You can also track
                         progress and manage your test by going to{" "}
                         <span className="text-blue-600">Experiments</span>.
@@ -195,25 +204,35 @@ const ABTestWizard = ({ open = true, onClose = () => {} }) => {
       case 2:
         return (
           <>
-            <div className="px-6 py-4 border-b bg-gray-50"></div>
-            <div className="p-8">
+            <div className="">
               {/* Hero illustration */}
-              <div className="w-full h-32 bg-gradient-to-r from-orange-100 via-pink-100 to-purple-100 rounded-lg mb-8 flex items-center justify-center relative overflow-hidden">
-                <div className="relative text-4xl">🎯 📝 🔄</div>
+              <div className="relative z-10 w-full h-full bg-gradient-to-r from-pink-100 via-blue-100 to-cyan-100 rounded-lg mb-8 flex items-center justify-center overflow-hidden">
+                <img
+                  src="/images/campaigns/ABTest2.png"
+                  className="w-full h-full object-cover rounded-lg"
+                />
+
+                {/* Close Button */}
+                <button
+                  onClick={close}
+                  className="absolute top-9 right-3  hover:bg-white rounded-full p-1  z-20"
+                >
+                  <X className="w-5 h-5 text-gray-700" />
+                </button>
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div>
-                  <h2 className="text-xl font-semibold mb-6">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 p-8 divide-x divide-gray-200">
+                <div className="pr-2 col-span-2">
+                  <h2 className="text-lg font-semibold ">
                     Start by setting up an ad to test against the one you
                     selected
                   </h2>
-                  <p className="text-gray-600 mb-6">
+                  <p className="text-gray-600 mb-6 text-sm">
                     You can make a copy of your ad and edit it, or you can pick
                     a second ad to test it against.
                   </p>
 
-                  <div className="space-y-4">
+                  <div className="space-y-4 ">
                     <label className="flex items-center gap-3 cursor-pointer">
                       <input
                         type="radio"
@@ -221,7 +240,7 @@ const ABTestWizard = ({ open = true, onClose = () => {} }) => {
                         defaultChecked
                         className="w-4 h-4 text-blue-600"
                       />
-                      <span className="font-medium">
+                      <span className="font-medium text-sm">
                         Make a copy of this ad
                       </span>
                     </label>
@@ -232,34 +251,36 @@ const ABTestWizard = ({ open = true, onClose = () => {} }) => {
                         name="adChoice"
                         className="w-4 h-4 text-blue-600"
                       />
-                      <span className="font-medium">
+                      <span className="font-medium text-sm">
                         Pick another existing ad
                       </span>
                     </label>
                   </div>
                 </div>
 
-                <div className="space-y-4">
-                  <div className="bg-white rounded-lg border p-4">
+                <div className="space-y-4 col-span-1">
+                  <div className="bg-white rounded-lg shadow p-4">
                     <div className="flex items-center gap-3 mb-2">
-                      <ChevronRight className="w-4 h-4 text-gray-400" />
-                      <span className="text-sm font-medium">Version A</span>
+                      <span className="text-lg font-bold">Version A</span>
                     </div>
                     <div className="flex items-center gap-3">
+                      <ChevronRight className="w-4 h-4 text-gray-400" />
+
+                      <span className="text-sm text-gray-700 flex justify-center items-center gap-1">
+                        <Blocks size={16} />
+                        Auto Insurance Lea...
+                      </span>
                       <div className="w-12 h-12 bg-red-100 rounded overflow-hidden flex-shrink-0">
                         <img
-                          src="/api/placeholder/48/48"
+                          src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=60&h=60&fit=crop&crop=center"
                           alt="Auto Insurance"
                           className="w-full h-full object-cover"
                         />
                       </div>
-                      <span className="text-sm text-gray-700">
-                        Auto Insurance Lea...
-                      </span>
                     </div>
                   </div>
 
-                  <div className="bg-gray-50 rounded-lg border border-dashed p-4">
+                  <div className="bg-gray-50 rounded-lg shadow p-4">
                     <div className="flex items-center gap-3 mb-2">
                       <span className="text-sm font-medium text-gray-500">
                         Version B
@@ -276,18 +297,28 @@ const ABTestWizard = ({ open = true, onClose = () => {} }) => {
       case 3:
         return (
           <>
-            <div className="px-6 py-4 border-b bg-gray-50"></div>
-            <div className="p-8">
-              <div className="w-full h-32 bg-gradient-to-r from-orange-100 via-pink-100 to-purple-100 rounded-lg mb-8 flex items-center justify-center relative overflow-hidden">
-                <div className="relative text-4xl">🔄 👥 📍 ⚙️</div>
+            <div className="">
+              <div className="relative z-10 w-full h-full bg-gradient-to-r from-pink-100 via-blue-100 to-cyan-100 rounded-lg mb-8 flex items-center justify-center overflow-hidden">
+                <img
+                  src="/images/campaigns/ABTest3.png"
+                  className="w-full h-full object-cover rounded-lg"
+                />
+
+                {/* Close Button */}
+                <button
+                  onClick={close}
+                  className="absolute top-9 right-3  hover:bg-white rounded-full p-1  z-20"
+                >
+                  <X className="w-5 h-5 text-gray-700" />
+                </button>
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div>
-                  <h2 className="text-xl font-semibold mb-4">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 p-8 divide-x divide-gray-200">
+                <div className="col-span-2 pr-3">
+                  <h2 className="text-lg font-semibold mb-4">
                     Which variable would you like to test?
                   </h2>
-                  <p className="text-gray-600 mb-6">
+                  <p className="text-gray-600 mb-6 text-sm">
                     Select the variable that will differ for each version.
                     Choose Custom to compare more than one variable at the same
                     time.
@@ -298,18 +329,18 @@ const ABTestWizard = ({ open = true, onClose = () => {} }) => {
                       onClick={() =>
                         setShowVariableDropdown(!showVariableDropdown)
                       }
-                      className="w-full p-3 border border-blue-500 rounded-lg bg-white flex items-center justify-between text-left"
+                      className="w-full p-3 border text-sm border-blue-500 rounded-lg bg-white flex items-center justify-between text-left"
                     >
                       <span>Select a variable to test</span>
                       <ChevronDown className="w-5 h-5" />
                     </button>
 
                     {showVariableDropdown && (
-                      <div className="absolute top-full left-0 right-0 mt-1 bg-white border rounded-lg shadow-lg z-10">
+                      <div className="absolute top-full left-0 right-0 mt-1 bg-white  rounded-lg shadow-lg z-50">
                         {variables.map((variable, index) => (
                           <label
                             key={index}
-                            className="flex items-start gap-3 p-4 hover:bg-gray-50 cursor-pointer border-b last:border-b-0"
+                            className="flex items-start gap-3 p-4 hover:bg-gray-50 cursor-pointer  last:border-b-0"
                           >
                             <input
                               type="radio"
@@ -337,27 +368,29 @@ const ABTestWizard = ({ open = true, onClose = () => {} }) => {
                   </div>
                 </div>
 
-                <div className="space-y-4">
-                  <div className="bg-white rounded-lg border p-4">
+                <div className="space-y-4 col-span-1">
+                  <div className="bg-white rounded-lg shadow p-4">
                     <div className="flex items-center gap-3 mb-2">
-                      <ChevronRight className="w-4 h-4 text-gray-400" />
-                      <span className="text-sm font-medium">Version A</span>
+                      <span className="text-lg font-bold">Version A</span>
                     </div>
                     <div className="flex items-center gap-3">
+                      <ChevronRight className="w-4 h-4 text-gray-400" />
+
+                      <span className="text-sm text-gray-700 flex justify-center items-center gap-1">
+                        <Blocks size={16} />
+                        Auto Insurance Lea...
+                      </span>
                       <div className="w-12 h-12 bg-red-100 rounded overflow-hidden flex-shrink-0">
                         <img
-                          src="/api/placeholder/48/48"
+                          src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=60&h=60&fit=crop&crop=center"
                           alt="Auto Insurance"
                           className="w-full h-full object-cover"
                         />
                       </div>
-                      <span className="text-sm text-gray-700">
-                        Auto Insurance Lea...
-                      </span>
                     </div>
                   </div>
 
-                  <div className="bg-gray-50 rounded-lg border border-dashed p-4">
+                  <div className="bg-gray-50 rounded-lg shadow p-4">
                     <div className="flex items-center gap-3 mb-2">
                       <span className="text-sm font-medium text-gray-500">
                         Version B
@@ -374,24 +407,34 @@ const ABTestWizard = ({ open = true, onClose = () => {} }) => {
       case 4:
         return (
           <>
-            <div className="px-6 py-4 border-b bg-gray-50"></div>
-            <div className="p-8">
-              <div className="w-full h-32 bg-gradient-to-r from-orange-100 via-pink-100 to-purple-100 rounded-lg mb-8 flex items-center justify-center relative overflow-hidden">
-                <div className="relative text-4xl">🔄 👥 📍 ⚙️</div>
+            <div className="">
+              <div className="relative z-10 w-full h-full bg-gradient-to-r from-pink-100 via-blue-100 to-cyan-100 rounded-lg mb-8 flex items-center justify-center overflow-hidden">
+                <img
+                  src="/images/campaigns/ABTest4.png"
+                  className="w-full h-full object-cover rounded-lg"
+                />
+
+                {/* Close Button */}
+                <button
+                  onClick={close}
+                  className="absolute top-9 right-3  hover:bg-white rounded-full p-1  z-20"
+                >
+                  <X className="w-5 h-5 text-gray-700" />
+                </button>
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div>
-                  <h2 className="text-xl font-semibold mb-4">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 p-8 divide-x divide-gray-200   ">
+                <div className="col-span-2 pr-3">
+                  <h2 className="text-lg font-semibold mb-4">
                     Which variable would you like to test?
                   </h2>
-                  <p className="text-gray-600 mb-6">
+                  <p className="text-gray-600 mb-6 text-sm">
                     Select the variable that will differ for each version.
                     Choose Custom to compare more than one variable at the same
                     time.
                   </p>
 
-                  <div className="space-y-4">
+                  <div className="space-y-4 text-sm">
                     <div className="relative">
                       <button
                         onClick={() =>
@@ -504,47 +547,63 @@ const ABTestWizard = ({ open = true, onClose = () => {} }) => {
                   </div>
                 </div>
 
-                <div className="space-y-4">
-                  <div className="bg-white rounded-lg border p-4">
-                    <div className="flex items-center gap-3 mb-2">
-                      <ChevronRight className="w-4 h-4 text-gray-400" />
-                      <span className="text-sm font-medium">Version A</span>
-                    </div>
-                    <div className="flex items-center gap-3">
+                <div className="space-y-4 col-span-1">
+                  <div className="bg-white rounded-lg shadow p-4">
+                    <div className="flex flex-row justify-between">
+                      <div className="flex items-start flex-col gap-1 mb-2">
+                        <span className="text-lg font-bold">Version A</span>
+                      </div>
                       <div className="w-12 h-12 bg-red-100 rounded overflow-hidden flex-shrink-0">
                         <img
-                          src="/api/placeholder/48/48"
+                          src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=60&h=60&fit=crop&crop=center"
                           alt="Auto Insurance"
                           className="w-full h-full object-cover"
                         />
                       </div>
-                      <span className="text-sm text-gray-700">
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <ChevronRight className="w-4 h-4 text-gray-400" />
+
+                      <span className="text-sm text-gray-700 flex justify-center items-center gap-1">
+                        <Blocks size={16} />
                         Auto Insurance Lea...
                       </span>
+                      {/* <div className="w-12 h-12 bg-red-100 rounded overflow-hidden flex-shrink-0">
+                        <img
+                          src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=60&h=60&fit=crop&crop=center"
+                          alt="Auto Insurance"
+                          className="w-full h-full object-cover"
+                        />
+                      </div> */}
                     </div>
                   </div>
 
-                  <div className="bg-white rounded-lg border p-4">
-                    <div className="flex items-center gap-3 mb-2">
-                      <span className="text-sm font-medium text-gray-700">
-                        Version B
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-3 mb-3">
+                  <div className="bg-white rounded-lg shadow p-4">
+                    <div className="flex flex-row justify-between">
+                      <div className="flex items-start flex-col gap-1 mb-2">
+                        <span className="text-lg font-bold">Version B</span>
+                        <p className="text-gray-300">Copy of version A</p>
+                      </div>
                       <div className="w-12 h-12 bg-red-100 rounded overflow-hidden flex-shrink-0">
                         <img
-                          src="/api/placeholder/48/48"
+                          src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=60&h=60&fit=crop&crop=center"
                           alt="Auto Insurance"
                           className="w-full h-full object-cover"
                         />
                       </div>
-                      <span className="text-sm font-medium">
-                        Copy of version A
-                      </span>
                     </div>
-                    <div className="text-sm text-gray-600">
-                      You can change the creative after you've finished setting
-                      up the test in the next step.
+                    <div className="flex items-center gap-3">
+                      <ChevronRight className="w-4 h-4 text-gray-400" />
+                      <div className="flex flex-col justify-center items-start">
+                        <span className="text-sm text-gray-700 flex justify-center items-center gap-1">
+                          <Blocks size={16} />
+                          Auto Insurance Lea...
+                        </span>
+                        <p className="text-xs">
+                          You can change the creative after you've finished
+                          setting up the test in the next step
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -859,17 +918,19 @@ const ABTestWizard = ({ open = true, onClose = () => {} }) => {
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg shadow-lg w-full max-w-5xl max-h-[90vh] overflow-y-auto">
         {/* Header with close button */}
-        <div className="flex justify-between items-center p-4 border-b">
-          <h2 className="text-lg font-semibold">A/B Test Wizard</h2>
-          <button onClick={close}>
-            <X className="w-5 h-5 text-gray-500 hover:text-gray-700" />
-          </button>
+        <div className="flex justify-end items-center px-4 mb-[-30px] z-50 ">
+          {/* <button
+            onClick={close}
+            className="absolute top-3 right-3 bg-white/70 hover:bg-white rounded-full p-1 shadow z-20"
+          >
+            <X className="w-5 h-5 text-gray-700" />
+          </button> */}
         </div>
 
         {renderStep()}
 
         {/* Footer navigation */}
-        <div className="flex justify-between items-center p-4 border-t">
+        <div className="flex justify-between items-center p-4">
           <button
             onClick={prev}
             disabled={step === 1}

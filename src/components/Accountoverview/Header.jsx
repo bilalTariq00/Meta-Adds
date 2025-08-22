@@ -15,9 +15,16 @@ import {
   Search,
   X,
   Lightbulb,
+  Delete,
+  DeleteIcon,
+  LucideDelete,
+  Trash,
+  Trash2,
 } from "lucide-react";
 import DetailedTooltip from "../DetailedTooltip";
 import userInfo from "@/assets/icons/userOverview.png";
+import ReviewDraftModal from "./ReviewDraftModal";
+import DiscardDraftsModal from "../campaigns/dialoges/DiscardDraftsModal";
 
 export default function Header() {
   const location = useLocation(); // Get current location from React Router
@@ -41,6 +48,8 @@ export default function Header() {
   const [showUnsavedChangesModal, setShowUnsavedChangesModal] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(true);
   const [reportName, setReportName] = useState("Untitled");
+  const [showReviewDraftModal, setShowReviewDraftModal] = useState(false);
+  const [showDiscardModal, setShowDiscardModal] = useState(false);
   // Remove the hardcoded currentPath state:
   // const [currentPath, setCurrentPath] = useState("/campaigns"); // DELETE THIS LINE
 
@@ -145,6 +154,12 @@ export default function Header() {
         !unsavedChangesModalRef.current.contains(event.target)
       ) {
         setShowUnsavedChangesModal(false);
+      }
+      if (
+        showReviewDraftModal &&
+        event.target.closest(".review-draft-modal") === null
+      ) {
+        setShowReviewDraftModal(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -289,7 +304,7 @@ export default function Header() {
                   <ChevronDown size={16} className="text-gray-600" />
                 </button>
                 {showAccountDropdown && (
-                  <div className="absolute top-full left-0 mt-2 w-[680px] bg-white border border-gray-200 rounded-xl shadow-lg z-50">
+                  <div className="absolute top-full left-0 mt-2 w-[680px] bg-white border border-gray-200 rounded-xl shadow-lg z-30">
                     <div className="mb-1 p-3">
                       <div className="relative">
                         <Search
@@ -655,7 +670,17 @@ export default function Header() {
               <button className="flex items-center gap-2 px-3 py-2 text-sm text-gray-500 border border-gray-300 rounded-sm hover:bg-gray-50 transition-colors cursor-not-allowed">
                 <RefreshCw size={18} />
               </button>
-              <button className="px-4 py-2 text-sm  text-gray-500 border border-gray-300 rounded-sm hover:bg-gray-50 transition-colors cursor-not-allowed">
+              <button
+                onClick={() => setShowDiscardModal(true)}
+                className="flex items-center gap-2 px-3 py-2 text-sm text-gray-500 border border-gray-300 rounded-sm hover:bg-gray-50 transition-colors"
+              >
+                {" "}
+                <Trash2 size={18} /> Discard Drafts
+              </button>
+              <button
+                onClick={() => setShowReviewDraftModal(true)}
+                className="px-4 py-2 text-sm text-white bg-[#0A78BE] border border-[#0A78BE] rounded-sm hover:bg-[#4f8ab4] transition-colors"
+              >
                 Review and Publish
               </button>
             </>
@@ -1083,7 +1108,17 @@ export default function Header() {
           </div>
         </div>
       )}
+      <ReviewDraftModal
+        isOpen={showReviewDraftModal}
+        onClose={() => setShowReviewDraftModal(false)}
+      />
 
+      <DiscardDraftsModal
+        isOpen={showDiscardModal}
+        onClose={() => setShowDiscardModal(false)}
+        accountName="Adkin Digital"
+        accountId="1263790274765251"
+      />
       {showOpportunityInfoModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div

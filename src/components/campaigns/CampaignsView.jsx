@@ -13,6 +13,7 @@ import SaveEditsPanel from "./SaveEditsPanel";
 import TabsAndDatePicker from "./TabsAndDatePicker";
 import { CreateCampaignModal } from "../Accountoverview/create-campaign-modal";
 import DuplicateModal from "./DuplicateModel";
+import DynamicDuplicateModal from "./dialoges/DynamicDuplicateModal";
 
 // Dummy API helpers
 const wait = (ms) => new Promise((res) => setTimeout(res, ms));
@@ -60,16 +61,23 @@ export default function CampaignsView() {
   const [selection, setSelection] = useState([]); // selected row IDs
   const [selectedTab, setSelectedTab] = useState(null); // which tab the selection belongs to
   const [showDropdown, setShowDropdown] = useState(false);
+  const [selectionHasToggleOn, setSelectionHasToggleOn] = useState(false);
   // Derived filter state connected to search bar in toolbar
   const tableQuery = useMemo(
     () => ({ search, filters, activeTab }),
     [search, filters, activeTab]
   );
 
-  // Handle selection change and track which tab it belongs to
-  const handleSelectionChange = (newSelection) => {
+  const handleSelectionChange = (newSelection, hasToggleOn = false) => {
+    console.log("CampaignsView Selection Change:", {
+      newSelection,
+      hasToggleOn,
+      selectionLength: newSelection.length,
+    });
+
     setSelection(newSelection);
     setSelectedTab(newSelection.length > 0 ? activeTab : null);
+    setSelectionHasToggleOn(hasToggleOn);
   };
 
   // Actions
@@ -183,16 +191,24 @@ export default function CampaignsView() {
         onClose={() => setShowDelete(false)}
         onConfirm={handleDelete}
       />
-      <DuplicateModal
-        open={open}
-        onClose={() => setOpen(false)}
-        onDuplicate={() => {
-          console.log("Duplicating...");
-          setOpen(false);
-        }}
-        applyRecommendation={applyRecommendation}
-        setApplyRecommendation={setApplyRecommendation}
-      />
+      {selectionHasToggleOn ? (
+        <DynamicDuplicateModal
+          open={open}
+          onClose={() => setOpen(false)}
+          onDuplicate={handleDuplicate}
+          activeTab={activeTab}
+          applyRecommendation={applyRecommendation}
+          setApplyRecommendation={setApplyRecommendation}
+        />
+      ) : (
+        <DuplicateModal
+          open={open}
+          onClose={() => setOpen(false)}
+          onDuplicate={handleDuplicate}
+          applyRecommendation={applyRecommendation}
+          setApplyRecommendation={setApplyRecommendation}
+        />
+      )}
     </div>
   );
 }
