@@ -107,7 +107,7 @@ export default function Toolbar({
     }`}
           >
             <Copy className="w-4 h-4" />
-            Duplicate
+            {!compactActions && "Duplicate"}
           </button>
 
           {/* Chevron Button */}
@@ -132,7 +132,7 @@ export default function Toolbar({
             className="px-3 py-1.75 bg-white hover:bg-gray-50 text-gray-700 text-sm font-medium flex items-center gap-1.5 transition-colors"
           >
             <Pencil className="w-4 h-4" />
-            Edit
+            {!compactActions && "Edit"}
           </button>
 
           {/* Chevron Button */}
@@ -156,7 +156,7 @@ export default function Toolbar({
           className="px-3 py-1.5 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-md text-sm font-medium flex items-center gap-1.5 transition-colors"
         >
           <FlaskConical className="w-4 h-4" />
-          A/B test
+          {!compactActions && " A/B test"}
         </button>
 
         {/* More dropdown */}
@@ -211,7 +211,8 @@ export default function Toolbar({
         <ColumnPresetsDropdown>
           <button className="px-3 py-1.5 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-md text-sm font-medium flex items-center gap-1.5 transition-colors">
             <Columns className="w-4 h-4" />
-            Columns: Performance
+
+            {!compactActions && "Columns: Performance"}
             <ChevronDown className="w-4 h-4 text-gray-500" />
           </button>
         </ColumnPresetsDropdown>
@@ -219,7 +220,7 @@ export default function Toolbar({
         <BreakdownsDropdown>
           <button className="px-3 py-1.5 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-md text-sm font-medium flex items-center gap-1.5 transition-colors">
             <Grid2X2 className="w-4 h-4" />
-            Breakdown
+            {!compactActions && "Breakdown"}
             <ChevronDown className="w-4 h-4 text-gray-500" />
           </button>
         </BreakdownsDropdown>

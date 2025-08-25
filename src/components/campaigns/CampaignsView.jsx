@@ -125,29 +125,33 @@ export default function CampaignsView() {
       />
 
       {/* Inner card holding controls + table */}
-      <div className="  bg-white rounded-xl shadow-sm p-3 flex-1 min-h-0 flex flex-col">
-        <Toolbar
-          search={search}
-          setSearch={setSearch}
-          filters={filters}
-          setFilters={setFilters}
-          activeTab={activeTab}
-          setActiveTab={setActiveTab}
-          selectedCount={selection.length}
-          compactActions={showSavePanel}
-          onCreate={() => setShowCreate(true)}
-          onShowSplit={() => setShowSplitAudience(true)}
-          onDuplicate={() => setOpen(true)}
-          onEdit={() => {}}
-          onDelete={() => setShowDelete(true)}
-          onRevert={handleRevert}
-          onABTest={() => setShowABTest(true)}
-          onRules={() => setShowRules(true)}
-          onToggleCharts={handleToggleCharts}
-        />
+      <div className="   flex flex-col">
+        <div className="flex-1 min-h-0 flex gap-2  ">
+          <div
+            className={`flex-1 min-w-0 bg-white  shadow-sm p-3 ${
+              showSavePanel ? "pr-0 rounded-l-xl" : "pr-0 rounded-xl"
+            }`}
+          >
+            <Toolbar
+              search={search}
+              setSearch={setSearch}
+              filters={filters}
+              setFilters={setFilters}
+              activeTab={activeTab}
+              setActiveTab={setActiveTab}
+              selectedCount={selection.length}
+              compactActions={showSavePanel}
+              onCreate={() => setShowCreate(true)}
+              onShowSplit={() => setShowSplitAudience(true)}
+              onDuplicate={() => setOpen(true)}
+              onEdit={() => {}}
+              onDelete={() => setShowDelete(true)}
+              onRevert={handleRevert}
+              onABTest={() => setShowABTest(true)}
+              onRules={() => setShowRules(true)}
+              onToggleCharts={handleToggleCharts}
+            />
 
-        <div className="flex-1 min-h-0 flex">
-          <div className={`flex-1 min-w-0 ${showSavePanel ? "pr-0" : "pr-0"}`}>
             <CampaignTable
               query={tableQuery}
               selectedIds={selection}
