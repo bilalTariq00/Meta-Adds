@@ -3,12 +3,61 @@
 import { useState } from "react";
 import { X, Trash2, Settings, ChevronDown, Plus } from "lucide-react";
 import ColumnPreferencesDropdown from "@/components/campaigns/column-preferences-dropdown";
+import ColumnPreferencesModal from "./dialoges/column-preferences-modal";
+import SortingDropdown from "./dropdowns/SortingDropdown";
+import BreakdownDropdown from "./dropdowns/BreakDownDropdown";
+import AttributionModal from "./dialoges/AttributionModal";
 
 export default function SaveEditsPanel({ open, onClose }) {
   const [name, setName] = useState("Active ads");
   const [description, setDescription] = useState("");
   const [dopen, setdOpen] = useState(false);
   const [value, setValue] = useState("only-you");
+  const [showCustomiseModal, setShowCustomiseModal] = useState(false);
+  const [selectedSort, setSelectedSort] = useState("delivery");
+  const [sortDirection, setSortDirection] = useState("asc");
+  const [selections, setSelections] = useState([]);
+  const [showAttributionModal, setShowAttributionModal] = useState(false);
+
+  // Attribution settings state
+  const [attributionSettings, setAttributionSettings] = useState({
+    window: "7_day_click_1_day_view",
+    model: "last_click",
+  });
+
+  // SKAdNetwork settings state
+  const [skAdNetworkSettings, setSkAdNetworkSettings] = useState({
+    enabled: false,
+  });
+
+  // Expanded state for advanced settings
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  // Attribution change handler
+  const handleAttributionChange = (key, value) => {
+    setAttributionSettings((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
+  };
+
+  // SKAdNetwork change handler
+  const handleSKAdNetworkChange = (key, value) => {
+    setSkAdNetworkSettings((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
+  };
+
+  const handleSelectionChange = (newSelections) => {
+    setSelections(newSelections);
+    console.log("Selected breakdowns:", newSelections);
+  };
+
+  const [selectedColumns, setSelectedColumns] = useState([
+    "performance",
+    "reach",
+  ]); // initial columns
   const [selectedColumnPreset, setSelectedColumnPreset] =
     useState("performance");
 
@@ -28,8 +77,22 @@ export default function SaveEditsPanel({ open, onClose }) {
     },
   ];
 
+  // Sample data based on your image
+  const sortingOptions = [
+    { value: "off_on", label: "Off/On" },
+    { value: "name", label: "Name" },
+    { value: "delivery", label: "Delivery" },
+    { value: "delivery_status", label: "Delivery status" },
+    { value: "budget", label: "Budget" },
+    { value: "results", label: "Results" },
+    { value: "reach", label: "Reach" },
+    { value: "impressions", label: "Impressions" },
+    { value: "cost_per_result", label: "Cost per result" },
+    { value: "amount_spent", label: "Amount spent" },
+    { value: "ends", label: "Ends" },
+  ];
   return (
-    <div className="w-[380px] bg-white border-l border-gray-200 h-full flex flex-col shrink-0 max-h-[57vh] overflow-y-auto">
+    <div className="w-[380px] bg-white border-l border-gray-200 h-full flex flex-col shrink-0 max-h-[57vh] overflow-y-auto overflow-x-visible">
       <div className="p-3 border-b border-gray-300 flex items-center justify-between">
         <div className="font-semibold">Save edits</div>
         <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded">
@@ -37,7 +100,7 @@ export default function SaveEditsPanel({ open, onClose }) {
         </button>
       </div>
 
-      <div className="p-4 space-y-4 overflow-auto">
+      <div className="p-4 space-y-4 overflow-auto overflow-x-visible">
         {/* Name */}
         <div>
           <label className="block text-sm font-medium mb-1">Name</label>
@@ -94,7 +157,7 @@ export default function SaveEditsPanel({ open, onClose }) {
           </button>
 
           {dopen && (
-            <div className="mt-3 w-full border border-gray-200 rounded-md shadow-2xl p-2 bg-white absolute">
+            <div className="mt-3 w-full border border-gray-200 rounded-md shadow-2xl p-2 bg-white absolute z-50">
               {options.map((opt) => (
                 <div
                   key={opt.id}
@@ -143,30 +206,38 @@ export default function SaveEditsPanel({ open, onClose }) {
                 placeholder="Columns: Performance"
               />
             </div>
-            <button className="p-2 border rounded">
+            <button
+              onClick={() => setShowCustomiseModal(true)}
+              className="p-2 border rounded border-gray-400 "
+            >
               <Settings className="w-4 h-4" />
             </button>
           </div>
-          <div className="flex items-center gap-2">
-            <select className="flex-1 border rounded px-3 py-2 text-sm">
-              <option>Sorting: Delivery</option>
-            </select>
-            <button className="p-2 border rounded">↑</button>
-          </div>
+          <SortingDropdown
+            options={sortingOptions}
+            value={selectedSort}
+            onChange={setSelectedSort}
+            sortDirection={sortDirection}
+            onSortDirectionChange={setSortDirection}
+            className="max-w-md"
+          />
         </div>
 
         {/* Breakdowns */}
-        <div>
-          <div className="text-sm font-semibold mb-1">Breakdowns</div>
-          <select className="w-full border rounded px-3 py-2 text-sm">
-            <option>Breakdowns: None selected</option>
-          </select>
-        </div>
+        <BreakdownDropdown
+          onSelectionChange={handleSelectionChange}
+          placeholder="Breakdowns: None selected"
+        />
 
         {/* Attribution settings */}
         <div>
-          <div className="text-sm font-semibold mb-1">Attribution settings</div>
-          <button className="text-sm text-blue-600 hover:underline">
+          <div className="text-sm font-semibold mb-1 ">
+            Attribution settings
+          </div>
+          <button
+            className="text-sm  bg-gray-100 p-2 rounded-md cursor-pointer"
+            onClick={() => setShowAttributionModal(true)}
+          >
             + Add comparison
           </button>
         </div>
@@ -184,6 +255,22 @@ export default function SaveEditsPanel({ open, onClose }) {
           Save edits
         </button>
       </div>
+      <ColumnPreferencesModal
+        open={showCustomiseModal}
+        onClose={() => setShowCustomiseModal(false)}
+        selectedColumns={selectedColumns}
+        onColumnsChange={setSelectedColumns}
+      />
+      <AttributionModal
+        show={showAttributionModal}
+        onClose={() => setShowAttributionModal(false)}
+        attributionSettings={attributionSettings}
+        handleAttributionChange={handleAttributionChange}
+        skAdNetworkSettings={skAdNetworkSettings}
+        handleSKAdNetworkChange={handleSKAdNetworkChange}
+        isExpanded={isExpanded}
+        toggleExpanded={() => setIsExpanded((prev) => !prev)}
+      />
     </div>
   );
 }
