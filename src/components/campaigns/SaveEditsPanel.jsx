@@ -224,6 +224,7 @@ export default function SaveEditsPanel({ open, onClose }) {
         </div>
 
         {/* Breakdowns */}
+        <h1 className="text-sm font-bold ">Breakdown</h1>
         <BreakdownDropdown
           onSelectionChange={handleSelectionChange}
           placeholder="Breakdowns: None selected"

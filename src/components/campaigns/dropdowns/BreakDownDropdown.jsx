@@ -1,6 +1,13 @@
 import React, { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { ChevronRight, Check, Search } from "lucide-react";
+import {
+  ChevronRight,
+  Check,
+  Search,
+  Grid2X2,
+  ChevronDown,
+  ChevronUp,
+} from "lucide-react";
 import {
   useFloating,
   offset,
@@ -10,8 +17,11 @@ import {
 } from "@floating-ui/react";
 
 const BreakdownDropdown = ({
+  compactActions = false,
   onSelectionChange,
   placeholder = "Breakdowns: None selected",
+  children, // Add children prop to support wrapper pattern
+  chartOpen = false,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedBreakdowns, setSelectedBreakdowns] = useState(["platform"]); // Pre-select platform
@@ -158,6 +168,10 @@ const BreakdownDropdown = ({
 
   const getDisplayText = () => {
     const count = getSelectedCount();
+    if (compactActions || chartOpen) {
+      // For compact mode, just show the count badge if there are selections
+      return null; // We'll handle the display in the JSX
+    }
     if (count === 0) return placeholder;
     if (count === 1) return `Breakdown: ${count} selected`;
     return `Breakdowns: ${count} selected`;
@@ -249,10 +263,13 @@ const BreakdownDropdown = ({
 
   return (
     <div className="relative w-full" ref={dropdownRef}>
-      <div className="text-sm font-semibold mb-1">Breakdowns</div>
+      {/* Only show label if not compact */}
+      {/* {!compactActions && (
+        <div className="text-sm font-semibold mb-1">Breakdowns</div>
+      )} */}
 
-      {/* Selected badges */}
-      {selectedBreakdowns.length > 0 && (
+      {/* Selected badges - only show if not compact or if there are selections */}
+      {/* {selectedBreakdowns.length > 0 && !compactActions && (
         <div className="flex flex-wrap gap-2 mb-2">
           {selectedBreakdowns.map((breakdown) => (
             <span
@@ -264,26 +281,55 @@ const BreakdownDropdown = ({
             </span>
           ))}
         </div>
-      )}
+      )} */}
 
-      {/* Main dropdown trigger */}
-      <button
-        ref={triggerRef}
-        onClick={() => setIsOpen(!isOpen)}
-        className="w-full border border-gray-300 rounded px-3 py-2 text-sm text-left bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 flex items-center justify-between"
-      >
-        <span className="text-gray-700">{getDisplayText()}</span>
-        <ChevronRight
-          className={`w-4 h-4 text-gray-400 transition-transform ${
-            isOpen ? "rotate-90" : ""
+      {/* Main dropdown trigger - use children if provided, otherwise render default */}
+      {children ? (
+        <div ref={triggerRef} onClick={() => setIsOpen(!isOpen)}>
+          {children}
+        </div>
+      ) : (
+        <button
+          ref={triggerRef}
+          onClick={() => setIsOpen(!isOpen)}
+          className={`w-full text-sm text-left transition-colors flex items-center justify-between ${
+            compactActions || chartOpen
+              ? "px-2 py-1.5 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-md font-medium gap-1.5"
+              : "border border-gray-300 rounded px-3 py-1.5 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           }`}
-        />
-      </button>
+        >
+          <div className="flex items-center ">
+            <>
+              <Grid2X2 className="w-4 h-4" />
+            </>
+
+            <span className="text-gray-700">{getDisplayText()}</span>
+            {/* {getSelectedCount() > 0 && (compactActions || chartOpen) && (
+              <span className="bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded-full text-xs font-medium min-w-[18px] text-center">
+                {getSelectedCount()}
+              </span>
+            )} */}
+          </div>
+          {compactActions || chartOpen ? (
+            <ChevronDown
+              className={`w-4 h-4 text-gray-400 transition-transform ${
+                isOpen ? "rotate-180" : ""
+              }`}
+            />
+          ) : (
+            <ChevronDown
+              className={`w-4 h-4 text-gray-400 transition-transform ${
+                isOpen ? "rotate-180" : ""
+              }`}
+            />
+          )}
+        </button>
+      )}
 
       {/* Main dropdown menu */}
       {isOpen && (
         <div
-          className={`${dropdownClasses} bg-white border border-gray-300 rounded-md shadow-lg z-40 max-h-96 overflow-y-auto`}
+          className={`${dropdownClasses} bg-white border border-gray-300 rounded-md shadow-lg z-40 max-h-96 overflow-y-auto min-w-80`}
         >
           {/* Search bar */}
           <div className="p-3 border-b border-gray-200">

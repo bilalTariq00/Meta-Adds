@@ -9,6 +9,7 @@ import {
   X,
   Search,
   ChevronUp,
+  Columns,
 } from "lucide-react";
 import ColumnPreferencesModal from "./dialoges/column-preferences-modal";
 import AttributionModal from "./dialoges/AttributionModal";
@@ -18,6 +19,8 @@ export default function ColumnPreferencesDropdown({
   onChange,
   className = "",
   placeholder = "Columns: Performance",
+  compactActions = false,
+  chartOpen = false,
 }) {
   const [colopen, setcolOpen] = useState(false);
   const [panel, setPanel] = useState("main"); // main | discover | presets
@@ -247,13 +250,26 @@ export default function ColumnPreferencesDropdown({
   return (
     <div className={`relative ${className}`}>
       {/* Trigger */}
+      {/* Trigger */}
       <button
         ref={triggerRef}
         onClick={() => setcolOpen(!colopen)}
-        className="w-full flex justify-between items-center border border-gray-300 rounded px-3 py-2 text-sm bg-white hover:bg-gray-50"
+        className="px-3 py-1.5 bg-white border border-gray-300 hover:bg-gray-50 w-full max-w-76
+           text-gray-700 rounded-md text-sm font-medium flex items-center justify-between gap-1.5 transition-colors whitespace-nowrap"
       >
-        {placeholder.replace("Performance", getSelectedLabel())}
-        <ChevronDown className="w-4 h-4 text-gray-500" />
+        <div className="flex items-center gap-1">
+          <Columns className="w-4 h-4" />
+          {!compactActions &&
+            !chartOpen &&
+            (!placeholder
+              ? ""
+              : placeholder.replace("Performance", getSelectedLabel()))}
+        </div>
+        <ChevronDown
+          className={`w-4 h-4 text-gray-400 transition-transform ${
+            colopen ? "rotate-180" : ""
+          }`}
+        />
       </button>
 
       {/* Dropdown */}
@@ -262,7 +278,7 @@ export default function ColumnPreferencesDropdown({
           ref={dropdownRef}
           className={`absolute ${
             dropdownPosition === "top" ? "bottom-full mb-1" : "top-full mt-1"
-          } left-0 w-full border border-gray-300 rounded-md shadow-lg bg-white z-50 max-h-85 overflow-y-auto`}
+          } left-0 w-80 border border-gray-300 rounded-md shadow-lg bg-white z-50 max-h-[400px] overflow-y-auto`}
         >
           {/* MAIN PANEL */}
           {panel === "main" && (

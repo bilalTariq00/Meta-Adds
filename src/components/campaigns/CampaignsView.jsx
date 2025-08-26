@@ -141,6 +141,7 @@ export default function CampaignsView() {
               setActiveTab={setActiveTab}
               selectedCount={selection.length}
               compactActions={showSavePanel}
+              ChartOpen={showCharts}
               onCreate={() => setShowCreate(true)}
               onShowSplit={() => setShowSplitAudience(true)}
               onDuplicate={() => setOpen(true)}
@@ -164,11 +165,14 @@ export default function CampaignsView() {
               onClose={() => setShowSavePanel(false)}
             />
           )}
+          <ChartsSidebar
+            open={showCharts}
+            onClose={() => setShowCharts(false)}
+          />
         </div>
       </div>
 
       {/* Right Charts Sidebar */}
-      <ChartsSidebar open={showCharts} onClose={() => setShowCharts(false)} />
 
       {/* Modals */}
       {/* <CreateCampaignModal
