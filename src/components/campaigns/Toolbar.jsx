@@ -13,7 +13,6 @@ import {
 } from "lucide-react";
 import { ExternalLink, FileDown, Upload, Eye, Settings } from "lucide-react";
 import AdsReportingDropdown from "./dropdowns/AdsReportingDropdown";
-import ExportDropdown from "./dropdowns/ExportDropdown";
 import DuplicateDropdown from "./dropdowns/duplicatedDropdown";
 import EditDropdown from "./dropdowns/EditDropDown";
 import ColumnPreferencesDropdown from "./column-preferences-dropdown";
@@ -24,6 +23,11 @@ import CreateRuleModal from "./dialoges/CreateRuleModal";
 import ApplyRuleModal from "./dialoges/ApplyRuleModal";
 import ActiveRulesModal from "./dialoges/ActiveRulesModal";
 import EditRuleModal from "./dialoges/EditRuleModal";
+import ImportAdsModal from "./dialoges/import-ads-modal";
+import ExportAllAdsModal from "./dialoges/export-all-ads-modal";
+import ExportAdModal from "./dialoges/export-ad-modal";
+import CustomiseColumnsModal from "./dialoges/customise-columns-modal";
+import ExportPopup from "./dropdowns/export-popup";
 import { Flag as Flask } from "lucide-react"; // Import Flask for onABTest
 
 const categoriesList = [
@@ -60,18 +64,26 @@ export default function Toolbar({
   const [showActiveRulesModal, setShowActiveRulesModal] = useState(false);
   const [showEditRuleModal, setShowEditRuleModal] = useState(false);
   const [selectedRuleForEdit, setSelectedRuleForEdit] = useState(null);
+  const [showImportModal, setShowImportModal] = useState(false);
+  const [showExportAllModal, setShowExportAllModal] = useState(false);
+  const [showExportAdModal, setShowExportAdModal] = useState(false);
+  const [showCustomiseColumnsModal, setShowCustomiseColumnsModal] =
+    useState(false);
+  const [showExportPopup, setShowExportPopup] = useState(false);
+  const [showMoreExportPopup, setShowMoreExportPopup] = useState(false);
+  const [showMainExportPopup, setShowMainExportPopup] = useState(false);
 
   // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setShowMore(false);
-      }
-    };
+  // useEffect(() => {
+  //   const handleClickOutside = (event) => {
+  //     if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+  //       setShowMore(false);
+  //     }
+  //   };
 
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  //   document.addEventListener("mousedown", handleClickOutside);
+  //   return () => document.removeEventListener("mousedown", handleClickOutside);
+  // }, []);
 
   const handleDelete = () => {
     console.log("Delete clicked");
@@ -88,6 +100,8 @@ export default function Toolbar({
     setShowMore(false);
   };
   const dropdownRef = useRef(null);
+  const moreDropdownRef = useRef(null);
+  const mainExportButtonRef = useRef(null);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const toggleCategory = (cat) => {
     const exists = filters.categories.includes(cat);
@@ -159,6 +173,54 @@ export default function Toolbar({
 
   const onABTest = () => {
     console.log("A/B Test clicked");
+  };
+
+  const handleImportAds = () => {
+    setShowImportModal(true);
+    setShowMore(false);
+  };
+
+  const handleExportAll = () => {
+    console.log("[v0] handleExportAll called");
+    setShowExportAllModal(true);
+    setShowMoreExportPopup(false);
+    setShowMainExportPopup(false);
+    setTimeout(() => setShowMore(false), 100);
+  };
+
+  const handleExportSelected = () => {
+    console.log("[v0] handleExportSelected called");
+    setShowExportAdModal(true);
+    setShowMoreExportPopup(false);
+    setShowMainExportPopup(false);
+    setTimeout(() => setShowMore(false), 100);
+  };
+
+  const handleCustomiseExport = () => {
+    console.log("[v0] handleCustomiseExport called");
+    setShowCustomiseColumnsModal(true);
+    setShowMoreExportPopup(false);
+    setShowMainExportPopup(false);
+    setTimeout(() => setShowMore(false), 100);
+  };
+
+  const handleDownloadTemplate = () => {
+    // Create and download Excel template
+    const templateContent =
+      "data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,";
+    const link = document.createElement("a");
+    link.setAttribute("href", templateContent);
+    link.setAttribute("download", "ads_manager_template_v1.0.xltx");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setShowMore(false);
+  };
+
+  const handleCustomiseColumnsApply = (selectedColumns) => {
+    console.log("Selected columns:", selectedColumns);
+    // Here you would typically update your table columns
+    setShowExportAdModal(true); // Open export modal after customization
   };
 
   return (
@@ -251,6 +313,7 @@ export default function Toolbar({
         {/* More dropdown */}
         <div className="relative" ref={dropdownRef}>
           <button
+            ref={moreDropdownRef}
             onClick={() => setShowMore(!showMore)}
             className="px-4 py-2 bg-white hover:bg-gray-50 text-gray-700  border-gray-300 rounded text-sm font-medium flex items-center gap-2 transition-colors"
           >
@@ -304,18 +367,42 @@ export default function Toolbar({
                   Import and export ad configuration
                 </div>
 
-                <button className="w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 rounded flex items-center gap-3">
+                <button
+                  onClick={handleImportAds}
+                  className="w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 rounded flex items-center gap-3"
+                >
                   <Upload className="w-4 h-4" />
                   Import Ads in Bulk
                 </button>
 
-                <button className="w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 rounded flex items-center gap-3">
-                  <FileDown className="w-4 h-4" />
-                  Export
-                  <ChevronDown className="w-3 h-3 ml-auto rotate-270" />
-                </button>
+                <div className="relative">
+                  <button
+                    onClick={() => {
+                      setShowMoreExportPopup(!showMoreExportPopup);
+                      // Removed setShowMore(false) to keep dropdown open
+                    }}
+                    className="w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 rounded flex items-center gap-3"
+                  >
+                    <FileDown className="w-4 h-4" />
+                    Export
+                    <ChevronDown className="w-3 h-3 ml-auto rotate-270" />
+                  </button>
 
-                <button className="w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 rounded flex items-center gap-3">
+                  <ExportPopup
+                    isOpen={showMoreExportPopup}
+                    onClose={() => setShowMoreExportPopup(false)}
+                    onExportAll={handleExportAll}
+                    onExportSelected={handleExportSelected}
+                    onCustomiseExport={handleCustomiseExport}
+                    position="right"
+                    triggerRef={moreDropdownRef}
+                  />
+                </div>
+
+                <button
+                  onClick={handleDownloadTemplate}
+                  className="w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 rounded flex items-center gap-3"
+                >
                   <FileDown className="w-4 h-4" />
                   Download Excel template
                 </button>
@@ -350,13 +437,35 @@ export default function Toolbar({
             <FileBarChart2 className="w-4 h-4 text-gray-600" />
           </button>
         </AdsReportingDropdown>
-        <div className="flex items-center gap-1  p-2 bg-white border border-gray-300 hover:bg-gray-50 rounded-md transition-colors">
+        <div
+          className="relative flex items-center gap-1 p-2 bg-white border border-gray-300 hover:bg-gray-50 rounded-md transition-colors"
+          ref={mainExportButtonRef}
+        >
           <button className="" title="Export">
             <Download className="w-4 h-4 text-gray-600" />
           </button>
-          <ExportDropdown>
+          <button
+            onClick={() => {
+              console.log(
+                "[v0] Main export button clicked, current state:",
+                showMainExportPopup
+              );
+              setShowMainExportPopup(!showMainExportPopup);
+            }}
+            title="Export Options"
+          >
             <ChevronDown className="w-4 h-4" />
-          </ExportDropdown>
+          </button>
+
+          <ExportPopup
+            isOpen={showMainExportPopup}
+            onClose={() => setShowMainExportPopup(false)}
+            onExportAll={handleExportAll}
+            onExportSelected={handleExportSelected}
+            onCustomiseExport={handleCustomiseExport}
+            position="bottom"
+            triggerRef={mainExportButtonRef}
+          />
         </div>
         <button
           onClick={onToggleCharts}
@@ -389,6 +498,27 @@ export default function Toolbar({
           onClose={() => setShowEditRuleModal(false)}
           onSave={handleSaveEditedRule}
           ruleData={selectedRuleForEdit}
+        />
+
+        <ImportAdsModal
+          isOpen={showImportModal}
+          onClose={() => setShowImportModal(false)}
+        />
+
+        <ExportAllAdsModal
+          isOpen={showExportAllModal}
+          onClose={() => setShowExportAllModal(false)}
+        />
+
+        <ExportAdModal
+          isOpen={showExportAdModal}
+          onClose={() => setShowExportAdModal(false)}
+        />
+
+        <CustomiseColumnsModal
+          isOpen={showCustomiseColumnsModal}
+          onClose={() => setShowCustomiseColumnsModal(false)}
+          onApply={handleCustomiseColumnsApply}
         />
       </div>
     </div>
