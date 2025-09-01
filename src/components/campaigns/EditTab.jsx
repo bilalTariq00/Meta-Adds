@@ -20,27 +20,12 @@ import {
   Home,
   Megaphone,
 } from "lucide-react";
+import CampaignNameModal from "./CampaignNameModal";
 
 export default function EditTab() {
   const [activeTab, setActiveTab] = useState("edit");
   const [showTemplateModal, setShowTemplateModal] = useState(false);
-  const [showAddComponentDropdown, setShowAddComponentDropdown] =
-    useState(false);
-  const [showCampaignFieldsDropdown, setShowCampaignFieldsDropdown] =
-    useState(false);
-  const [showSpecialAdDropdown, setShowSpecialAdDropdown] = useState(false);
   const [showSecondModal, setShowSecondModal] = useState(false);
-  const [selectedComponentType, setSelectedComponentType] = useState("");
-  const [templateComponents, setTemplateComponents] = useState([
-    {
-      id: 1,
-      type: "open-text",
-      label: "Open text field",
-      value: "DYT - Home Improvement US Campaign",
-    },
-  ]);
-  const [fieldSeparator, setFieldSeparator] = useState("—");
-  const [itemSeparator, setItemSeparator] = useState("::");
   const [showMoreSettings, setShowMoreSettings] = useState(false);
   const [showBudgetScheduling, setShowBudgetScheduling] = useState(false);
   const [campaignName, setCampaignName] = useState(
@@ -62,7 +47,7 @@ export default function EditTab() {
   const [selectedCountries, setSelectedCountries] = useState([]);
   const [showExpandedView, setShowExpandedView] = useState(false);
   const dropdownRef = useRef(null);
-  
+
   // Refs for scrolling to specific cards
   const campaignNameRef = useRef(null);
   const campaignDetailsRef = useRef(null);
@@ -195,9 +180,9 @@ export default function EditTab() {
     setActiveTab("edit");
     setTimeout(() => {
       if (cardRef.current) {
-        cardRef.current.scrollIntoView({ 
-          behavior: 'smooth', 
-          block: 'start' 
+        cardRef.current.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
         });
       }
     }, 100);
@@ -211,52 +196,7 @@ export default function EditTab() {
     }
   };
 
-  const addTemplateComponent = (type) => {
-    let label = "";
-    switch (type) {
-      case "open-text":
-        label = "Open text field";
-        break;
-      case "custom-field":
-        label = "Custom field";
-        break;
-      case "advantage-plus-budget":
-        label = "Advantage+ campaign budget";
-        break;
-      case "objective":
-        label = "Objective";
-        break;
-      case "campaign-id":
-        label = "Campaign ID";
-        break;
-      default:
-        label = "Campaign field";
-    }
 
-    const newComponent = {
-      id: Date.now(),
-      type,
-      label,
-      value: "",
-    };
-    setTemplateComponents([...templateComponents, newComponent]);
-  };
-
-  const removeTemplateComponent = (id) => {
-    setTemplateComponents(templateComponents.filter((c) => c.id !== id));
-  };
-
-  const updateTemplateComponent = (id, value) => {
-    setTemplateComponents(
-      templateComponents.map((c) => (c.id === id ? { ...c, value } : c))
-    );
-  };
-
-  const generatePreview = () => {
-    return templateComponents
-      .map((c) => c.value || c.label)
-      .join(fieldSeparator);
-  };
 
   return (
     <div className="flex h-full w-full">
@@ -300,7 +240,10 @@ export default function EditTab() {
               {/* Right Side - 5 Campaign Cards */}
               <div className="flex-1 space-y-4">
                 {/* Campaign Name Card */}
-                <div ref={campaignNameRef} className="bg-white rounded-lg p-4 border border-gray-200">
+                <div
+                  ref={campaignNameRef}
+                  className="bg-white rounded-lg p-4 border border-gray-200"
+                >
                   <div className="flex items-center gap-2 mb-3">
                     <div className="w-5 h-5 border border-green-500  rounded-full flex items-center justify-center">
                       <Check className="w-4 h-4  text-green-500" />
@@ -392,7 +335,10 @@ export default function EditTab() {
                 </div>
 
                 {/* Budget Card */}
-                <div ref={budgetRef} className="bg-white rounded-lg p-4 border border-gray-200">
+                <div
+                  ref={budgetRef}
+                  className="bg-white rounded-lg p-4 border border-gray-200"
+                >
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
                       <div className="w-5 h-5 border border-green-500 rounded-full flex items-center justify-center">
@@ -535,7 +481,10 @@ export default function EditTab() {
                 </div>
 
                 {/* Campaign Bid Strategy Card */}
-                <div ref={bidStrategyRef} className="bg-white rounded-lg p-4 border border-gray-200">
+                <div
+                  ref={bidStrategyRef}
+                  className="bg-white rounded-lg p-4 border border-gray-200"
+                >
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2 text-xs font-medium text-gray-900">
                       Campaign bid strategy
@@ -586,7 +535,10 @@ export default function EditTab() {
                 </div>
 
                 {/* Special Ad Categories Card */}
-                <div ref={specialAdRef} className="bg-white rounded-lg p-4 border border-gray-200">
+                <div
+                  ref={specialAdRef}
+                  className="bg-white rounded-lg p-4 border border-gray-200"
+                >
                   <div className="flex items-center gap-2 mb-3">
                     <div className="w-5 h-5 border border-green-500 rounded-full flex items-center justify-center">
                       <Check className="w-4 h-4 text-green-500" />
@@ -854,7 +806,7 @@ export default function EditTab() {
 
           {/* Review Tab Content */}
           {activeTab === "review" && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Left Side - Full Review Card */}
               <div className="col-span-1">
                 <div className="bg-white rounded-lg border border-gray-200 md:w-[500px] w-full">
@@ -872,7 +824,7 @@ export default function EditTab() {
                           <div className="text-sm text-gray-500">
                             ID: 120232146845310228
                           </div>
-                          <button 
+                          <button
                             onClick={() => scrollToCard(campaignNameRef)}
                             className="absolute right-3 top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-200 hover:bg-gray-300 px-3 py-1.5 rounded text-base text-gray-600 flex items-center gap-1"
                           >
@@ -886,7 +838,7 @@ export default function EditTab() {
                             Buying type
                           </div>
                           <div className="text-base text-gray-600">Auction</div>
-                          <button 
+                          <button
                             onClick={() => setActiveTab("edit")}
                             className="absolute right-3 top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-200 hover:bg-gray-300 px-3 py-1.5 rounded text-base text-gray-600 flex items-center gap-1"
                           >
@@ -900,7 +852,7 @@ export default function EditTab() {
                             Objective
                           </div>
                           <div className="text-base text-gray-600">Leads</div>
-                          <button 
+                          <button
                             onClick={() => setActiveTab("edit")}
                             className="absolute right-3 top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-200 hover:bg-gray-300 px-3 py-1.5 rounded text-base text-gray-600 flex items-center gap-1"
                           >
@@ -919,7 +871,7 @@ export default function EditTab() {
                           <div className="text-base text-gray-600">
                             Daily Budget ${dailyBudget}
                           </div>
-                          <button 
+                          <button
                             onClick={() => scrollToCard(budgetRef)}
                             className="absolute right-3 top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-200 hover:bg-gray-300 px-3 py-1.5 rounded text-base text-gray-600 flex items-center gap-1"
                           >
@@ -935,7 +887,7 @@ export default function EditTab() {
                           <div className="text-base text-gray-600">
                             Enabled: No
                           </div>
-                          <button 
+                          <button
                             onClick={() => setActiveTab("edit")}
                             className="absolute right-3 top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-200 hover:bg-gray-300 px-3 py-1.5 rounded text-sm text-gray-600 flex items-center gap-1"
                           >
@@ -951,7 +903,7 @@ export default function EditTab() {
                           <div className="text-base text-gray-600">
                             Highest volume
                           </div>
-                          <button 
+                          <button
                             onClick={() => scrollToCard(bidStrategyRef)}
                             className="absolute right-3 top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-200 hover:bg-gray-300 px-3 py-1.5 rounded text-sm text-gray-600 flex items-center gap-1"
                           >
@@ -964,8 +916,10 @@ export default function EditTab() {
                           <div className="text-base font-medium text-gray-900 mb-2">
                             Delivery type
                           </div>
-                          <div className="text-base text-gray-600">Standard</div>
-                          <button 
+                          <div className="text-base text-gray-600">
+                            Standard
+                          </div>
+                          <button
                             onClick={() => setActiveTab("edit")}
                             className="absolute right-3 top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-200 hover:bg-gray-300 px-3 py-1.5 rounded text-sm text-gray-600 flex items-center gap-1"
                           >
@@ -981,7 +935,7 @@ export default function EditTab() {
                           <div className="text-base text-gray-600">
                             No categories declared
                           </div>
-                          <button 
+                          <button
                             onClick={() => scrollToCard(specialAdRef)}
                             className="absolute right-3 top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-200 hover:bg-gray-300 px-3 py-1.5 rounded text-sm text-gray-600 flex items-center gap-1"
                           >
@@ -997,7 +951,7 @@ export default function EditTab() {
                           <div className="text-base text-gray-600">
                             1 total ad sets
                           </div>
-                          <button 
+                          <button
                             onClick={() => setActiveTab("edit")}
                             className="absolute right-3 top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-200 hover:bg-gray-300 px-3 py-1.5 rounded text-sm text-gray-600 flex items-center gap-1"
                           >
@@ -1007,12 +961,179 @@ export default function EditTab() {
                         </div>
                       </div>
 
-                      {/* Right Column - Empty as requested */}
-                      <div className="space-y-4"></div>
+                      {/* Right Column - Activity History */}
+                      <div className="space-y-4">
+                        <div className="bg-white rounded-lg border border-gray-200">
+                          <div className="p-4 border-b border-gray-200">
+                            <h3 className="text-lg font-semibold text-gray-900">
+                              Activity History
+                            </h3>
+                    </div>
+
+                          {/* Filters */}
+                          <div className="p-4 border-b border-gray-200">
+            <div className="flex gap-3">
+                              <button className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50">
+                                <span>
+                                  Last 30 days: 3 Aug 2025 - 1 Sep 2025
+                                </span>
+                                <ChevronDown className="w-4 h-4" />
+              </button>
+                              <button className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50">
+                                <span>Activity history: All</span>
+                                <ChevronDown className="w-4 h-4" />
+              </button>
+                              <button className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50">
+                                <span>Changed by: Anyone</span>
+                                <ChevronDown className="w-4 h-4" />
+              </button>
+        </div>
+      </div>
+
+                          {/* Table */}
+                          <div className="overflow-x-auto">
+                            <table className="w-full">
+                              <thead className="bg-gray-50">
+                                <tr>
+                                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900 border-r border-gray-200">
+                                    Activity
+                                  </th>
+                                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900 border-r border-gray-200">
+                                    Activity details
+                                  </th>
+                                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900 border-r border-gray-200">
+                                    Item changed
+                                  </th>
+                                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900 border-r border-gray-200">
+                                    Changed by
+                                  </th>
+                                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">
+                                    Date and Time
+                                  </th>
+                                </tr>
+                              </thead>
+                              <tbody className="divide-y divide-gray-200">
+                                <tr className="bg-white hover:bg-gray-50">
+                                  <td className="px-4 py-3 text-sm text-gray-900">
+                                    Campaign status updated
+                                  </td>
+                                  <td className="px-4 py-3 text-sm text-gray-600">
+                                    From Active to Pending process
+                                  </td>
+                                  <td className="px-4 py-3">
+                                    <div className="text-sm text-blue-600 hover:underline cursor-pointer">
+                                      {campaignName}
+          </div>
+                                    <div className="text-xs text-gray-500">
+                                      Campaign ID: 120232146845310228
+                    </div>
+                                  </td>
+                                  <td className="px-4 py-3 text-sm text-gray-900">
+                                    Muhammad Bilal
+                                  </td>
+                                  <td className="px-4 py-3 text-sm text-gray-600">
+                                    22 Aug at 20:21
+                                  </td>
+                                </tr>
+                                <tr className="bg-gray-50 hover:bg-gray-100">
+                                  <td className="px-4 py-3 text-sm text-gray-900">
+                                    Ad set status updated
+                                  </td>
+                                  <td className="px-4 py-3 text-sm text-gray-600">
+                                    From Active to Inactive
+                                  </td>
+                                  <td className="px-4 py-3">
+                                    <div className="text-sm text-blue-600 hover:underline cursor-pointer">
+                                      20-65 USA FB Feeds only - DYT Home
+                                      Improvement
+                              </div>
+                              <div className="text-xs text-gray-500">
+                                      Ad set ID: 120232146845300228
+                              </div>
+                                  </td>
+                                  <td className="px-4 py-3 text-sm text-gray-900">
+                                    Hassan Abbas
+                                  </td>
+                                  <td className="px-4 py-3 text-sm text-gray-600">
+                                    22 Aug at 01:34
+                                  </td>
+                                </tr>
+                                <tr className="bg-white hover:bg-gray-50">
+                                  <td className="px-4 py-3 text-sm text-gray-900">
+                                    Ad status updated
+                                  </td>
+                                  <td className="px-4 py-3 text-sm text-gray-600">
+                                    From Pending process to Active
+                                  </td>
+                                  <td className="px-4 py-3">
+                                    <div className="text-sm text-blue-600 hover:underline cursor-pointer">
+                                      DYT Home Improvement
+                            </div>
+                                    <div className="text-xs text-gray-500">
+                                      Ad ID: 120232146845320228
+                                    </div>
+                                  </td>
+                                  <td className="px-4 py-3 text-sm text-gray-900">
+                                    Muhammad Bilal
+                                  </td>
+                                  <td className="px-4 py-3 text-sm text-gray-600">
+                                    21 Aug at 15:42
+                                  </td>
+                                </tr>
+                                <tr className="bg-gray-50 hover:bg-gray-100">
+                                  <td className="px-4 py-3 text-sm text-gray-900">
+                                    Updated status of ad after it finishes ad
+                                    review
+                                  </td>
+                                  <td className="px-4 py-3 text-sm text-gray-600">
+                                    From Pending process to Inactive
+                                  </td>
+                                  <td className="px-4 py-3">
+                                    <div className="text-sm text-blue-600 hover:underline cursor-pointer">
+                                      DYT Home Improvement - Video
+                              </div>
+                              <div className="text-xs text-gray-500">
+                                      Ad ID: 120232146845320229
+                              </div>
+                                  </td>
+                                  <td className="px-4 py-3 text-sm text-gray-900">
+                                    System
+                                  </td>
+                                  <td className="px-4 py-3 text-sm text-gray-600">
+                                    21 Aug at 14:15
+                                  </td>
+                                </tr>
+                                <tr className="bg-white hover:bg-gray-50">
+                                  <td className="px-4 py-3 text-sm text-gray-900">
+                                    Campaign budget updated
+                                  </td>
+                                  <td className="px-4 py-3 text-sm text-gray-600">
+                                    Daily budget changed from $0.50 to $1.00
+                                  </td>
+                                  <td className="px-4 py-3">
+                                    <div className="text-sm text-blue-600 hover:underline cursor-pointer">
+                                      {campaignName}
+                            </div>
+                                    <div className="text-xs text-gray-500">
+                                      Campaign ID: 120232146845310228
+                          </div>
+                                  </td>
+                                  <td className="px-4 py-3 text-sm text-gray-900">
+                                    Muhammad Bilal
+                                  </td>
+                                  <td className="px-4 py-3 text-sm text-gray-600">
+                                    20 Aug at 09:30
+                                  </td>
+                                </tr>
+                              </tbody>
+                            </table>
+                        </div>
                     </div>
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
             </div>
           )}
 
@@ -1025,7 +1146,7 @@ export default function EditTab() {
               tools is subject to our{" "}
               <button className="text-blue-600 hover:underline">
                 Terms and Conditions
-              </button>
+            </button>
               .
             </p>
             <div className="flex gap-3">
@@ -1037,152 +1158,17 @@ export default function EditTab() {
               </button>
               <button className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm">
                 Publish
-              </button>
-            </div>
+            </button>
           </div>
+        </div>
         </div>
       </div>
 
-      {/* Create Template Modal - Full Page */}
-      {showTemplateModal && !showSecondModal && (
-        <div className="fixed inset-0 bg-white z-50 flex flex-col">
-          {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b border-gray-200">
-            <h2 className="text-xl font-semibold text-gray-900">
-              Campaign name
-            </h2>
-            <button
-              onClick={() => setShowTemplateModal(false)}
-              className="p-2 hover:bg-gray-100 rounded-lg"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-
-          {/* Content */}
-          <div className="flex-1 p-8">
-            <div className="max-w-2xl mx-auto">
-              <p className="text-gray-600 mb-8">
-                Name your campaigns consistently by creating a template based on
-                your naming convention. Campaign names will update automatically
-                to match your current campaign settings.
-              </p>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-900 mb-3">
-                  Template
-                </label>
-                <div className="bg-gray-50 rounded-lg p-6 min-h-[200px]">
-                  {templateComponents.map((component) => (
-                    <div
-                      key={component.id}
-                      className="flex items-center gap-3 mb-3"
-                    >
-                      <GripVertical className="w-4 h-4 text-gray-400" />
-                      <Type className="w-4 h-4 text-gray-500" />
-                      <span className="text-sm text-gray-700">
-                        {component.label}
-                      </span>
-                      <button
-                        onClick={() => removeTemplateComponent(component.id)}
-                        className="ml-auto p-1 hover:bg-gray-200 rounded"
-                      >
-                        <Trash2 className="w-4 h-4 text-gray-500" />
-                      </button>
-                    </div>
-                  ))}
-
-                  <div className="flex gap-3">
-                    <div className="relative">
-                      <button
-                        onClick={() =>
-                          setShowAddComponentDropdown(!showAddComponentDropdown)
-                        }
-                        className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50"
-                      >
-                        <Plus className="w-4 h-4" />
-                        Add component
-                      </button>
-
-                      {showAddComponentDropdown && (
-                        <div className="absolute top-full left-0 mt-1 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
-                          <div className="p-2">
-                            <div
-                              className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 rounded cursor-pointer"
-                              onClick={() => {
-                                setSelectedComponentType("campaign-fields");
-                                setShowSecondModal(true);
-                                setShowAddComponentDropdown(false);
-                              }}
-                            >
-                              <span className="text-sm font-medium">
-                                Campaign fields
-                              </span>
-                              <ChevronDown className="w-4 h-4" />
-                            </div>
-                            <div
-                              className="px-3 py-2 hover:bg-gray-50 rounded cursor-pointer"
-                              onClick={() => {
-                                setSelectedComponentType("open-text");
-                                addTemplateComponent("open-text");
-                                setShowAddComponentDropdown(false);
-                              }}
-                            >
-                              <div className="text-sm font-medium">
-                                Open text field
-                              </div>
-                              <div className="text-xs text-gray-500">
-                                An empty space you can fill in
-                              </div>
-                            </div>
-                            <div
-                              className="px-3 py-2 hover:bg-gray-50 rounded cursor-pointer"
-                              onClick={() => {
-                                setSelectedComponentType("custom-field");
-                                addTemplateComponent("custom-field");
-                                setShowAddComponentDropdown(false);
-                              }}
-                            >
-                              <div className="text-sm font-medium">
-                                Custom field
-                              </div>
-                              <div className="text-xs text-gray-500">
-                                Unique info you can add about your ads
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                    <button className="text-blue-600 hover:underline text-sm">
-                      Choose existing template
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Footer */}
-          <div className="flex justify-end gap-3 p-6 border-t border-gray-200">
-            <button
-              onClick={() => setShowTemplateModal(false)}
-              className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={() => {
-                setCampaignName(generatePreview());
-                setShowTemplateModal(false);
-              }}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-            >
-              Save
-            </button>
-          </div>
-        </div>
-      )}
+      {/* Campaign Name Modal */}
+      <CampaignNameModal
+        isOpen={showTemplateModal && !showSecondModal}
+        onClose={() => setShowTemplateModal(false)}
+      />
 
       {/* Second Modal - Campaign Fields */}
       {showSecondModal && (
@@ -1336,12 +1322,16 @@ export default function EditTab() {
                   Unavailable options
                 </h4>
                 <div className="space-y-1">
-                  <div className="text-base text-gray-600">• Age and gender</div>
+                  <div className="text-base text-gray-600">
+                    • Age and gender
+                  </div>
                   <div className="text-base text-gray-600">• Postcode</div>
                   <div className="text-base text-gray-600">
                     • Lookalike Audiences
                   </div>
-                  <div className="text-base text-gray-600">• Saved audiences</div>
+                  <div className="text-base text-gray-600">
+                    • Saved audiences
+                  </div>
                 </div>
               </div>
             </div>
