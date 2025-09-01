@@ -218,6 +218,7 @@ export default function CampaignsView() {
           setApplyRecommendation={setApplyRecommendation}
         />
       )}
+
     </div>
   );
 }

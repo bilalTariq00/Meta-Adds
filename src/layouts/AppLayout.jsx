@@ -8,12 +8,15 @@ import LoadingModal from "@/components/LoadingModal";
 import { ActivityHistorySidebar } from "@/components/activity-history-sidebar";
 import { useState } from "react";
 import { Clock, BarChart3, Edit3 } from "lucide-react";
+import CampaignSidebar from "@/components/campaigns/CampaignSidebar";
 
 // This is your child layout with Header and Sidebar
 export default function AppLayout() {
   const { isLoading } = useLoading();
   const [isActivitySidebarOpen, setIsActivitySidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("activity");
+  const [isCampaignSidebarOpen, setIsCampaignSidebarOpen] = useState(false);
+  const [campaignSidebarTab, setCampaignSidebarTab] = useState("chart");
   const location = useLocation();
 
   // Check if current page is campaign page
@@ -46,13 +49,18 @@ export default function AppLayout() {
 
         {/* Right sidebar with tabs */}
         <div className="absolute right-0 top-0 bottom-0 w-10 bg-slate-700 flex flex-col items-center py-4 border-l border-slate-600 z-40">
+          {/* Campaign Header - Only visible on campaign pages */}
+
           {/* Chart Tab - Only visible on campaign pages */}
           {isCampaignPage && (
             <div className="relative group mb-2">
               <button
-                onClick={() => handleTabClick("chart")}
+                onClick={() => {
+                  setCampaignSidebarTab("chart");
+                  setIsCampaignSidebarOpen(true);
+                }}
                 className={`px-3 text-slate-300 hover:text-white hover:bg-slate-600 rounded-lg transition-colors ${
-                  activeTab === "chart" && isActivitySidebarOpen
+                  campaignSidebarTab === "chart" && isCampaignSidebarOpen
                     ? "bg-slate-600 text-white"
                     : ""
                 }`}
@@ -69,13 +77,17 @@ export default function AppLayout() {
               </div>
             </div>
           )}
+
           {/* Edit Tab - Only visible on campaign pages */}
           {isCampaignPage && (
             <div className="relative group mb-2">
               <button
-                onClick={() => handleTabClick("edit")}
+                onClick={() => {
+                  setCampaignSidebarTab("edit");
+                  setIsCampaignSidebarOpen(true);
+                }}
                 className={`px-3 text-slate-300 hover:text-white hover:bg-slate-600 rounded-lg transition-colors ${
-                  activeTab === "edit" && isActivitySidebarOpen
+                  campaignSidebarTab === "edit" && isCampaignSidebarOpen
                     ? "bg-slate-600 text-white"
                     : ""
                 }`}
@@ -92,13 +104,25 @@ export default function AppLayout() {
               </div>
             </div>
           )}
-          {/* Activity History Tab - Always visible */}
 
+          {/* Activity History Tab - Always visible */}
           <div className="relative group mb-2">
             <button
-              onClick={() => handleTabClick("activity")}
+              onClick={() => {
+                if (isCampaignPage) {
+                  setCampaignSidebarTab("activity");
+                  setIsCampaignSidebarOpen(true);
+                } else {
+                  handleTabClick("activity");
+                }
+              }}
               className={`px-3 text-slate-300 hover:text-white hover:bg-slate-600 rounded-lg transition-colors ${
-                activeTab === "activity" && isActivitySidebarOpen
+                (isCampaignPage &&
+                  campaignSidebarTab === "activity" &&
+                  isCampaignSidebarOpen) ||
+                (!isCampaignPage &&
+                  activeTab === "activity" &&
+                  isActivitySidebarOpen)
                   ? "bg-slate-600 text-white"
                   : ""
               }`}
@@ -109,7 +133,9 @@ export default function AppLayout() {
             {/* Hover tooltip */}
             <div className="absolute right-full mr-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
               <div className="bg-gray-800 text-white text-sm px-3 py-2 rounded-lg shadow-lg whitespace-nowrap">
-                Activity History (Ctrl+H)
+                {isCampaignPage
+                  ? "Activity History (Ctrl+H)"
+                  : "Activity History (Ctrl+H)"}
                 <div className="absolute left-full top-1/2 -translate-y-1/2 border-4 border-transparent border-l-gray-800"></div>
               </div>
             </div>
@@ -122,6 +148,13 @@ export default function AppLayout() {
           onClose={() => setIsActivitySidebarOpen(false)}
           initialTab={activeTab}
           showAllTabs={isCampaignPage}
+        />
+
+        {/* Campaign Sidebar */}
+        <CampaignSidebar
+          isOpen={isCampaignSidebarOpen}
+          onClose={() => setIsCampaignSidebarOpen(false)}
+          activeTab={campaignSidebarTab}
         />
       </div>
     </div>
