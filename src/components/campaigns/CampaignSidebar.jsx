@@ -23,12 +23,14 @@ import {
   File,
   FileIcon,
   ChevronDown,
+  MoreHorizontal,
 } from "lucide-react";
 import PerformanceOverview from "./PerformanceOverview";
 import DemographicsPlatform from "./DemographicsPlatform";
 import ActionsTab from "./ActionsTab";
 import EditTab from "./EditTab";
 import DateRangePicker from "@/components/ui/DateRangePicker";
+import CampaignStructureSidebar from "./CampaignStructureSidebar";
 
 export default function CampaignSidebar({
   isOpen,
@@ -44,7 +46,16 @@ export default function CampaignSidebar({
   const [showChangedByDropdown, setShowChangedByDropdown] = useState(false);
   const [selectedActivityFilter, setSelectedActivityFilter] = useState("All");
   const [selectedChangedByFilter, setSelectedChangedByFilter] = useState("Anyone");
+  const [showContextMenu, setShowContextMenu] = useState(false);
+  const [selectedCampaignItem, setSelectedCampaignItem] = useState({
+    id: 3,
+    type: "Ad",
+    name: "DYT Home Improvement",
+    status: "Active",
+    icon: "FileText"
+  });
   const dropdownRef = useRef(null);
+  const contextMenuRef = useRef(null);
 
   // Sample activity data
   const activityData = [
@@ -152,6 +163,9 @@ export default function CampaignSidebar({
         setShowActivityDropdown(false);
         setShowChangedByDropdown(false);
       }
+      if (contextMenuRef.current && !contextMenuRef.current.contains(event.target)) {
+        setShowContextMenu(false);
+      }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
@@ -169,6 +183,11 @@ export default function CampaignSidebar({
     if (newInternalSidebarState && !isExpanded) {
       setIsExpanded(true);
     }
+  };
+
+  // Handle campaign item selection
+  const handleCampaignItemSelect = (item) => {
+    setSelectedCampaignItem(item);
   };
 
   if (!isOpen) return null;
@@ -240,99 +259,11 @@ export default function CampaignSidebar({
         <div className="flex-1 flex bg-gray-50">
           {/* Internal Collapsible Sidebar */}
           {isInternalSidebarOpen && (
-            <div className="w-64 bg-white border-r border-gray-200 flex-shrink-0">
-              <div className="p-4">
-                {/* Search Bar */}
-                <div className="relative mb-4">
-                  <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
-                    <svg
-                      className="w-4 h-4 text-gray-400"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                      />
-                    </svg>
-                  </div>
-                  <input
-                    type="text"
-                    placeholder="Search"
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
-
-                {/* Campaign Structure List */}
-                <div className="space-y-1">
-                  {/* Campaign Item (Selected) */}
-                  <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg cursor-pointer">
-                    <div className="flex items-center gap-3 min-w-0 flex-1">
-                      <div className="w-5 h-5 text-blue-600 flex-shrink-0">
-                        📁
-                      </div>
-                      <span className="text-sm font-medium text-blue-900 truncate block">
-                        DYT - Home Improvement US Campaign
-                      </span>
-                    </div>
-                    <button className="p-1 hover:bg-blue-100 rounded flex-shrink-0">
-                      <svg
-                        className="w-4 h-4 text-gray-500"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
-                      </svg>
-                    </button>
-                  </div>
-
-                  {/* Ad Set Item */}
-                  <div className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
-                    <div className="flex items-center gap-3 min-w-0 flex-1">
-                      <div className="w-5 h-5 text-gray-600 flex-shrink-0">
-                        🔲
-                      </div>
-                      <span className="text-sm text-gray-900 truncate block">
-                        20-65 USA FB Feeds only - DYT Home Improvement
-                      </span>
-                    </div>
-                    <button className="p-1 hover:bg-gray-100 rounded flex-shrink-0">
-                      <svg
-                        className="w-4 h-4 text-gray-500"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
-                      </svg>
-                    </button>
-                  </div>
-
-                  {/* Ad Item (Indented) */}
-                  <div className="flex items-center justify-between p-3 pl-8 hover:bg-gray-50 rounded-lg cursor-pointer">
-                    <div className="flex items-center gap-3 min-w-0 flex-1">
-                      <div className="w-5 h-5 text-gray-600 flex-shrink-0">
-                        📄
-                      </div>
-                      <span className="text-sm text-gray-900 truncate block">
-                        DYT Home Improvement Ad Creative
-                      </span>
-                    </div>
-                    <button className="p-1 hover:bg-gray-100 rounded flex-shrink-0">
-                      <svg
-                        className="w-4 h-4 text-gray-500"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <CampaignStructureSidebar
+              isOpen={isInternalSidebarOpen}
+              onClose={() => setIsInternalSidebarOpen(false)}
+              onItemSelect={handleCampaignItemSelect}
+            />
           )}
 
           {/* Right Content Area */}
@@ -358,64 +289,96 @@ export default function CampaignSidebar({
                   </button>
 
                   {/* Campaign breadcrumb structure */}
-                  <div
-                    className={`flex items-center ${
-                      isExpanded ? "gap-2 text-sm" : "gap-1.5 text-xs"
-                    }`}
-                  >
+                  <div className="flex items-center gap-1 text-xs min-w-0 flex-1">
+                    {/* Campaign Level */}
                     <div
-                      className={`flex items-center ${
-                        isExpanded ? "gap-2" : "gap-1.5"
+                      className={`rounded-full flex items-center px-2 py-0.5 gap-1.5 min-w-0 ${
+                        selectedCampaignItem.id === 1 
+                          ? "bg-blue-50" 
+                          : "bg-gray-50"
                       }`}
                     >
                       <div
-                        className={`bg-blue-50 rounded-full flex items-center ${
-                          isExpanded ? "px-3 py-1 gap-2" : "px-2 py-0.5 gap-1.5"
+                        className={`w-3 h-3 flex-shrink-0 ${
+                          selectedCampaignItem.id === 1 
+                            ? "text-blue-600" 
+                            : "text-gray-500"
                         }`}
                       >
-                        <div
-                          className={`text-blue-600 ${
-                            isExpanded ? "w-4 h-4" : "w-3 h-3"
-                          }`}
-                        >
-                          <FolderIcon size={isExpanded ? 20 : 16} />
+                        <FolderIcon size={16} />
                         </div>
                         <span
-                          className={`text-blue-600 font-medium bg-blue-50 rounded-full ${
-                            isExpanded
-                              ? "px-3 py-1 text-sm"
-                              : "px-2 py-0.5 text-xs"
-                          }`}
+                        className={`truncate max-w-[120px] ${
+                          selectedCampaignItem.id === 1 
+                            ? "text-blue-600 font-medium" 
+                            : "text-gray-600"
+                        }`}
+                        title="DYT - Home Improvement US Campaign"
                         >
                           DYT - Home Improvement US Campaign
                         </span>
                       </div>
-                      <ChevronRight
-                        className={`text-gray-400 ${
-                          isExpanded ? "w-3 h-3" : "w-2.5 h-2.5"
-                        }`}
-                      />
+                    
+                    <ChevronRight className="w-2.5 h-2.5 text-gray-400 flex-shrink-0" />
+                    
+                    {/* Ad Set Level */}
+                    <div
+                      className={`rounded-full flex items-center px-2 py-0.5 gap-1.5 min-w-0 ${
+                        selectedCampaignItem.id === 2 
+                          ? "bg-blue-50" 
+                          : "bg-gray-50"
+                      }`}
+                    >
                       <div
-                        className={`text-gray-500 ${
-                          isExpanded ? "w-4 h-4" : "w-3 h-3"
+                        className={`w-3 h-3 flex-shrink-0 ${
+                          selectedCampaignItem.id === 2 
+                            ? "text-blue-600" 
+                            : "text-gray-500"
                         }`}
                       >
-                        <BlocksIcon size={isExpanded ? 20 : 16} />
+                        <BlocksIcon size={16} />
                       </div>
-                      <span className="text-gray-600">1 Ad set</span>
-                      <ChevronRight
-                        className={`text-gray-400 ${
-                          isExpanded ? "w-3 h-3" : "w-2.5 h-2.5"
+                      <span
+                        className={`truncate max-w-[100px] ${
+                          selectedCampaignItem.id === 2 
+                            ? "text-blue-600 font-medium" 
+                            : "text-gray-600"
                         }`}
-                      />
+                        title="20-65 USA FB Feeds only - DYT Home Improvement"
+                      >
+                        20-65 USA FB Feeds only - DYT H...
+                      </span>
+                    </div>
+                    
+                    <ChevronRight className="w-2.5 h-2.5 text-gray-400 flex-shrink-0" />
+                    
+                    {/* Ad Level */}
+                    <div
+                      className={`rounded-full flex items-center px-2 py-0.5 gap-1.5 min-w-0 ${
+                        selectedCampaignItem.id === 3 
+                          ? "bg-blue-50" 
+                          : "bg-gray-50"
+                      }`}
+                    >
                       <div
-                        className={`text-gray-500 ${
-                          isExpanded ? "w-4 h-4" : "w-3 h-3"
+                        className={`w-3 h-3 flex-shrink-0 ${
+                          selectedCampaignItem.id === 3 
+                            ? "text-blue-600" 
+                            : "text-gray-500"
                         }`}
                       >
-                        <FileIcon size={isExpanded ? 20 : 16} />
+                        <FileIcon size={16} />
                       </div>
-                      <span className="text-gray-600">1 Ad</span>
+                      <span
+                        className={`truncate max-w-[100px] ${
+                          selectedCampaignItem.id === 3 
+                            ? "text-blue-600 font-medium" 
+                            : "text-gray-600"
+                        }`}
+                        title="DYT Home Improvement"
+                      >
+                        DYT Home Improvement
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -453,19 +416,71 @@ export default function CampaignSidebar({
                       ></span>
                     </button>
                   </div>
+                  <div className="relative" ref={contextMenuRef}>
                   <button
+                      onClick={() => setShowContextMenu(!showContextMenu)}
                     className={`hover:bg-gray-100 rounded-lg transition-colors ${
                       isExpanded ? "p-2" : "p-1.5"
                     }`}
                   >
                     <div
-                      className={`bg-gray-800 rounded-sm text-white flex items-center justify-center ${
-                        isExpanded ? "w-4 h-4 text-sm" : "w-3 h-3 text-xs"
-                      }`}
+                        className={`bg-gray-100 rounded-sm border border-gray-300 rounded-md p-2 flex items-center justify-center `}
                     >
-                      ⋮
+                        <MoreHorizontal size={isExpanded ? 16 : 14} />
                     </div>
                   </button>
+                    
+                    {showContextMenu && (
+                      <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-[10000] min-w-[250px]">
+                        {/* Standard Actions */}
+                        <div className="py-1">
+                          <div className="px-3 py-2 text-sm text-gray-900 hover:bg-gray-50 cursor-pointer flex items-center justify-between">
+                            <span>Duplicate</span>
+                            <span className="text-xs text-gray-500">Ctrl+D</span>
+                          </div>
+                          <div className="px-3 py-2 text-sm text-gray-900 hover:bg-gray-50 cursor-pointer flex items-center justify-between">
+                            <span>Copy</span>
+                            <span className="text-xs text-gray-500">Ctrl+C</span>
+                          </div>
+                          <div className="px-3 py-2 text-sm text-gray-400 hover:bg-gray-50 cursor-pointer flex items-center justify-between">
+                            <span>Paste</span>
+                            <span className="text-xs text-gray-400">Ctrl+V</span>
+                          </div>
+                          <div className="px-3 py-2 text-sm text-gray-900 hover:bg-gray-50 cursor-pointer flex items-center justify-between">
+                            <span>Delete</span>
+                            <span className="text-xs text-gray-500">Ctrl+Del</span>
+                          </div>
+                        </div>
+                        
+                        {/* Separator */}
+                        <div className="border-t border-gray-200"></div>
+                        
+                        {/* Creation Actions */}
+                        <div className="py-1">
+                          <div className="px-3 py-2 text-sm text-gray-900 hover:bg-gray-50 cursor-pointer">
+                            Create ad set
+                          </div>
+                          <div className="px-3 py-2 text-sm text-gray-900 hover:bg-gray-50 cursor-pointer">
+                            Create rule
+                          </div>
+                        </div>
+                        
+                        {/* Separator */}
+                        <div className="border-t border-gray-200"></div>
+                        
+                        {/* ID Information */}
+                        <div className="py-1 flex items-center justify-between">
+                          <div className="px-3 py-2 text-sm ">
+                            <span className="text-gray-500">ID:</span>
+                            <span className="text-gray-900">120232146845310228</span>
+                          </div>
+                          <div className="px-3 py-2 text-sm text-gray-400 hover:bg-gray-50 cursor-pointer text-right">
+                            Copy
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
 
