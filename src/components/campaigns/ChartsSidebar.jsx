@@ -21,8 +21,8 @@ import {
   Cell,
 } from "recharts";
 
-export default function ChartsSidebar({ open, onClose }) {
-  const [activeTab, setActiveTab] = useState("trends");
+export default function ChartsSidebar({ open, onClose, selectedFieldData = null }) {
+  const [activeTab, setActiveTab] = useState(selectedFieldData ? "edit" : "trends");
   const [timeframeDropdownOpen, setTimeframeDropdownOpen] = useState(false);
   const [metricDropdownOpen, setMetricDropdownOpen] = useState(false);
   const [moreMetricsDropdownOpen, setMoreMetricsDropdownOpen] = useState(false);
@@ -80,6 +80,75 @@ export default function ChartsSidebar({ open, onClose }) {
   ]);
   const removeChart = (id) => {
     setCharts((prevCharts) => prevCharts.filter((chart) => chart.id !== id));
+  };
+
+  const renderEditTab = () => {
+    if (!selectedFieldData) return null;
+    
+    return (
+      <div className="space-y-4">
+        <div className="bg-gray-50 rounded-lg p-4">
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">Edit Campaign</h3>
+          <div className="space-y-3">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Campaign Name
+              </label>
+              <input
+                type="text"
+                defaultValue={selectedFieldData.name}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Budget
+              </label>
+              <input
+                type="text"
+                defaultValue={selectedFieldData.budget}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Bid Strategy
+              </label>
+              <select
+                defaultValue={selectedFieldData.bidStrategy}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="Highest volume">Highest volume</option>
+                <option value="Lowest cost">Lowest cost</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Delivery Status
+              </label>
+              <select
+                defaultValue={selectedFieldData.delivery}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="On">On</option>
+                <option value="Off">Off</option>
+              </select>
+            </div>
+          </div>
+          <div className="flex gap-3 mt-6">
+            <button className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">
+              Save Changes
+            </button>
+            <button 
+              onClick={onClose}
+              className="flex-1 border border-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-50 transition-colors"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    );
   };
   if (!open) return null;
 
@@ -835,13 +904,27 @@ export default function ChartsSidebar({ open, onClose }) {
   return (
     <div className="w-[420px] bg-white border-l border-gray-200 h-full flex flex-col shrink-0">
       <div className="p-4 border-b border-gray-200 flex items-center justify-between">
-        <div className=" font-semibold">Compare 1 campaign</div>
+        <div className=" font-semibold">
+          {selectedFieldData ? `Edit: ${selectedFieldData.name}` : "Compare 1 campaign"}
+        </div>
         <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg">
           <X className="w-5 h-5" />
         </button>
       </div>
 
       <div className="flex p-2 ">
+        {selectedFieldData && (
+          <button
+            onClick={() => setActiveTab("edit")}
+            className={` py-2 px-3 text-center text-sm rounded-md font-medium ${
+              activeTab === "edit"
+                ? "text-blue-600 bg-blue-50 "
+                : "text-gray-700 hover:bg-gray-50"
+            }`}
+          >
+            Edit
+          </button>
+        )}
         <button
           onClick={() => setActiveTab("trends")}
           className={` py-2 px-3 text-center text-sm rounded-md font-medium ${
@@ -865,7 +948,7 @@ export default function ChartsSidebar({ open, onClose }) {
       </div>
 
       <div className="flex-1 overflow-y-auto p-4">
-        {activeTab === "trends" ? renderTrendsTab() : renderBreakdownsTab()}
+        {activeTab === "edit" ? renderEditTab() : activeTab === "trends" ? renderTrendsTab() : renderBreakdownsTab()}
       </div>
       <div className=" w-full flex items-center justify-end py-5 px-2">
         <button

@@ -10,6 +10,8 @@ import {
   BarChart3,
   ChevronDown,
   Play,
+  Trash2,
+  Undo2,
 } from "lucide-react";
 import { ExternalLink, FileDown, Upload, Eye, Settings } from "lucide-react";
 import AdsReportingDropdown from "./dropdowns/AdsReportingDropdown";
@@ -53,6 +55,7 @@ export default function Toolbar({
   onDelete,
   onRevert,
   onRules,
+  onABTest,
   onToggleCharts,
   ChartOpen = false,
 }) {
@@ -171,9 +174,7 @@ export default function Toolbar({
     setSelectedRuleForEdit(null);
   };
 
-  const onABTest = () => {
-    console.log("A/B Test clicked");
-  };
+
 
   const handleImportAds = () => {
     setShowImportModal(true);
@@ -224,14 +225,14 @@ export default function Toolbar({
   };
 
   return (
-    <div className="flex items-center gap-2 px-4 py-2 bg-white border-b border-gray-200">
+    <div className="flex items-center gap-1 px-3 py-2 bg-white border-b border-gray-200">
       {/* Primary Action Buttons */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1">
         <button
           onClick={onCreate}
-          className="flex items-center gap-1 px-4 py-2 bg-green-800 text-white rounded hover:bg-green-700 transition-colors text-sm"
+          className="flex items-center gap-1 px-2 py-1.5 bg-green-800 text-white rounded hover:bg-green-700 transition-colors text-sm"
         >
-          <Plus size={16} />
+          <Plus size={14} />
           Create
         </button>
 
@@ -240,7 +241,7 @@ export default function Toolbar({
           <button
             onClick={onDuplicate}
             disabled={selectedCount === 0}
-            className={`px-3 py-1.75 flex items-center gap-1.5 text-sm font-medium transition-colors
+            className={`px-2 py-1.5 flex items-center gap-1 text-sm font-medium transition-colors
     ${
       selectedCount === 0
         ? "bg-gray-100 text-gray-400 cursor-not-allowed"
@@ -254,9 +255,9 @@ export default function Toolbar({
           {/* Chevron Button */}
           <button
             onClick={() => setShowDropdown((prev) => !prev)}
-            className="px-2 py-1.5 bg-white hover:bg-gray-50 text-gray-500 border-l border-gray-300 transition-colors"
+            className="px-1.5 py-1.5 bg-white hover:bg-gray-50 text-gray-500 border-l border-gray-300 transition-colors"
           >
-            <ChevronDown className="w-4 h-4" />
+            <ChevronDown className="w-3 h-3" />
           </button>
           {showDropdown && (
             <DuplicateDropdown
@@ -270,7 +271,13 @@ export default function Toolbar({
           {/* Edit Button */}
           <button
             onClick={onEdit}
-            className="px-3 py-1.75 bg-white hover:bg-gray-50 text-gray-700 text-sm font-medium flex items-center gap-1.5 transition-colors"
+            disabled={selectedCount === 0}
+            className={`px-2 py-1.5 flex items-center gap-1 text-sm font-medium transition-colors
+    ${
+      selectedCount === 0
+        ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+        : "bg-white hover:bg-gray-50 text-gray-700"
+    }`}
           >
             <Pencil className="w-4 h-4" />
             {!compactActions && !ChartOpen && "Edit"}
@@ -279,9 +286,9 @@ export default function Toolbar({
           {/* Chevron Button */}
           <button
             onClick={() => setShowEditDropdown((prev) => !prev)}
-            className="px-2 py-1.5 bg-white hover:bg-gray-50 text-gray-500 border-l border-gray-300 transition-colors"
+            className="px-1.5 py-1.5 bg-white hover:bg-gray-50 text-gray-500 border-l border-gray-300 transition-colors"
           >
-            <ChevronDown className="w-4 h-4" />
+            <ChevronDown className="w-3 h-3" />
           </button>
 
           {/* Dropdown */}
@@ -292,18 +299,43 @@ export default function Toolbar({
             />
           )}
         </div>
-        {/* <button
+
+        {/* Delete Button - Icon Only */}
+        <button
           onClick={() => setIsDeleteOpen(true)}
-          className="px-3 py-1.5 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-md text-sm font-medium flex items-center gap-1.5 transition-colors"
+          disabled={selectedCount === 0}
+          className={`px-2 py-1.5 flex items-center justify-center text-sm font-medium transition-colors rounded-md border
+    ${
+      selectedCount === 0
+        ? "bg-gray-100 text-gray-400 cursor-not-allowed border-gray-200"
+        : "bg-white hover:bg-gray-50 text-gray-700 border-gray-300"
+    }`}
         >
           <Trash2 className="w-4 h-4" />
         </button>
-        <button className="px-3 py-1.5 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-md text-sm font-medium flex items-center gap-1.5 transition-colors">
-          <UndoIcon className="w-4 h-4" />
-        </button> */}
+
+        {/* Revert Button - Icon Only */}
+        <button
+          onClick={onRevert}
+          disabled={selectedCount === 0}
+          className={`px-2 py-1.5 flex items-center justify-center text-sm font-medium transition-colors rounded-md border
+    ${
+      selectedCount === 0
+        ? "bg-gray-100 text-gray-400 cursor-not-allowed border-gray-200"
+        : "bg-white hover:bg-gray-50 text-gray-700 border-gray-300"
+    }`}
+        >
+          <Undo2 className="w-4 h-4" />
+        </button>
         <button
           onClick={onABTest}
-          className="px-3 py-1.5 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-md text-sm font-medium flex items-center gap-1.5 transition-colors"
+          disabled={selectedCount === 0}
+          className={`px-2 py-1.5 flex items-center gap-1 text-sm font-medium transition-colors rounded-md border
+    ${
+      selectedCount === 0
+        ? "bg-gray-100 text-gray-400 cursor-not-allowed border-gray-200"
+        : "bg-white hover:bg-gray-50 text-gray-700 border-gray-300"
+    }`}
         >
           <Flask className="w-4 h-4" />
           {!compactActions && !ChartOpen && " A/B test"}
@@ -476,8 +508,12 @@ export default function Toolbar({
         </button>
       </div>
       <DeleteModal
-        isOpen={isDeleteOpen}
+        open={isDeleteOpen}
         onClose={() => setIsDeleteOpen(false)}
+        onConfirm={() => {
+          onDelete();
+          setIsDeleteOpen(false);
+        }}
       />
       <div className="">
         <ApplyRuleModal

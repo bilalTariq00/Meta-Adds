@@ -6,8 +6,9 @@ import ABTestWizard from "./ABTestWizard";
 import RulesModal from "./RulesModal";
 import SplitAudienceModal from "./SplitAudienceModal";
 import DeleteModal from "./DeleteModal";
+import RevertModal from "./RevertModal";
 import ChartsSidebar from "./ChartsSidebar";
-import CampaignTable from "./CampaignTable";
+import CampaignTable, { campaignsSeed, adsetsSeed, adsSeed } from "./CampaignTable";
 import PageFiltersBar from "./PageFiltersBar";
 import SaveEditsPanel from "./SaveEditsPanel";
 import TabsAndDatePicker from "./TabsAndDatePicker";
@@ -15,6 +16,8 @@ import { CreateCampaignModal } from "../Accountoverview/create-campaign-modal";
 import DuplicateModal from "./DuplicateModel";
 import DynamicDuplicateModal from "./dialoges/DynamicDuplicateModal";
 import ExportPopups from "./dropdowns/export-popup";
+import { useCampaignSidebar } from "@/contexts/CampaignSidebarContext";
+
 
 // Dummy API helpers
 const wait = (ms) => new Promise((res) => setTimeout(res, ms));
@@ -38,6 +41,7 @@ const fakeApi = {
 };
 
 export default function CampaignsView() {
+  const { openSidebar } = useCampaignSidebar();
   const [search, setSearch] = useState("");
   const [chips, setChips] = useState([
     "Impressions (campaign) > 0",
@@ -47,6 +51,11 @@ export default function CampaignsView() {
     hadDelivery: false,
     active: false,
     categories: [],
+    breakdowns: [], // for breakdown dropdown
+    columns: "performance", // for column preferences
+    status: "all", // all, active, paused, draft
+    budget: "all", // all, low, medium, high
+    performance: "all", // all, good, poor
   });
   const [activeTab, setActiveTab] = useState("campaigns"); // campaigns | adsets | ads
 
@@ -55,6 +64,7 @@ export default function CampaignsView() {
   const [showRules, setShowRules] = useState(false);
   const [showSplitAudience, setShowSplitAudience] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
+  const [showRevert, setShowRevert] = useState(false);
   const [showCharts, setShowCharts] = useState(false);
   const [showSavePanel, setShowSavePanel] = useState(false);
   const [open, setOpen] = useState(false);
@@ -65,7 +75,10 @@ export default function CampaignsView() {
   const [selectionHasToggleOn, setSelectionHasToggleOn] = useState(false);
   // Derived filter state connected to search bar in toolbar
   const tableQuery = useMemo(
-    () => ({ search, filters, activeTab }),
+    () => {
+      console.log('Table query updated:', { search, filters, activeTab });
+      return { search, filters, activeTab };
+    },
     [search, filters, activeTab]
   );
 
@@ -93,9 +106,21 @@ export default function CampaignsView() {
 
   const handleRevert = async () => {
     await fakeApi.revert();
-    setFilters({ hadDelivery: false, active: false, categories: [] });
+    setFilters({ 
+      hadDelivery: false, 
+      active: false, 
+      categories: [],
+      breakdowns: [],
+      columns: "performance",
+      status: "all",
+      budget: "all", 
+      performance: "all"
+    });
     setSearch("");
+    setShowRevert(false);
   };
+
+
 
   const handleSaveRule = async (payload) => {
     await fakeApi.saveRule(payload);
@@ -103,6 +128,17 @@ export default function CampaignsView() {
   };
 
   const handleToggleCharts = useCallback(() => setShowCharts((v) => !v), []);
+
+  const handleEdit = useCallback(() => {
+    if (selection.length > 0) {
+      // Get the selected field data from the current table data
+      const currentData = activeTab === "adsets" ? adsetsSeed : 
+                         activeTab === "ads" ? adsSeed : campaignsSeed;
+      const selectedData = currentData.filter(item => selection.includes(item.id));
+      const fieldData = selectedData[0]; // Take the first selected item
+      openSidebar("edit", fieldData); // Open the main CampaignSidebar with edit tab
+    }
+  }, [selection, activeTab, openSidebar]);
 
   return (
     <div className="flex flex-col h-full">
@@ -146,10 +182,13 @@ export default function CampaignsView() {
               onCreate={() => setShowCreate(true)}
               onShowSplit={() => setShowSplitAudience(true)}
               onDuplicate={() => setOpen(true)}
-              onEdit={() => {}}
+              onEdit={handleEdit}
               onDelete={() => setShowDelete(true)}
-              onRevert={handleRevert}
-              onABTest={() => setShowABTest(true)}
+              onRevert={() => setShowRevert(true)}
+              onABTest={() => {
+                console.log("A/B Test button clicked, setting showABTest to true");
+                setShowABTest(true);
+              }}
               onRules={() => setShowRules(true)}
               onToggleCharts={handleToggleCharts}
             />
@@ -200,6 +239,11 @@ export default function CampaignsView() {
         onClose={() => setShowDelete(false)}
         onConfirm={handleDelete}
       />
+      <RevertModal
+        open={showRevert}
+        onClose={() => setShowRevert(false)}
+        onConfirm={handleRevert}
+      />
       {selectionHasToggleOn ? (
         <DynamicDuplicateModal
           open={open}
@@ -218,6 +262,8 @@ export default function CampaignsView() {
           setApplyRecommendation={setApplyRecommendation}
         />
       )}
+
+
 
     </div>
   );

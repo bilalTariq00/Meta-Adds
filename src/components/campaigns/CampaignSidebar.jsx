@@ -36,10 +36,11 @@ export default function CampaignSidebar({
   isOpen,
   onClose,
   activeTab = "chart",
+  selectedFieldData = null,
 }) {
   const [sidebarTab, setSidebarTab] = useState(activeTab);
   const [currentTab, setCurrentTab] = useState("performance");
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(activeTab === "edit");
   const [isInternalSidebarOpen, setIsInternalSidebarOpen] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showActivityDropdown, setShowActivityDropdown] = useState(false);
@@ -562,7 +563,7 @@ export default function CampaignSidebar({
                     </div>
                   )}
 
-                  {sidebarTab === "edit" && <EditTab />}
+                  {sidebarTab === "edit" && <EditTab selectedFieldData={selectedFieldData} />}
 
                   {sidebarTab === "activity" && (
                         <div className="space-y-4">
@@ -702,7 +703,7 @@ export default function CampaignSidebar({
                     </div>
                   )}
                   
-                                      {sidebarTab === "edit" && <EditTab />}
+                                      {sidebarTab === "edit" && <EditTab selectedFieldData={selectedFieldData} />}
                   
                     {sidebarTab === "activity" && (
                     <div className="space-y-4">

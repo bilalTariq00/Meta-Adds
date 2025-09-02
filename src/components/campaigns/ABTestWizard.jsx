@@ -11,7 +11,8 @@ import {
   Blocks,
 } from "lucide-react";
 
-const ABTestWizard = ({ open = true, onClose = () => {} }) => {
+const ABTestWizard = ({ open = false, onClose = () => {} }) => {
+  console.log("ABTestWizard rendered with open:", open);
   const [step, setStep] = useState(1);
   const [showVariableDropdown, setShowVariableDropdown] = useState(false);
   const [showAdDropdown, setShowAdDropdown] = useState(false);
@@ -1217,7 +1218,7 @@ const ABTestWizard = ({ open = true, onClose = () => {} }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-[9999]">
       <div className="bg-white rounded-lg shadow-lg w-full max-w-5xl max-h-[90vh] overflow-y-auto">
         {/* Header with close button */}
         <div className="flex justify-end items-center px-4 mb-[-30px] z-50 ">

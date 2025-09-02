@@ -172,9 +172,9 @@ const BreakdownDropdown = ({
       // For compact mode, just show the count badge if there are selections
       return null; // We'll handle the display in the JSX
     }
-    if (count === 0) return placeholder;
-    if (count === 1) return `Breakdown: ${count} selected`;
-    return `Breakdowns: ${count} selected`;
+    if (count === 0) return "Breakdown";
+    if (count === 1) return "Breakdown: 1 selected";
+    return `Breakdown: ${count} selected`;
   };
 
   const getPopupConfig = () => {

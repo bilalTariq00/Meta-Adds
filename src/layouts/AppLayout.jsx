@@ -9,14 +9,14 @@ import { ActivityHistorySidebar } from "@/components/activity-history-sidebar";
 import { useState } from "react";
 import { Clock, BarChart3, Edit3 } from "lucide-react";
 import CampaignSidebar from "@/components/campaigns/CampaignSidebar";
+import { CampaignSidebarProvider, useCampaignSidebar } from "@/contexts/CampaignSidebarContext";
 
-// This is your child layout with Header and Sidebar
-export default function AppLayout() {
+// Sidebar controls component that uses the context
+function SidebarControls() {
   const { isLoading } = useLoading();
+  const { isOpen, activeTab, selectedFieldData, openSidebar, closeSidebar } = useCampaignSidebar();
   const [isActivitySidebarOpen, setIsActivitySidebarOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState("activity");
-  const [isCampaignSidebarOpen, setIsCampaignSidebarOpen] = useState(false);
-  const [campaignSidebarTab, setCampaignSidebarTab] = useState("chart");
+  const [activityTab, setActivityTab] = useState("activity");
   const location = useLocation();
 
   // Check if current page is campaign page
@@ -27,7 +27,7 @@ export default function AppLayout() {
     location.pathname.includes("/ad-sets");
 
   const handleTabClick = (tab) => {
-    setActiveTab(tab);
+    setActivityTab(tab);
     setIsActivitySidebarOpen(true);
   };
 
@@ -55,12 +55,9 @@ export default function AppLayout() {
           {isCampaignPage && (
             <div className="relative group mb-2">
               <button
-                onClick={() => {
-                  setCampaignSidebarTab("chart");
-                  setIsCampaignSidebarOpen(true);
-                }}
+                onClick={() => openSidebar("chart")}
                 className={`px-3 text-slate-300 hover:text-white hover:bg-slate-600 rounded-lg transition-colors ${
-                  campaignSidebarTab === "chart" && isCampaignSidebarOpen
+                  activeTab === "chart" && isOpen
                     ? "bg-slate-600 text-white"
                     : ""
                 }`}
@@ -82,12 +79,9 @@ export default function AppLayout() {
           {isCampaignPage && (
             <div className="relative group mb-2">
               <button
-                onClick={() => {
-                  setCampaignSidebarTab("edit");
-                  setIsCampaignSidebarOpen(true);
-                }}
+                onClick={() => openSidebar("edit")}
                 className={`px-3 text-slate-300 hover:text-white hover:bg-slate-600 rounded-lg transition-colors ${
-                  campaignSidebarTab === "edit" && isCampaignSidebarOpen
+                  activeTab === "edit" && isOpen
                     ? "bg-slate-600 text-white"
                     : ""
                 }`}
@@ -110,18 +104,17 @@ export default function AppLayout() {
             <button
               onClick={() => {
                 if (isCampaignPage) {
-                  setCampaignSidebarTab("activity");
-                  setIsCampaignSidebarOpen(true);
+                  openSidebar("activity");
                 } else {
                   handleTabClick("activity");
                 }
               }}
               className={`px-3 text-slate-300 hover:text-white hover:bg-slate-600 rounded-lg transition-colors ${
                 (isCampaignPage &&
-                  campaignSidebarTab === "activity" &&
-                  isCampaignSidebarOpen) ||
-                (!isCampaignPage &&
                   activeTab === "activity" &&
+                  isOpen) ||
+                (!isCampaignPage &&
+                  activityTab === "activity" &&
                   isActivitySidebarOpen)
                   ? "bg-slate-600 text-white"
                   : ""
@@ -146,17 +139,27 @@ export default function AppLayout() {
         <ActivityHistorySidebar
           isOpen={isActivitySidebarOpen}
           onClose={() => setIsActivitySidebarOpen(false)}
-          initialTab={activeTab}
+          initialTab={activityTab}
           showAllTabs={isCampaignPage}
         />
 
         {/* Campaign Sidebar */}
         <CampaignSidebar
-          isOpen={isCampaignSidebarOpen}
-          onClose={() => setIsCampaignSidebarOpen(false)}
-          activeTab={campaignSidebarTab}
+          isOpen={isOpen}
+          onClose={closeSidebar}
+          activeTab={activeTab}
+          selectedFieldData={selectedFieldData}
         />
       </div>
     </div>
+  );
+}
+
+// Main AppLayout component that provides the context
+export default function AppLayout() {
+  return (
+    <CampaignSidebarProvider>
+      <SidebarControls />
+    </CampaignSidebarProvider>
   );
 }

@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 
 // Sample data for different tabs
-const campaignsSeed = [
+export const campaignsSeed = [
   {
     id: "c1",
     name: "DYT - Home Improvement US Campaign",
@@ -100,7 +100,7 @@ const campaignsSeed = [
   },
 ];
 
-const adsetsSeed = [
+export const adsetsSeed = [
   {
     id: "s1",
     name: "Auto Insurance Leads - AFDTFB",
@@ -183,7 +183,7 @@ const adsetsSeed = [
   },
 ];
 
-const adsSeed = [
+export const adsSeed = [
   {
     id: "a1",
     name: "DYT Home Improvement",

@@ -6,7 +6,10 @@ import { X } from "lucide-react";
 export default function DeleteModal({ open, onClose, onConfirm }) {
   if (!open) return null;
   return (
-    <div className="absolute inset-0 z-[60] flex items-center justify-center">
+    <div 
+      className="fixed inset-0 bg-black/70 z-[60] flex items-center justify-center"
+      onClick={onClose}
+    >
       <div
         className="bg-white rounded-lg shadow-xl w-[500px]"
         onClick={(e) => e.stopPropagation()}
