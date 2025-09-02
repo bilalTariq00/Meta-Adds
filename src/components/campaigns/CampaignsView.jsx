@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState, useCallback } from "react";
+import React, { useMemo, useState, useCallback, useEffect } from "react";
 import Toolbar from "./Toolbar";
 import ABTestWizard from "./ABTestWizard";
 import RulesModal from "./RulesModal";
@@ -11,6 +11,7 @@ import ChartsSidebar from "./ChartsSidebar";
 import CampaignTable, { campaignsSeed, adsetsSeed, adsSeed } from "./CampaignTable";
 import PageFiltersBar from "./PageFiltersBar";
 import SaveEditsPanel from "./SaveEditsPanel";
+import CreateViewSidebar from "./CreateViewSidebar";
 import TabsAndDatePicker from "./TabsAndDatePicker";
 import { CreateCampaignModal } from "../Accountoverview/create-campaign-modal";
 import DuplicateModal from "./DuplicateModel";
@@ -41,7 +42,6 @@ const fakeApi = {
 };
 
 export default function CampaignsView() {
-  const { openSidebar } = useCampaignSidebar();
   const [search, setSearch] = useState("");
   const [chips, setChips] = useState([
     "Impressions (campaign) > 0",
@@ -67,10 +67,27 @@ export default function CampaignsView() {
   const [showRevert, setShowRevert] = useState(false);
   const [showCharts, setShowCharts] = useState(false);
   const [showSavePanel, setShowSavePanel] = useState(false);
+  const [showCreateViewPanel, setShowCreateViewPanel] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [duplicatedItems, setDuplicatedItems] = useState([]); // Track duplicated items
+  const [isCreating, setIsCreating] = useState(false); // Track if we're in create mode
+  const [createData, setCreateData] = useState(null); // Store create data
+  const [dateRange, setDateRange] = useState({
+    range: "last30days",
+    startDate: "22 Jul 2025",
+    endDate: "20 Aug 2025",
+    compare: false
+  });
   const [open, setOpen] = useState(false);
   const [applyRecommendation, setApplyRecommendation] = useState(true);
   const [selection, setSelection] = useState([]); // selected row IDs
   const [selectedTab, setSelectedTab] = useState(null); // which tab the selection belongs to
+  const [selectedCountsByTab, setSelectedCountsByTab] = useState({
+    campaigns: 0,
+    adsets: 0,
+    ads: 0
+  });
+  const [customTabs, setCustomTabs] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const [selectionHasToggleOn, setSelectionHasToggleOn] = useState(false);
   // Derived filter state connected to search bar in toolbar
@@ -87,16 +104,70 @@ export default function CampaignsView() {
       newSelection,
       hasToggleOn,
       selectionLength: newSelection.length,
+      activeTab
     });
 
     setSelection(newSelection);
     setSelectedTab(newSelection.length > 0 ? activeTab : null);
     setSelectionHasToggleOn(hasToggleOn);
+    
+    // Update counts per tab
+    setSelectedCountsByTab(prev => ({
+      ...prev,
+      [activeTab]: newSelection.length
+    }));
   };
 
   // Actions
+  const { openSidebar, closeSidebar } = useCampaignSidebar();
+
+  const handleCreate = async (data) => {
+    // Store create data and open sidebar in create mode
+    setCreateData(data);
+    setIsCreating(true);
+    setHasUnsavedChanges(true); // Mark that changes have been made
+    
+    // Open the main sidebar with edit tab for creation
+    openSidebar("edit", {
+      ...data,
+      isCreating: true,
+      name: `New ${data.objective} Campaign with recommended settings`,
+      onPublish: handlePublish // Pass the publish function
+    });
+  };
+
   const handleDuplicate = async (opts) => {
-    await fakeApi.duplicate(selection, opts);
+    // Get current data based on active tab
+    const currentData = activeTab === "adsets" ? adsetsSeed :
+                       activeTab === "ads" ? adsSeed : campaignsSeed;
+    
+    // Find selected items
+    const selectedData = currentData.filter(item => selection.includes(item.id));
+    
+    // Create duplicated items with new IDs
+    const duplicatedData = selectedData.map(item => ({
+      ...item,
+      id: `${item.id}_duplicate_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      name: `${item.name} (Copy)`,
+      lastEdit: new Date().toLocaleDateString('en-GB', { 
+        day: '2-digit', 
+        month: 'short', 
+        year: 'numeric' 
+      }) + ', ' + new Date().toLocaleTimeString('en-GB', { 
+        hour: '2-digit', 
+        minute: '2-digit' 
+      }),
+      editTime: "Just now"
+    }));
+    
+    // Store duplicated items for potential reversion
+    setDuplicatedItems(prev => [...prev, ...duplicatedData]);
+    setHasUnsavedChanges(true); // Mark that changes have been made
+    
+    // Close the duplicate modal
+    setOpen(false);
+    
+    console.log('Duplicated items:', duplicatedData);
   };
 
   const handleDelete = async () => {
@@ -104,20 +175,69 @@ export default function CampaignsView() {
     setShowDelete(false);
   };
 
+  const handlePublish = async (campaignData) => {
+    // Add the new campaign to duplicated items (which will show in table)
+    setDuplicatedItems(prev => [...prev, campaignData]);
+    setIsCreating(false);
+    setCreateData(null);
+    setHasUnsavedChanges(false); // Clear unsaved changes since it's now published
+    
+    // Close the sidebar
+    closeSidebar();
+    
+    console.log('Published campaign:', campaignData);
+  };
+
+  const handleDateRangeChange = (newDateRange) => {
+    console.log("Date range changed in CampaignsView:", newDateRange);
+    setDateRange(newDateRange);
+    // Here you can add logic to filter table data based on date range
+    // For now, we'll just update the state
+  };
+
+  // Clear current selection when switching tabs, but keep the counts for contextual text
+  useEffect(() => {
+    setSelection([]);
+    setSelectedTab(null);
+    setSelectionHasToggleOn(false);
+    // Note: We keep selectedCountsByTab intact so contextual text can be shown
+  }, [activeTab]);
+
   const handleRevert = async () => {
-    await fakeApi.revert();
-    setFilters({ 
-      hadDelivery: false, 
-      active: false, 
-      categories: [],
-      breakdowns: [],
-      columns: "performance",
-      status: "all",
-      budget: "all", 
-      performance: "all"
-    });
-    setSearch("");
+    // Remove all duplicated items and clear create state
+    setDuplicatedItems([]);
+    setIsCreating(false);
+    setCreateData(null);
+    setHasUnsavedChanges(false); // Clear unsaved changes
     setShowRevert(false);
+    
+    console.log('Reverted: Removed duplicated items and cleared create state');
+  };
+
+  const clearAllSelections = () => {
+    setSelection([]);
+    setSelectedTab(null);
+    setSelectionHasToggleOn(false);
+    setSelectedCountsByTab({
+      campaigns: 0,
+      adsets: 0,
+      ads: 0
+    });
+  };
+
+
+
+  const handleClearSelection = (tabId) => {
+    setSelectedCountsByTab(prev => ({
+      ...prev,
+      [tabId]: 0
+    }));
+    // Also clear current selection if it's the active tab
+    if (activeTab === tabId) {
+      setSelection([]);
+      setSelectedTab(null);
+      setSelectionHasToggleOn(false);
+    }
   };
 
 
@@ -151,6 +271,15 @@ export default function CampaignsView() {
         filters={filters}
         setFilters={setFilters}
         onOpenSave={() => setShowSavePanel(true)}
+        onCreateView={() => setShowCreateViewPanel(true)}
+        customViews={customTabs}
+        onViewCreated={(newView) => {
+          console.log('New view created:', newView);
+          // Add the new view to custom views (will appear in PageFiltersBar)
+          setCustomTabs(prev => [newView, ...prev]);
+          // Close the create view panel
+          setShowCreateViewPanel(false);
+        }}
       />
 
       {/* Tabs and Date Picker */}
@@ -159,6 +288,9 @@ export default function CampaignsView() {
         setActiveTab={setActiveTab}
         selectedCount={selection.length}
         selectedTab={selectedTab}
+        selectedCountsByTab={selectedCountsByTab}
+        onClearSelection={handleClearSelection}
+        onDateRangeChange={handleDateRangeChange}
       />
 
       {/* Inner card holding controls + table */}
@@ -166,7 +298,7 @@ export default function CampaignsView() {
         <div className="flex-1 min-h-0 flex gap-2  ">
           <div
             className={`flex-1 min-w-0 bg-white  shadow-sm p-3 ${
-              showSavePanel ? "pr-0 rounded-l-xl" : "pr-0 rounded-xl"
+              showSavePanel || showCreateViewPanel ? "pr-0 rounded-l-xl" : "pr-0 rounded-xl"
             }`}
           >
             <Toolbar
@@ -177,7 +309,7 @@ export default function CampaignsView() {
               activeTab={activeTab}
               setActiveTab={setActiveTab}
               selectedCount={selection.length}
-              compactActions={showSavePanel}
+              compactActions={showSavePanel || showCreateViewPanel}
               ChartOpen={showCharts}
               onCreate={() => setShowCreate(true)}
               onShowSplit={() => setShowSplitAudience(true)}
@@ -185,6 +317,7 @@ export default function CampaignsView() {
               onEdit={handleEdit}
               onDelete={() => setShowDelete(true)}
               onRevert={() => setShowRevert(true)}
+              hasUnsavedChanges={hasUnsavedChanges || isCreating}
               onABTest={() => {
                 console.log("A/B Test button clicked, setting showABTest to true");
                 setShowABTest(true);
@@ -197,12 +330,55 @@ export default function CampaignsView() {
               query={tableQuery}
               selectedIds={selection}
               onSelectionChange={handleSelectionChange}
+              duplicatedItems={duplicatedItems}
+              isCreating={isCreating}
+              createData={createData}
+              dateRange={dateRange}
+              onViewCharts={(item) => {
+                // Open chart tab in main right sidebar
+                openSidebar("chart", item);
+              }}
+              onEdit={(item) => {
+                // Open edit tab in main right sidebar
+                openSidebar("edit", item);
+              }}
+              onDuplicate={(item) => {
+                // Set selection to this item and open duplicate modal
+                setSelection([item.id]);
+                setOpen(true);
+              }}
+              onCompare={(item) => {
+                // Open compare small right sidebar
+                setShowCharts(true);
+              }}
+
+              onViewHistory={(item) => {
+                // Open view history tab in main right sidebar
+                openSidebar("activity", item);
+              }}
             />
           </div>
           {showSavePanel && (
             <SaveEditsPanel
               open={showSavePanel}
               onClose={() => setShowSavePanel(false)}
+            />
+          )}
+          {showCreateViewPanel && (
+            <CreateViewSidebar
+              open={showCreateViewPanel}
+              onClose={() => setShowCreateViewPanel(false)}
+              onSave={(viewData) => {
+                const newView = {
+                  id: Date.now(),
+                  name: viewData.name,
+                  filters: viewData.filters,
+                  createdAt: new Date().toISOString(),
+                };
+                
+                setCustomTabs(prev => [newView, ...prev]);
+                setShowCreateViewPanel(false);
+              }}
             />
           )}
           <ChartsSidebar
@@ -222,6 +398,7 @@ export default function CampaignsView() {
       <CreateCampaignModal
         isOpen={showCreate}
         onClose={() => setShowCreate(false)}
+        onCreate={handleCreate}
       />
       <ABTestWizard open={showABTest} onClose={() => setShowABTest(false)} />
       <RulesModal

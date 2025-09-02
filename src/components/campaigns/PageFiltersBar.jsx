@@ -9,6 +9,9 @@ import {
   Plus,
   SlidersHorizontal,
 } from "lucide-react";
+import QuickViewsDropdown from "./dropdowns/QuickViewsDropdown";
+import MyViewsDropdown from "./dropdowns/MyViewsDropdown";
+import SharedViewsDropdown from "./dropdowns/SharedViewsDropdown";
 
 // Chip component for selected filters
 function Chip({ label, onRemove }) {
@@ -891,6 +894,9 @@ export default function PageFiltersBar({
   filters,
   setFilters,
   onOpenSave,
+  onViewCreated,
+  onCreateView,
+  customViews = [],
 }) {
   const [showSearch, setShowSearch] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -903,6 +909,11 @@ export default function PageFiltersBar({
     position: { top: 0, left: 0 },
     condition: "is",
   });
+
+  // New states for dropdown system
+  const [showQuickViews, setShowQuickViews] = useState(false);
+  const [showMyViews, setShowMyViews] = useState(false);
+  const [showSharedViews, setShowSharedViews] = useState(false);
   // const [filters, setFilters] = useState({
   //   allAds: false,
   //   hadDelivery: false,
@@ -914,13 +925,27 @@ export default function PageFiltersBar({
   const inputRef = useRef(null);
 
   const selectQuick = (key) => {
-    setFilters((f) => ({
-      ...f,
-      allAds: key === "allAds",
-      hadDelivery: key === "hadDelivery",
-      actions: key === "actions",
-      active: key === "active",
-    }));
+    setFilters((f) => {
+      const newFilters = {
+        ...f,
+        allAds: key === "allAds",
+        hadDelivery: key === "hadDelivery",
+        actions: key === "actions",
+        active: key === "active",
+      };
+      
+      // Clear all custom view selections
+      customViews.forEach(view => {
+        newFilters[`custom-${view.id}`] = false;
+      });
+      
+      // Set the selected custom view if it's a custom view
+      if (key.startsWith("custom-")) {
+        newFilters[key] = true;
+      }
+      
+      return newFilters;
+    });
   };
 
   const handleSelectFilter = (filter, position = null) => {
@@ -1041,6 +1066,51 @@ export default function PageFiltersBar({
       condition: "is",
     });
   };
+
+  // Dropdown handlers
+  const handleQuickViewsClick = () => {
+    setShowQuickViews(!showQuickViews);
+    setShowMyViews(false);
+    setShowSharedViews(false);
+  };
+
+  const handleMyViewsClick = () => {
+    setShowMyViews(true);
+    setShowQuickViews(false);
+    setShowSharedViews(false);
+  };
+
+  const handleSharedViewsClick = () => {
+    setShowSharedViews(true);
+    setShowQuickViews(false);
+    setShowMyViews(false);
+  };
+
+  const handleCreateViewClick = () => {
+    setShowQuickViews(false);
+    setShowMyViews(false);
+    setShowSharedViews(false);
+    // Close the dropdown
+    handleCloseAllDropdowns();
+    // Call the parent handler to show create view panel
+    if (onCreateView) {
+      onCreateView();
+    }
+  };
+
+  const handleBackToQuickViews = () => {
+    setShowMyViews(false);
+    setShowSharedViews(false);
+    setShowQuickViews(true);
+  };
+
+
+
+  const handleCloseAllDropdowns = () => {
+    setShowQuickViews(false);
+    setShowMyViews(false);
+    setShowSharedViews(false);
+  };
   return (
     <div className=" px-4 py-2">
       {/* Top row: search icon, quick buttons, Save edits */}
@@ -1106,6 +1176,26 @@ export default function PageFiltersBar({
           Had delivery
         </button>
 
+        {/* Custom View Tabs */}
+        {customViews.map((view) => (
+          <button
+            key={view.id}
+            onClick={() => selectQuick(`custom-${view.id}`)}
+            className={`hover:bg-[#C3DCF5] flex items-center justify-center gap-2 px-3 py-2.5 rounded-sm border text-sm ${
+              filters?.[`custom-${view.id}`]
+                ? " border-[#0A78BE] font-bold text-[#0A78BE]"
+                : "bg-white border-gray-300 text-gray-700"
+            }`}
+          >
+            <img
+              src="/images/campaigns/CampaignsLight.png"
+              alt={view.name}
+              className="w-5 h-4"
+            />
+            {view.name}
+          </button>
+        ))}
+
         <button
           onClick={() => selectQuick("actions")}
           className={`hover:bg-[#C3DCF5] flex items-center justify-center gap-2 px-3 py-2.5 rounded-sm border text-sm ${
@@ -1146,15 +1236,40 @@ export default function PageFiltersBar({
           Active ads
         </button>
 
-        <button
-          onClick={() => setFilters((f) => ({ ...f, more: !f.more }))}
-          className={`flex items-center justify-center gap-2  px-3 py-2.5 rounded-sm text-sm hover:bg-gray-200 ${
-            filters?.more ? "bg-gray-200  font-bold " : "  text-gray-700"
-          }`}
-        >
-          <Plus size={20} />
-          See more
-        </button>
+        <div className="relative">
+          <button
+            onClick={handleQuickViewsClick}
+            className={`flex items-center justify-center gap-2  px-3 py-2.5 rounded-sm text-sm hover:bg-gray-200 ${
+              showQuickViews || showMyViews || showSharedViews ? "bg-gray-200  font-bold " : "  text-gray-700"
+            }`}
+          >
+            <Plus size={20} />
+            {customViews.length > 0 ? `+${customViews.length} more` : "See more"}
+          </button>
+
+          {/* Quick Views Dropdown */}
+          <QuickViewsDropdown
+            isOpen={showQuickViews}
+            onClose={handleCloseAllDropdowns}
+            onMyViews={handleMyViewsClick}
+            onSharedViews={handleSharedViewsClick}
+            onCreateView={handleCreateViewClick}
+          />
+
+          {/* My Views Dropdown */}
+          <MyViewsDropdown
+            isOpen={showMyViews}
+            onClose={handleCloseAllDropdowns}
+            onBack={handleBackToQuickViews}
+          />
+
+          {/* Shared Views Dropdown */}
+          <SharedViewsDropdown
+            isOpen={showSharedViews}
+            onClose={handleCloseAllDropdowns}
+            onBack={handleBackToQuickViews}
+          />
+        </div>
 
         <button
           onClick={onOpenSave}

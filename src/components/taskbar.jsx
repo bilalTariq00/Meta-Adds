@@ -1,7 +1,7 @@
 "use client";
-import { Chrome, Search, Wifi, Volume2, Battery } from "lucide-react";
+import { Chrome, Search, Wifi, Volume2, Battery, BatteryFull, BatteryFullIcon, BatteryChargingIcon } from "lucide-react";
 import windows from "@/assets/window.png";
-
+import Chromes from '@/assets/chrome.png'
 export default function Taskbar({ isChromeOpen, isMinimized, onChromeClick }) {
   const currentTime = new Date();
   const timeString = currentTime.toLocaleTimeString([], {
@@ -46,7 +46,11 @@ export default function Taskbar({ isChromeOpen, isMinimized, onChromeClick }) {
                   : "bg-white/20 hover:bg-white/30 border-b-2 border-blue-400"
               }`}
             >
-              <Chrome size={20} className="" />
+               <img
+              src={Chromes}
+              alt="My Icon"
+              className="w-8 h-8"
+            />
             </button>
           )}
         </div>
@@ -55,7 +59,7 @@ export default function Taskbar({ isChromeOpen, isMinimized, onChromeClick }) {
           <div className="flex items-center gap-2">
             <Wifi size={16} className="" />
             <Volume2 size={16} className="" />
-            <Battery size={16} className="" />
+            <BatteryChargingIcon size={16} className="" />
           </div>
           <div className=" text-sm text-right leading-tight">
             <div className="font-medium">{timeString}</div>

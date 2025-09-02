@@ -15,7 +15,7 @@ import {
   FileImage,
 } from "lucide-react";
 
-export function CreateCampaignModal({ isOpen, onClose }) {
+export function CreateCampaignModal({ isOpen, onClose, onCreate }) {
   const [activeTab, setActiveTab] = useState("create-campaign");
   const [selectedObjective, setSelectedObjective] = useState("");
   const [hoveredObjective, setHoveredObjective] = useState(null);
@@ -444,6 +444,15 @@ export function CreateCampaignModal({ isOpen, onClose }) {
                   </button>
                   <button
                     disabled={!selectedObjective}
+                    onClick={() => {
+                      if (onCreate) {
+                        onCreate({
+                          objective: selectedObjective,
+                          buyingType: selectedBuyingType
+                        });
+                      }
+                      onClose();
+                    }}
                     className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-sm font-medium transition-colors"
                   >
                     Continue

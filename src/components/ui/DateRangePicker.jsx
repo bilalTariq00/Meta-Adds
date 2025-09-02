@@ -79,13 +79,13 @@ export default function DateRangePicker({
   const getPositionClasses = () => {
     switch (position) {
       case "bottom-left":
-        return "top-full left-0 mt-1";
+        return "top-full left-0 mt-2";
       case "top-right":
-        return "bottom-full right-0 mb-1";
+        return "bottom-full right-0 mb-2";
       case "top-left":
-        return "bottom-full left-0 mb-1";
+        return "bottom-full left-0 mb-2";
       default: // bottom-right
-        return "top-full right-0 mt-1";
+        return "top-full right-0 mt-2";
     }
   };
 

@@ -99,12 +99,16 @@ export default function ChromeWindow({ onClose, onMinimize }) {
 
   return (
     <div
-      className={`fixed bg-white shadow-2xl flex flex-col border border-gray-300 transition-all duration-200 ease-in-out z-2 ${
+      className={`fixed bg-white shadow-lg flex flex-col border border-gray-200 transition-all duration-200 ease-in-out z-2 ${
         isMaximized
-          ? "top-0 left-0 right-0 bottom-12 rounded-none" // Changed from inset-0 to leave space for taskbar
-          : "top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[900px] h-[600px] rounded-xl"
+          ? "top-0 left-0 right-0 bottom-12 rounded-none"
+          : "top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[700px] rounded-lg"
       }`}
-      style={{ minWidth: "600px", minHeight: "400px" }}
+      style={{ 
+        minWidth: "800px", 
+        minHeight: "600px",
+        boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)"
+      }}
     >
       {/* Row 1: Tabs + Window Controls */}
       <TitleBar
@@ -120,34 +124,34 @@ export default function ChromeWindow({ onClose, onMinimize }) {
       />
 
       {/* Row 2: Navigation Bar */}
-      <div className="flex items-center  px-3 py-2 gap-2 border-b border-gray-200 shadow-xs">
+      <div className="flex items-center px-3 py-2 gap-2 border-b border-gray-100 bg-white">
         <div className="flex gap-1">
-          <button className="p-1.5 hover:bg-black/5 rounded-lg transition-colors">
-            <ArrowLeft size={16} className="text-gray-600" />
+          <button className="p-1.5 hover:bg-gray-100 rounded-full transition-colors">
+            <ArrowLeft size={16} className="text-gray-700" />
           </button>
-          <button className="p-1.5 hover:bg-black/5 rounded-lg transition-colors">
-            <ArrowRight size={16} className="text-gray-600" />
+          <button className="p-1.5 hover:bg-gray-100 rounded-full transition-colors">
+            <ArrowRight size={16} className="text-gray-700" />
           </button>
-          <button className="p-1.5 hover:bg-black/5 rounded-lg transition-colors">
-            <RotateCw size={16} className="text-gray-600" />
+          <button className="p-1.5 hover:bg-gray-100 rounded-full transition-colors">
+            <RotateCw size={16} className="text-gray-700" />
           </button>
         </div>
 
         <SearchBar />
 
         <div className="flex items-center gap-1">
-          <button className="p-1.5 hover:bg-black/5 rounded-lg transition-colors">
-            <Avatar className="w-6 h-6 bg-blue-400">
-              <AvatarFallback className="text-gray-100 text-xs">
+          <button className="p-1.5 hover:bg-gray-100 rounded-full transition-colors">
+            <Avatar className="w-6 h-6 bg-blue-500">
+              <AvatarFallback className="text-white text-xs">
                 H
               </AvatarFallback>
             </Avatar>
           </button>
           <button
-            className="p-1.5 hover:bg-black/5 rounded-lg transition-colors relative"
+            className="p-1.5 hover:bg-gray-100 rounded-full transition-colors relative"
             onClick={() => setShowMenu(!showMenu)}
           >
-            <MoreVertical size={16} className="text-gray-600" />
+            <MoreVertical size={16} className="text-gray-700" />
             {showMenu && <VerticalMenu onClose={() => setShowMenu(false)} />}
           </button>
         </div>

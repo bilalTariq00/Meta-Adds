@@ -29,6 +29,7 @@ import PerformanceOverview from "./PerformanceOverview";
 import DemographicsPlatform from "./DemographicsPlatform";
 import ActionsTab from "./ActionsTab";
 import EditTab from "./EditTab";
+import CreateEditTab from "./CreateEditTab";
 import DateRangePicker from "@/components/ui/DateRangePicker";
 import CampaignStructureSidebar from "./CampaignStructureSidebar";
 
@@ -37,10 +38,16 @@ export default function CampaignSidebar({
   onClose,
   activeTab = "chart",
   selectedFieldData = null,
+  onPublish = null,
 }) {
   const [sidebarTab, setSidebarTab] = useState(activeTab);
   const [currentTab, setCurrentTab] = useState("performance");
   const [isExpanded, setIsExpanded] = useState(activeTab === "edit");
+
+  // Sync sidebarTab with activeTab prop changes
+  useEffect(() => {
+    setSidebarTab(activeTab);
+  }, [activeTab]);
   const [isInternalSidebarOpen, setIsInternalSidebarOpen] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showActivityDropdown, setShowActivityDropdown] = useState(false);
@@ -563,7 +570,26 @@ export default function CampaignSidebar({
                     </div>
                   )}
 
-                  {sidebarTab === "edit" && <EditTab selectedFieldData={selectedFieldData} />}
+                  {sidebarTab === "edit" && (
+                    selectedFieldData?.isCreating ? (
+                      <CreateEditTab 
+                        selectedFieldData={selectedFieldData}
+                        onPublish={selectedFieldData?.onPublish || onPublish}
+                        onNext={() => {
+                          // Handle next step
+                          console.log('Next step');
+                        }}
+                        onBack={() => {
+                          // Handle back
+                          console.log('Back');
+                        }}
+                        currentStep={1}
+                        totalSteps={3}
+                      />
+                    ) : (
+                      <EditTab selectedFieldData={selectedFieldData} />
+                    )
+                  )}
 
                   {sidebarTab === "activity" && (
                         <div className="space-y-4">
@@ -703,7 +729,26 @@ export default function CampaignSidebar({
                     </div>
                   )}
                   
-                                      {sidebarTab === "edit" && <EditTab selectedFieldData={selectedFieldData} />}
+                  {sidebarTab === "edit" && (
+                    selectedFieldData?.isCreating ? (
+                      <CreateEditTab 
+                        selectedFieldData={selectedFieldData}
+                        onPublish={selectedFieldData?.onPublish || onPublish}
+                        onNext={() => {
+                          // Handle next step
+                          console.log('Next step');
+                        }}
+                        onBack={() => {
+                          // Handle back
+                          console.log('Back');
+                        }}
+                        currentStep={1}
+                        totalSteps={3}
+                      />
+                    ) : (
+                      <EditTab selectedFieldData={selectedFieldData} />
+                    )
+                  )}
                   
                     {sidebarTab === "activity" && (
                     <div className="space-y-4">

@@ -10,6 +10,8 @@ import {
   Pin,
   Clock,
   RotateCcw,
+  BarChart3,
+  GitCompare,
 } from "lucide-react";
 
 // Sample data for different tabs
@@ -28,7 +30,7 @@ export const campaignsSeed = [
     costPerResult: "—",
     amountSpent: 19.93,
     ends: "Ongoing",
-    lastEdit: "20 Aug 2025, 22:...",
+    lastEdit: "20 Aug 2025, 22:30",
     editTime: "2 days ago",
     resultType: "Website view content",
     on: false,
@@ -49,7 +51,7 @@ export const campaignsSeed = [
     costPerResult: "—",
     amountSpent: 0.75,
     ends: "Ongoing",
-    lastEdit: "13 Aug 2025, 20:...",
+    lastEdit: "13 Aug 2025, 20:15",
     editTime: "9 days ago",
     resultType: "Website view content",
     on: false,
@@ -278,6 +280,13 @@ export default function CampaignTable({
   query,
   selectedIds,
   onSelectionChange,
+  duplicatedItems = [],
+  onViewCharts,
+  onEdit,
+  onDuplicate,
+  onCompare,
+  onViewHistory,
+  dateRange = null,
 }) {
   const [campaigns, setCampaigns] = useState(campaignsSeed);
   const [adsets, setAdsets] = useState(adsetsSeed);
@@ -285,6 +294,7 @@ export default function CampaignTable({
   const [loading, setLoading] = useState(false);
   const [hoveredRow, setHoveredRow] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(null);
+  const [pinnedItems, setPinnedItems] = useState(new Set());
 
   useEffect(() => {
     setLoading(true);
@@ -296,18 +306,53 @@ export default function CampaignTable({
     const q = (query.search || "").toLowerCase();
     const f = query.filters || {};
 
+    // Get base data and add duplicated items
+    let baseData = [];
     if (query.activeTab === "adsets") {
-      return adsets.filter((r) => r.name.toLowerCase().includes(q));
-    }
-    if (query.activeTab === "ads") {
-      return ads.filter((r) => r.name.toLowerCase().includes(q));
+      baseData = [...adsets];
+    } else if (query.activeTab === "ads") {
+      baseData = [...ads];
+    } else {
+      baseData = [...campaigns];
     }
 
-    let filtered = campaigns.filter((r) => r.name.toLowerCase().includes(q));
-    if (f.hadDelivery) filtered = filtered.filter((r) => r.hadDelivery);
-    if (f.active) filtered = filtered.filter((r) => r.active);
-    return filtered;
-  }, [campaigns, adsets, ads, query]);
+    // Add duplicated items to the base data
+    const allData = [...baseData, ...duplicatedItems];
+
+    // Apply search filter
+    let filtered = allData.filter((r) => r.name.toLowerCase().includes(q));
+    
+    // Apply other filters for campaigns
+    if (query.activeTab === "campaigns") {
+      if (f.hadDelivery) filtered = filtered.filter((r) => r.hadDelivery);
+      if (f.active) filtered = filtered.filter((r) => r.active);
+    }
+    
+    // Apply date range filter if provided
+    if (dateRange && dateRange.range !== "maximum") {
+      filtered = filtered.filter((item) => {
+        // For demo purposes, we'll filter based on lastEdit date
+        // In a real app, you'd filter based on actual date fields
+        const itemDate = new Date(item.lastEdit);
+        const startDate = new Date(dateRange.startDate);
+        const endDate = new Date(dateRange.endDate);
+        
+        return itemDate >= startDate && itemDate <= endDate;
+      });
+    }
+    
+    // Sort to put pinned items at the top
+    const sorted = filtered.sort((a, b) => {
+      const aPinned = pinnedItems.has(a.id);
+      const bPinned = pinnedItems.has(b.id);
+      
+      if (aPinned && !bPinned) return -1; // a comes first
+      if (!aPinned && bPinned) return 1;  // b comes first
+      return 0; // maintain original order for non-pinned items
+    });
+    
+    return sorted;
+  }, [campaigns, adsets, ads, duplicatedItems, query, pinnedItems, dateRange]);
 
   const toggleSelect = (id) => {
     const exists = selectedIds.includes(id);
@@ -322,6 +367,18 @@ export default function CampaignTable({
     const anyToggleOn = selectedRows.some((row) => row.on);
 
     onSelectionChange(newIds, anyToggleOn);
+  };
+
+  const handlePin = (item) => {
+    setPinnedItems(prev => {
+      const newPinned = new Set(prev);
+      if (newPinned.has(item.id)) {
+        newPinned.delete(item.id); // Unpin if already pinned
+      } else {
+        newPinned.add(item.id); // Pin if not pinned
+      }
+      return newPinned;
+    });
   };
 
   const toggleOn = (id) => {
@@ -714,7 +771,10 @@ export default function CampaignTable({
                     </div>
                   )}
                   <div className="flex flex-col justify-center flex-1">
-                    <div className="text-fb-blue hover:underline cursor-pointer text-sm font-medium truncate">
+                    <div className="text-fb-blue hover:underline cursor-pointer text-sm font-medium truncate flex items-center gap-1">
+                      {pinnedItems.has(item.id) && (
+                        <Pin className="w-3 h-3 text-blue-600 flex-shrink-0" />
+                      )}
                       {item.name}
                     </div>
                     <div className="text-xs text-fb-gray-500 flex">
@@ -723,21 +783,43 @@ export default function CampaignTable({
                         <div className="flex items-center gap-1 ml-2">
                           <button
                             className="p-1 hover:bg-blue-100 rounded text-gray-600"
+                            title="View charts"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onViewCharts?.(item);
+                            }}
+                          >
+                            <BarChart3 className="w-4 h-4" />
+                          </button>
+                          <button
+                            className="p-1 hover:bg-blue-100 rounded text-gray-600"
                             title="Edit"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onEdit?.(item);
+                            }}
                           >
                             <Edit className="w-4 h-4" />
                           </button>
                           <button
                             className="p-1 hover:bg-blue-100 rounded text-gray-600"
                             title="Duplicate"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onDuplicate?.(item);
+                            }}
                           >
                             <Copy className="w-4 h-4" />
                           </button>
                           <button
                             className="p-1 hover:bg-blue-100 rounded text-gray-600"
-                            title="Delete"
+                            title="Compare"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onCompare?.(item);
+                            }}
                           >
-                            <Trash2 className="w-4 h-4" />
+                            <GitCompare className="w-4 h-4" />
                           </button>
                           <div className="relative">
                             <button
@@ -761,17 +843,27 @@ export default function CampaignTable({
                                 }`}
                                 onClick={(e) => e.stopPropagation()}
                               >
-                                <button className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <button 
+                                  className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handlePin(item);
+                                    setDropdownOpen(null);
+                                  }}
+                                >
                                   <Pin className="w-4 h-4" />
-                                  Pin
+                                  {pinnedItems.has(item.id) ? "Unpin" : "Pin"}
                                 </button>
-                                <button className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <button 
+                                  className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    onViewHistory?.(item);
+                                    setDropdownOpen(null);
+                                  }}
+                                >
                                   <Clock className="w-4 h-4" />
                                   View history
-                                </button>
-                                <button className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                  <RotateCcw className="w-4 h-4" />
-                                  Rules
                                 </button>
                               </div>
                             )}

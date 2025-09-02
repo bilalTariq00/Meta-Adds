@@ -3,18 +3,21 @@
 import React, { useState } from "react";
 import {
   Calendar as CalendarIcon,
-  ChevronLeft,
-  ChevronRight,
+  ChevronDown,
   FolderClosed,
   Grid3X3,
   LayoutPanelLeft,
 } from "lucide-react";
+import DateRangePicker from "@/components/ui/DateRangePicker";
 
 export default function TabsAndDatePicker({
   activeTab,
   setActiveTab,
   selectedCount = 0,
   selectedTab = null,
+  onDateRangeChange,
+  selectedCountsByTab = {}, // New prop to get counts per tab
+  onClearSelection, // New prop to handle clearing selections
 }) {
   const [dateOpen, setDateOpen] = useState(false);
   const [range, setRange] = useState({
@@ -23,21 +26,72 @@ export default function TabsAndDatePicker({
   });
 
   const getTabLabel = (tabId) => {
-    // Show selection count in all tab labels if there are selections
-    const hasAnySelection = selectedCount > 0;
+    // Get counts for contextual text
+    const campaignsCount = selectedCountsByTab.campaigns || 0;
+    const adsetsCount = selectedCountsByTab.adsets || 0;
+    const currentTabCount = selectedCountsByTab[tabId] || 0;
 
+    // If this tab has selections, show only the base name (no contextual text)
+    if (currentTabCount > 0) {
+      switch (tabId) {
+        case "campaigns":
+          return "Campaigns";
+        case "adsets":
+          return "Ad sets";
+        case "ads":
+          return "Ads";
+        default:
+          return "";
+      }
+    }
+
+    // If no selections in this tab, show contextual text based on other tabs
     switch (tabId) {
       case "campaigns":
-        return hasAnySelection ? `Campaigns ` : "Campaigns";
+        return "Campaigns";
       case "adsets":
-        return hasAnySelection
-          ? `Ad sets for ${selectedCount} Campaign`
-          : "Ad sets";
+        if (campaignsCount > 0) {
+          return `Ad sets for ${campaignsCount} Campaign${campaignsCount > 1 ? 's' : ''}`;
+        } else {
+          return "Ad sets";
+        }
       case "ads":
-        return hasAnySelection ? `Ads for ${selectedCount} Ad set` : "Ads";
+        if (adsetsCount > 0) {
+          return `Ads for ${adsetsCount} Ad set${adsetsCount > 1 ? 's' : ''}`;
+        } else if (campaignsCount > 0) {
+          return `Ads for ${campaignsCount} Campaign${campaignsCount > 1 ? 's' : ''}`;
+        } else {
+          return "Ads";
+        }
       default:
         return "";
     }
+  };
+
+  const getTabBadge = (tabId) => {
+    const tabCount = selectedCountsByTab[tabId] || 0;
+    const shouldShowBadge = tabCount > 0; // Show badge whenever there are selections, not just on active tab
+    
+    if (!shouldShowBadge) return null;
+    
+    return (
+      <span className="inline-flex items-center gap-1 rounded-sm px-2 py-0.5 text-xs bg-blue-600 text-white flex-shrink-0">
+        {tabCount} selected
+        <button
+          className="w-3 h-3 rounded-sm bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors flex-shrink-0"
+          title="Clear selection"
+          onClick={(e) => {
+            e.stopPropagation();
+            // Clear selection for this tab
+            if (onClearSelection) {
+              onClearSelection(tabId);
+            }
+          }}
+        >
+          ×
+        </button>
+      </span>
+    );
   };
 
   const tabs = [
@@ -64,7 +118,7 @@ export default function TabsAndDatePicker({
   return (
     <div className="flex flex-row justify-between">
       {/* Raised tabs row */}
-      <div className="flex items-center gap-3 px-1 mb-[-8px] relative ml-3">
+      <div className="flex items-center gap-4 px-1 mb-[-8px] relative ml-3">
         {tabs.map((t) => (
           <button
             key={t.id}
@@ -82,21 +136,12 @@ export default function TabsAndDatePicker({
               <img
                 src={activeTab === t.id ? t.activeIcon : t.lightIcon}
                 alt={t.label}
-                className="w-5 h-5"
+                className="w-5 h-5 flex-shrink-0"
               />
-              <span className="font-semibold tracking-tight">{t.label}</span>
-
-              {selectedTab === t.id && selectedCount > 0 && (
-                <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs bg-blue-600 text-white">
-                  {selectedCount} selected
-                  <button
-                    className="ml-1 w-3 h-3 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30"
-                    title="Clear selection"
-                  >
-                    ×
-                  </button>
-                </span>
-              )}
+              <span className="font-semibold tracking-tight whitespace-nowrap">{t.label}</span>
+              <div className="flex-shrink-0">
+                {getTabBadge(t.id)}
+              </div>
             </div>
           </button>
         ))}
@@ -106,107 +151,36 @@ export default function TabsAndDatePicker({
         <div className="relative inline-block">
           <button
             onClick={() => setDateOpen((v) => !v)}
-            className="px-3 py-1.5 rounded-md border bg-white border-gray-300 text-sm inline-flex items-center gap-2"
+            className="px-3 py-1.5 rounded-md border bg-white border-gray-300 text-sm inline-flex items-center gap-2 hover:bg-gray-50 transition-colors"
           >
             <CalendarIcon className="w-4 h-4" />
+            <span className="text-sm font-medium">
             Last 30 days: {range.from} - {range.to}
+            </span>
+            <ChevronDown className="w-4 h-4" />
           </button>
-          {dateOpen && (
-            <div className="absolute left-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-xl p-3 w-[720px] z-[5]">
-              <div className="grid grid-cols-[220px_1fr] gap-3">
-                {/* Presets */}
-                <div className="space-y-1">
-                  {[
-                    "Today",
-                    "Yesterday",
-                    "Today and yesterday",
-                    "Last 7 days",
-                    "Last 14 days",
-                    "Last 28 days",
-                    "Last 30 days",
-                    "This week",
-                    "Last week",
-                    "This month",
-                    "Last month",
-                    "Maximum",
-                    "Custom",
-                  ].map((p) => (
-                    <label
-                      key={p}
-                      className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-gray-50 text-sm"
-                    >
-                      <input
-                        name="preset"
-                        type="radio"
-                        defaultChecked={p === "Last 30 days"}
-                      />{" "}
-                      {p}
-                    </label>
-                  ))}
-                </div>
-                {/* Calendars (static mock) */}
-                <div className="grid grid-cols-2 gap-6">
-                  {["Jul", "Aug"].map((month, i) => (
-                    <div key={month}>
-                      <div className="flex items-center justify-between mb-2 text-sm">
-                        <button className="p-1 hover:bg-gray-100 rounded">
-                          <ChevronLeft className="w-4 h-4" />
-                        </button>
-                        <div className="font-medium">{month} 2025</div>
-                        <button className="p-1 hover:bg-gray-100 rounded">
-                          <ChevronRight className="w-4 h-4" />
-                        </button>
-                      </div>
-                      <div className="grid grid-cols-7 gap-1 text-xs text-gray-500 mb-1">
-                        {"Sun Mon Tue Wed Thu Fri Sat".split(" ").map((d) => (
-                          <div key={d} className="text-center p-1">
-                            {d}
-                          </div>
-                        ))}
-                      </div>
-                      <div className="grid grid-cols-7 gap-1">
-                        {Array.from({ length: 31 }, (_, d) => d + 1).map(
-                          (d) => (
-                            <button
-                              key={d}
-                              className={`text-center p-1.5 text-xs rounded hover:bg-blue-50 ${
-                                (i === 0 && d >= 22) || (i === 1 && d <= 20)
-                                  ? "bg-blue-100 text-blue-700"
-                                  : ""
-                              } ${
-                                (i === 0 && d === 22) || (i === 1 && d === 20)
-                                  ? "!bg-blue-600 !text-white"
-                                  : ""
-                              }`}
-                            >
-                              {d}
-                            </button>
-                          )
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <div className="flex justify-end gap-2 mt-3">
-                <button
-                  onClick={() => setDateOpen(false)}
-                  className="px-3 py-1.5 border rounded text-sm"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={() => {
-                    setRange({ from: "22 Jul 2025", to: "20 Aug 2025" });
-                    setDateOpen(false);
-                  }}
-                  className="px-3 py-1.5 bg-blue-600 text-white rounded text-sm"
-                >
-                  Update
-                </button>
-              </div>
-            </div>
-          )}
+          
+          {/* Reusable DateRangePicker */}
+          <DateRangePicker
+            isOpen={dateOpen}
+            onClose={() => setDateOpen(false)}
+            onDateRangeChange={(dateRange) => {
+              console.log("Date range changed:", dateRange);
+              // Update local state
+              setRange({
+                from: dateRange.startDate,
+                to: dateRange.endDate,
+              });
+              // Call parent callback to update table data
+              if (onDateRangeChange) {
+                onDateRangeChange(dateRange);
+              }
+            }}
+            position="bottom-right"
+            initialDateRange="last30days"
+            initialStartDate="22 Jul 2025"
+            initialEndDate="20 Aug 2025"
+          />
         </div>
       </div>
     </div>

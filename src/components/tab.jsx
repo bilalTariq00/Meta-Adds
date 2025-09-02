@@ -4,35 +4,58 @@ import { X } from "lucide-react";
 export default function Tab({ id, title, isActive, onClick, onClose }) {
   return (
     <div
-      className={`relative flex items-center gap-2 px-3 py-2 mr-0.5 cursor-pointer transition-all duration-200 min-w-[120px] max-w-[180px] overflow-hidden ${
-        isActive ? "bg-white  z-20" : "bg-yellow-100 hover:bg-yellow-200  "
-      } rounded-t-2xl `} // 🔥 this adds the top curve
+      className={`relative flex items-center gap-2 px-3 py-1.5 mr-0.5 cursor-pointer transition-all duration-200 min-w-[120px] max-w-[200px] overflow-visible ${
+        isActive ? "bg-white z-20" : "bg-gray-100 hover:bg-gray-200"
+      }`}
+      style={{
+        borderRadius: isActive ? "18px 22px 0 0" : "6px 6px 0 0",
+        borderBottomLeftRadius: isActive ? "0" : "6px",
+        borderBottomRightRadius: isActive ? "0" : "6px",
+        position: "relative"
+      }}
       onClick={() => onClick(id)}
     >
-      {/* Left curve filler */}
+      {/* Left outward curve for active tab */}
       {isActive && (
-        <div className="absolute left-[-16px] bottom-0 w-5 h-7 bg-yellow-100  rounded-br-xl "></div>
+        <div 
+          className="absolute left-0 bottom-0 w-1.5 h-full bg-gray-100"
+          style={{
+            borderBottomLeftRadius: "0px",
+            borderBottomRightRadius: "100px",
+            borderTopLeftRadius: "100px",
+            borderTopRightRadius: "0px"
+          }}
+        />
       )}
-      {/* Right curve filler */}
+      
+      {/* Right outward curve for active tab */}
       {isActive && (
-        <div className="absolute right-[-16px] bottom-0 w-5 h-7 bg-yellow-100  rounded-bl-xl"></div>
+        <div 
+          className="absolute right-0 bottom-0 w-1.5 h-full bg-gray-100"
+          style={{
+            borderBottomLeftRadius: "100px",
+            borderBottomRightRadius: "0px",
+            borderTopLeftRadius: "0px",
+            borderTopRightRadius: "100px"
+          }}
+        />
       )}
 
       <span
         className={`text-sm flex-1 truncate ${
-          isActive ? "text-gray-800 font-medium" : "text-gray-600"
+          isActive ? "text-gray-800" : "text-gray-600"
         }`}
       >
         {title}
       </span>
       <button
-        className="p-0.5 hover:bg-black/10 rounded-full transition-colors"
+        className="p-1 hover:bg-gray-200 rounded-full transition-colors"
         onClick={(e) => {
           e.stopPropagation();
           onClose(id);
         }}
       >
-        <X size={12} className="text-gray-500" />
+        <X size={12} className="text-gray-600" />
       </button>
     </div>
   );

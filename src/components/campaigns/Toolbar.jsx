@@ -57,6 +57,7 @@ export default function Toolbar({
   onRules,
   onABTest,
   onToggleCharts,
+  hasUnsavedChanges = false,
   ChartOpen = false,
 }) {
   const [showCategories, setShowCategories] = useState(false);
@@ -314,19 +315,15 @@ export default function Toolbar({
           <Trash2 className="w-4 h-4" />
         </button>
 
-        {/* Revert Button - Icon Only */}
-        <button
-          onClick={onRevert}
-          disabled={selectedCount === 0}
-          className={`px-2 py-1.5 flex items-center justify-center text-sm font-medium transition-colors rounded-md border
-    ${
-      selectedCount === 0
-        ? "bg-gray-100 text-gray-400 cursor-not-allowed border-gray-200"
-        : "bg-white hover:bg-gray-50 text-gray-700 border-gray-300"
-    }`}
-        >
-          <Undo2 className="w-4 h-4" />
-        </button>
+        {/* Revert Button - Icon Only - Only show when there are unsaved changes */}
+        {hasUnsavedChanges && (
+          <button
+            onClick={onRevert}
+            className="px-2 py-1.5 flex items-center justify-center text-sm font-medium transition-colors rounded-md border bg-white hover:bg-gray-50 text-gray-700 border-gray-300"
+          >
+            <Undo2 className="w-4 h-4" />
+          </button>
+        )}
         <button
           onClick={onABTest}
           disabled={selectedCount === 0}
