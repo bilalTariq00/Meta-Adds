@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, useRef } from "react";
+import { createPortal } from "react-dom";
 import {
   ChevronDown,
   Edit,
@@ -12,7 +13,18 @@ import {
   RotateCcw,
   BarChart3,
   GitCompare,
+  Plus,
+  Trash,
+  Settings,
+  ArrowLeft,
+  Bookmark,
+  Filter,
+  ArrowUp,
+  ArrowDown,
+  MoveRight,
 } from "lucide-react";
+import CustomiseColumnsModal from "./dialoges/customise-columns-modal";
+import AttributionModal from "./dialoges/AttributionModal";
 
 // Sample data for different tabs
 export const campaignsSeed = [
@@ -276,6 +288,351 @@ export const adsSeed = [
   },
 ];
 
+// Add Column Modal Component
+function AddColumnModal({ isOpen, onClose, onAddColumn, afterColumn }) {
+  const modalRef = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (modalRef.current && !modalRef.current.contains(event.target)) {
+        onClose();
+      }
+    }
+
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => document.removeEventListener("mousedown", handleClickOutside);
+    }
+  }, [isOpen, onClose]);
+
+  if (!isOpen) return null;
+
+  const popularColumns = [
+    { id: 'purchases', label: 'Purchases' },
+    { id: 'purchase-roas', label: 'Purchase ROAS (return on ad spend)' },
+    { id: 'link-clicks', label: 'Link clicks' },
+    { id: 'ctr', label: 'CTR (all)' },
+    { id: 'frequency', label: 'Frequency' },
+  ];
+
+  const handleColumnSelect = (columnId) => {
+    onAddColumn(columnId, afterColumn);
+    onClose();
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[10000]">
+      <div
+        ref={modalRef}
+        className="bg-white rounded-lg shadow-xl w-80 max-h-[400px] overflow-y-auto"
+      >
+        {/* Header */}
+        <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-200">
+          <button
+            onClick={onClose}
+            className="p-1 hover:bg-gray-100 rounded"
+          >
+            <ArrowLeft className="w-4 h-4" />
+          </button>
+          <h2 className="text-sm font-semibold text-gray-900">
+            Add column after
+          </h2>
+        </div>
+
+        {/* Content */}
+        <div className="p-4">
+          <div className="text-sm font-semibold text-gray-900 mb-3">Popular</div>
+          <div className="space-y-2">
+            {popularColumns.map((column) => (
+              <button
+                key={column.id}
+                className="flex items-center gap-3 w-full text-left p-2 hover:bg-gray-100 rounded"
+                onClick={() => handleColumnSelect(column.id)}
+              >
+                <input
+                  type="radio"
+                  name="column"
+                  className="w-4 h-4"
+                  readOnly
+                />
+                <span className="text-sm text-gray-700">{column.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="p-4 border-t border-gray-200">
+          <button
+            onClick={() => {
+              // Open customise columns modal
+              onClose();
+            }}
+            className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded"
+          >
+            <Settings className="w-4 h-4" />
+            Customise columns
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Remove Column Confirmation Modal
+function RemoveColumnModal({ isOpen, onClose, onConfirm, columnName }) {
+  const modalRef = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (modalRef.current && !modalRef.current.contains(event.target)) {
+        onClose();
+      }
+    }
+
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => document.removeEventListener("mousedown", handleClickOutside);
+    }
+  }, [isOpen, onClose]);
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[10000]">
+      <div
+        ref={modalRef}
+        className="bg-white rounded-lg shadow-xl w-80"
+      >
+        {/* Header */}
+        <div className="px-4 py-3 border-b border-gray-200">
+          <h2 className="text-sm font-semibold text-gray-900">
+            Remove column
+          </h2>
+        </div>
+
+        {/* Content */}
+        <div className="p-4">
+          <p className="text-sm text-gray-700">
+            Are you sure you want to remove the "{columnName}" column?
+          </p>
+        </div>
+
+        {/* Footer */}
+        <div className="flex justify-end gap-3 p-4 border-t border-gray-200">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 text-sm text-gray-700 bg-gray-100 hover:bg-gray-200 rounded"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={() => {
+              onConfirm();
+              onClose();
+            }}
+            className="px-4 py-2 text-sm text-white bg-red-600 hover:bg-red-700 rounded"
+          >
+            Remove
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Campaign Header Dropdown Component (First Image)
+function CampaignHeaderDropdown({ isOpen, onClose, onFilterChange, onSortChange, onMoreFilters, position }) {
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        onClose();
+      }
+    }
+
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => document.removeEventListener("mousedown", handleClickOutside);
+    }
+  }, [isOpen, onClose]);
+
+  if (!isOpen) return null;
+
+  const quickFilters = [
+    { id: 'ad-changed', label: 'Ad changed is betwe...', icon: Clock },
+    { id: 'had-delivery-1', label: 'Had delivery', icon: Bookmark },
+    { id: 'had-delivery-2', label: 'Had delivery', icon: Bookmark },
+    { id: 'campaign', label: 'Campaign', icon: Filter },
+  ];
+
+  const sortOptions = [
+    { id: 'sort-a-z', label: 'Sort A to Z', icon: ArrowUp },
+    { id: 'sort-z-a', label: 'Sort Z to A', icon: ArrowDown },
+    { id: 'errors', label: 'Errors' },
+    { id: 'changed', label: 'Changed' },
+  ];
+
+  return createPortal(
+    <div
+      ref={dropdownRef}
+      className="fixed bg-white border border-gray-200 max-h-[250px] overflow-y-auto rounded-md shadow-lg py-2 min-w-[200px] z-[9999]"
+      style={{
+        top: position?.top || 0,
+        left: position?.left || 0,
+      }}
+    >
+      {/* Quick filters section */}
+      <div className="px-3 py-2">
+        <div className="text-sm font-bold text-gray-900 mb-2">Quick filters</div>
+        {quickFilters.map((filter) => (
+          <button
+            key={filter.id}
+            className="flex items-center gap-2 w-full px-2 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded whitespace-nowrap"
+            onClick={() => onFilterChange(filter.id)}
+          >
+            <filter.icon className="w-4 h-4" />
+            {filter.label}
+          </button>
+        ))}
+        <button
+          className="text-blue-600 text-sm hover:underline px-2 py-1 whitespace-nowrap"
+          onClick={onMoreFilters}
+        >
+          More Filters
+        </button>
+      </div>
+
+      {/* Separator */}
+      <div className="border-t border-gray-200 my-1"></div>
+
+      {/* Sort options section */}
+      <div className="px-3 py-2">
+        <div className="text-sm font-bold text-gray-900 mb-2">Sort by</div>
+        {sortOptions.map((option) => (
+          <button
+            key={option.id}
+            className="flex items-center gap-2 w-full px-2 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded whitespace-nowrap"
+            onClick={() => onSortChange(option.id)}
+          >
+            {option.icon && <option.icon className="w-4 h-4" />}
+            {option.label}
+          </button>
+        ))}
+      </div>
+    </div>,
+    document.body
+  );
+}
+
+// Column Header Dropdown Component (Second Image)
+function ColumnHeaderDropdown({ isOpen, onClose, columnKey, position, onColumnAction, onOpenCustomiseModal, onOpenAttributionModal, hasPriority, columnIndex, totalColumns }) {
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        onClose();
+      }
+    }
+
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => document.removeEventListener("mousedown", handleClickOutside);
+    }
+  }, [isOpen, onClose]);
+
+  if (!isOpen) return null;
+
+  const columnActions = [
+    ...(columnIndex > 0 ? [{ id: 'move-left', label: 'Move left', icon: ArrowLeft }] : []),
+    { id: 'move-right', label: 'Move right', icon: MoveRight },
+    { id: 'add-column-after', label: 'Add column after', icon: Plus },
+    { id: 'remove-column', label: 'Remove column', icon: Trash },
+    { id: 'customise-columns', label: 'Customise columns', icon: Settings },
+  ];
+
+  const handleAction = (actionId) => {
+    if (actionId === 'customise-columns') {
+      onOpenCustomiseModal();
+    } else if (actionId === 'compare-attribution') {
+      onOpenAttributionModal();
+    } else {
+      onColumnAction(columnKey, actionId);
+    }
+    onClose();
+  };
+
+  return createPortal(
+    <div
+      ref={dropdownRef}
+      className="fixed bg-white border border-gray-200 rounded-md shadow-lg py-1 min-w-[160px] z-[9999]"
+      style={{
+        top: position?.top || 0,
+        left: position?.left || 0,
+      }}
+    >
+      {columnActions.map((action) => (
+        <button
+          key={action.id}
+          className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 whitespace-nowrap"
+          onClick={() => handleAction(action.id)}
+        >
+          <action.icon className="w-4 h-4" />
+          {action.label}
+        </button>
+      ))}
+      
+      {/* Priority sorting options */}
+      {hasPriority && (
+        <>
+          <div className="border-t border-gray-200 my-1"></div>
+          <button
+            className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 whitespace-nowrap"
+            onClick={() => handleAction('sort-high-priority')}
+          >
+            <ArrowUp className="w-4 h-4" />
+            High priority
+          </button>
+          <button
+            className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 whitespace-nowrap"
+            onClick={() => handleAction('sort-low-priority')}
+          >
+            <ArrowDown className="w-4 h-4" />
+            Low priority
+          </button>
+          <div className="border-t border-gray-200 my-1"></div>
+        </>
+      )}
+      
+      {/* Filters option */}
+      <button
+        className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 whitespace-nowrap"
+        onClick={() => handleAction('filters')}
+      >
+        <Filter className="w-4 h-4" />
+        Filters
+      </button>
+      
+      {/* Compare attribution setting */}
+      {columnKey === 'attribution' && (
+        <>
+          <div className="border-t border-gray-200 my-1"></div>
+          <button
+            className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 whitespace-nowrap"
+            onClick={() => handleAction('compare-attribution')}
+          >
+            <Settings className="w-4 h-4" />
+            Compare attribution setting
+          </button>
+        </>
+      )}
+    </div>,
+    document.body
+  );
+}
+
 export default function CampaignTable({
   query,
   selectedIds,
@@ -295,6 +652,31 @@ export default function CampaignTable({
   const [hoveredRow, setHoveredRow] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(null);
   const [pinnedItems, setPinnedItems] = useState(new Set());
+  const [headerDropdownOpen, setHeaderDropdownOpen] = useState(null);
+  const [headerDropdownPosition, setHeaderDropdownPosition] = useState(null);
+  const [tableFilters, setTableFilters] = useState({
+    quickFilters: [],
+    sortBy: null,
+    sortDirection: 'asc'
+  });
+  const [showCustomiseModal, setShowCustomiseModal] = useState(false);
+  const [showAttributionModal, setShowAttributionModal] = useState(false);
+  const [showAddColumnModal, setShowAddColumnModal] = useState(false);
+  const [showRemoveColumnModal, setShowRemoveColumnModal] = useState(false);
+  const [columnToRemove, setColumnToRemove] = useState(null);
+  const [columnToAddAfter, setColumnToAddAfter] = useState(null);
+  const [columnOrder, setColumnOrder] = useState([]);
+  const [visibleColumns, setVisibleColumns] = useState(new Set());
+  const [customColumns, setCustomColumns] = useState([]);
+  const [attributionSettings, setAttributionSettings] = useState({
+    window: "7_day_click_1_day_view",
+    model: "last_click",
+  });
+  const [skAdNetworkSettings, setSkAdNetworkSettings] = useState({
+    window: "7_day_click_1_day_view",
+    model: "last_click",
+  });
+  const [isExpanded, setIsExpanded] = useState(false);
 
   useEffect(() => {
     setLoading(true);
@@ -328,6 +710,58 @@ export default function CampaignTable({
       if (f.active) filtered = filtered.filter((r) => r.active);
     }
     
+    // Apply table filters from CampaignHeaderDropdown
+    if (tableFilters.quickFilters.length > 0) {
+      filtered = filtered.filter((item) => {
+        return tableFilters.quickFilters.some(filterId => {
+          switch (filterId) {
+            case 'ad-changed':
+              // Filter for items that have been changed recently
+              return item.lastEdit && new Date(item.lastEdit) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+            case 'had-delivery-1':
+            case 'had-delivery-2':
+              // Filter for items that had delivery
+              return item.hadDelivery || item.delivery === 'On';
+            case 'campaign':
+              // Filter for campaign type items
+              return query.activeTab === 'campaigns';
+            default:
+              return true;
+          }
+        });
+      });
+    }
+    
+    // Apply sorting from CampaignHeaderDropdown
+    if (tableFilters.sortBy) {
+      filtered = filtered.sort((a, b) => {
+        let comparison = 0;
+        
+        switch (tableFilters.sortBy) {
+          case 'sort-a-z':
+            comparison = a.name.localeCompare(b.name);
+            break;
+          case 'sort-z-a':
+            comparison = b.name.localeCompare(a.name);
+            break;
+          case 'errors':
+            // Sort by items with errors first
+            comparison = (b.errors || 0) - (a.errors || 0);
+            break;
+          case 'changed':
+            // Sort by recently changed items first
+            const aDate = new Date(a.lastEdit || 0);
+            const bDate = new Date(b.lastEdit || 0);
+            comparison = bDate - aDate;
+            break;
+          default:
+            comparison = 0;
+        }
+        
+        return tableFilters.sortDirection === 'desc' ? -comparison : comparison;
+      });
+    }
+    
     // Apply date range filter if provided
     if (dateRange && dateRange.range !== "maximum") {
       filtered = filtered.filter((item) => {
@@ -352,7 +786,7 @@ export default function CampaignTable({
     });
     
     return sorted;
-  }, [campaigns, adsets, ads, duplicatedItems, query, pinnedItems, dateRange]);
+  }, [campaigns, adsets, ads, duplicatedItems, query, pinnedItems, dateRange, tableFilters]);
 
   const toggleSelect = (id) => {
     const exists = selectedIds.includes(id);
@@ -379,6 +813,192 @@ export default function CampaignTable({
       }
       return newPinned;
     });
+  };
+
+  // Header dropdown handlers
+  const handleHeaderDropdownClick = (headerKey, event) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    
+    // Calculate position for dropdown
+    const position = {
+      top: rect.bottom + window.scrollY + 5,
+      left: rect.left + window.scrollX
+    };
+    
+    setHeaderDropdownOpen(headerKey);
+    setHeaderDropdownPosition(position);
+  };
+
+  const handleFilterChange = (filterId) => {
+    setTableFilters(prev => ({
+      ...prev,
+      quickFilters: prev.quickFilters.includes(filterId) 
+        ? prev.quickFilters.filter(id => id !== filterId)
+        : [...prev.quickFilters, filterId]
+    }));
+    
+    // Close dropdown after selection
+    setHeaderDropdownOpen(null);
+  };
+
+  const handleSortChange = (sortId) => {
+    setTableFilters(prev => ({
+      ...prev,
+      sortBy: sortId,
+      sortDirection: sortId === prev.sortBy && prev.sortDirection === 'asc' ? 'desc' : 'asc'
+    }));
+    
+    // Close dropdown after selection
+    setHeaderDropdownOpen(null);
+  };
+
+  const handleMoreFilters = () => {
+    // This would open the top search bar - for now just close dropdown
+    setHeaderDropdownOpen(null);
+    // In a real implementation, you'd trigger the search bar to open
+  };
+
+  const handleColumnAction = (columnKey, actionId) => {
+    switch (actionId) {
+      case 'move-left':
+        // Move column to the left
+        moveColumn(columnKey, 'left');
+        break;
+      case 'move-right':
+        // Move column to the right
+        moveColumn(columnKey, 'right');
+        break;
+      case 'remove-column':
+        // Show confirmation modal for removing column
+        setColumnToRemove(columnKey);
+        setShowRemoveColumnModal(true);
+        break;
+      case 'add-column-after':
+        // Show add column modal
+        setColumnToAddAfter(columnKey);
+        setShowAddColumnModal(true);
+        break;
+      case 'sort-high-priority':
+        // Sort by high priority
+        setTableFilters(prev => ({
+          ...prev,
+          sortBy: `${columnKey}-high-priority`,
+          sortDirection: 'asc'
+        }));
+        break;
+      case 'sort-low-priority':
+        // Sort by low priority
+        setTableFilters(prev => ({
+          ...prev,
+          sortBy: `${columnKey}-low-priority`,
+          sortDirection: 'desc'
+        }));
+        break;
+      case 'filters':
+        // Open filter modal for this column
+        console.log(`Open filters for ${columnKey}`);
+        break;
+      default:
+        break;
+    }
+  };
+
+  const moveColumn = (columnKey, direction) => {
+    setColumnOrder(prev => {
+      // If no order is set, initialize with base column order
+      if (prev.length === 0) {
+        const baseColumns = getBaseColumns();
+        prev = [...baseColumns.map(col => col.key), ...customColumns.map(col => col.key)];
+      }
+      
+      const currentIndex = prev.indexOf(columnKey);
+      if (currentIndex === -1) return prev;
+      
+      const newOrder = [...prev];
+      if (direction === 'right' && currentIndex < newOrder.length - 1) {
+        // Swap with next column
+        [newOrder[currentIndex], newOrder[currentIndex + 1]] = [newOrder[currentIndex + 1], newOrder[currentIndex]];
+      } else if (direction === 'left' && currentIndex > 0) {
+        // Swap with previous column
+        [newOrder[currentIndex], newOrder[currentIndex - 1]] = [newOrder[currentIndex - 1], newOrder[currentIndex]];
+      }
+      return newOrder;
+    });
+  };
+
+  const handleAddColumn = (columnId, afterColumn) => {
+    const newColumn = {
+      key: columnId,
+      label: getColumnLabel(columnId),
+      sortable: true,
+      width: "120px"
+    };
+    
+    // Add to custom columns
+    setCustomColumns(prev => [...prev, newColumn]);
+    
+    // Update column order to insert after the specified column
+    setColumnOrder(prev => {
+      if (prev.length === 0) {
+        // Initialize with base column order
+        const baseColumns = getBaseColumns();
+        prev = [...baseColumns.map(col => col.key), ...customColumns.map(col => col.key)];
+      }
+      
+      const afterIndex = prev.indexOf(afterColumn);
+      if (afterIndex === -1) {
+        // If afterColumn not found, add to end
+        return [...prev, columnId];
+      }
+      
+      // Insert after the specified column
+      const newOrder = [...prev];
+      newOrder.splice(afterIndex + 1, 0, columnId);
+      return newOrder;
+    });
+    
+    console.log(`Added column ${columnId} after ${afterColumn}`);
+  };
+
+  const handleRemoveColumn = () => {
+    if (columnToRemove) {
+      setCustomColumns(prev => prev.filter(col => col.key !== columnToRemove));
+      setVisibleColumns(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(columnToRemove);
+        return newSet;
+      });
+      
+      // Remove from column order
+      setColumnOrder(prev => prev.filter(key => key !== columnToRemove));
+      
+      console.log(`Removed column ${columnToRemove}`);
+    }
+  };
+
+  const getColumnLabel = (columnId) => {
+    const labels = {
+      'purchases': 'Purchases',
+      'purchase-roas': 'Purchase ROAS',
+      'link-clicks': 'Link clicks',
+      'ctr': 'CTR (all)',
+      'frequency': 'Frequency'
+    };
+    return labels[columnId] || columnId;
+  };
+
+  const handleAttributionChange = (key, value) => {
+    setAttributionSettings((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
+  };
+
+  const handleSKAdNetworkChange = (key, value) => {
+    setSkAdNetworkSettings((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
   };
 
   const toggleOn = (id) => {
@@ -417,10 +1037,11 @@ export default function CampaignTable({
   const isAds = query.activeTab === "ads";
 
   // Define columns for each tab
-  const getColumns = () => {
+  // Define base columns for each tab
+  const getBaseColumns = () => {
     if (isCampaigns) {
       return [
-        { key: "delivery", label: "Delivery", sortable: true, width: "110px" },
+        { key: "delivery", label: "Delivery", sortable: true, width: "110px", hasPriority: true },
         { key: "actions", label: "Actions", sortable: false, width: "90px" },
         {
           key: "bidStrategy",
@@ -428,7 +1049,7 @@ export default function CampaignTable({
           sortable: true,
           width: "140px",
         },
-        { key: "budget", label: "Budget", sortable: true, width: "150px" },
+        { key: "budget", label: "Budget", sortable: true, width: "150px", hasPriority: true },
         {
           key: "attribution",
           label: "Attribution setting",
@@ -505,7 +1126,6 @@ export default function CampaignTable({
       ];
     } else if (isAds) {
       return [
-        // { key: "thumbnail", label: "", sortable: false, width: "60px" },
         { key: "delivery", label: "Delivery", sortable: true, width: "110px" },
         { key: "actions", label: "Actions", sortable: false, width: "90px" },
         {
@@ -557,6 +1177,32 @@ export default function CampaignTable({
       ];
     }
     return [];
+  };
+
+  // Define columns for each tab with ordering
+  const getColumns = () => {
+    const baseColumns = getBaseColumns();
+    const allColumns = [...baseColumns, ...customColumns];
+    
+    // Apply column ordering if specified
+    if (columnOrder.length > 0) {
+      const orderedColumns = [];
+      const remainingColumns = [...allColumns];
+      
+      // Add columns in the specified order
+      columnOrder.forEach(key => {
+        const columnIndex = remainingColumns.findIndex(col => col.key === key);
+        if (columnIndex !== -1) {
+          orderedColumns.push(remainingColumns.splice(columnIndex, 1)[0]);
+        }
+      });
+      
+      // Add remaining columns
+      orderedColumns.push(...remainingColumns);
+      return orderedColumns;
+    }
+    
+    return allColumns;
   };
 
   const columns = getColumns();
@@ -673,15 +1319,33 @@ export default function CampaignTable({
             </div>
             <div className="w-16 px-3 py-2 text-sm font-medium text-fb-gray-700 flex items-center border-r  border-table-border border-gray-200">
               Off/On
-              <ChevronDown className="w-3 h-3 ml-1 text-fb-gray-400" />
+              <ChevronDown className="w-3 h-3 ml-2 text-fb-gray-400" />
             </div>
             <div
-              className={`px-3 py-2 text-sm font-medium text-fb-gray-700 flex items-center  ${
+              className={`px-3 py-2 text-sm font-medium text-fb-gray-700 flex items-center relative ${
                 isAds ? "w-72" : "w-80"
               }`}
+              style={{ zIndex: 10 }}
             >
-              {isCampaigns ? "Campaign" : isAdsets ? "Ad set" : "Ad"}
-              <ChevronDown className="w-3 h-3 ml-1 text-fb-gray-400" />
+              <button
+                className="flex items-center w-full text-left"
+                onClick={(e) => handleHeaderDropdownClick('campaign', e)}
+              >
+                {isCampaigns ? "Campaign" : isAdsets ? "Ad set" : "Ad"}
+                <ChevronDown className="w-3 h-3 ml-2 text-fb-gray-400" />
+              </button>
+              
+              {/* Campaign Header Dropdown */}
+              {isCampaigns && headerDropdownOpen === 'campaign' && (
+                <CampaignHeaderDropdown
+                  isOpen={true}
+                  onClose={() => setHeaderDropdownOpen(null)}
+                  onFilterChange={handleFilterChange}
+                  onSortChange={handleSortChange}
+                  onMoreFilters={handleMoreFilters}
+                  position={headerDropdownPosition}
+                />
+              )}
             </div>
             {isAds && (
               <div className="w-10 px-3 py-2 text-sm font-medium text-fb-gray-700"></div>
@@ -885,15 +1549,36 @@ export default function CampaignTable({
           <div className="min-w-fit">
             {/* Scrollable header */}
             <div className="bg-table-header border-b border-table-border border-gray-200 h-10 flex sticky top-0 z-10">
-              {columns.map((column) => (
+              {columns.map((column, index) => (
                 <div
                   key={column.key}
-                  className="px-3 py-2 text-sm font-semibold text-fb-gray-700 border-r  border-table-border border-gray-200 flex items-center flex-shrink-0"
-                  style={{ width: column.width }}
+                  className="px-3 py-2 text-sm font-semibold text-fb-gray-700 border-r  border-table-border border-gray-200 flex items-center flex-shrink-0 relative"
+                  style={{ width: column.width, zIndex: 10 }}
                 >
-                  {column.label}
-                  {column.sortable && (
-                    <ChevronDown className="w-3 h-3 ml-1 text-fb-gray-400" />
+                  <button
+                    className="flex items-center w-full text-left"
+                    onClick={(e) => handleHeaderDropdownClick(column.key, e)}
+                  >
+                    {column.label}
+                    {column.sortable && (
+                      <ChevronDown className="w-3 h-3 ml-2 text-fb-gray-400" />
+                    )}
+                  </button>
+                  
+                  {/* Column Header Dropdown */}
+                  {headerDropdownOpen === column.key && (
+                    <ColumnHeaderDropdown
+                      isOpen={true}
+                      onClose={() => setHeaderDropdownOpen(null)}
+                      columnKey={column.key}
+                      position={headerDropdownPosition}
+                      onColumnAction={handleColumnAction}
+                      onOpenCustomiseModal={() => setShowCustomiseModal(true)}
+                      onOpenAttributionModal={() => setShowAttributionModal(true)}
+                      hasPriority={column.hasPriority}
+                      columnIndex={index}
+                      totalColumns={columns.length}
+                    />
                   )}
                 </div>
               ))}
@@ -930,6 +1615,41 @@ export default function CampaignTable({
         {isCampaigns ? "campaigns" : isAdsets ? "ad sets" : "ads"}
         <span className="ml-2 text-fb-gray-400">Excludes deleted items</span>
       </div>
+
+      {/* Modals */}
+      <CustomiseColumnsModal
+        isOpen={showCustomiseModal}
+        onClose={() => setShowCustomiseModal(false)}
+        onApply={(selectedColumns) => {
+          console.log('Selected columns:', selectedColumns);
+          setShowCustomiseModal(false);
+        }}
+      />
+
+      <AttributionModal
+        show={showAttributionModal}
+        onClose={() => setShowAttributionModal(false)}
+        attributionSettings={attributionSettings}
+        handleAttributionChange={handleAttributionChange}
+        skAdNetworkSettings={skAdNetworkSettings}
+        handleSKAdNetworkChange={handleSKAdNetworkChange}
+        isExpanded={isExpanded}
+        toggleExpanded={() => setIsExpanded((prev) => !prev)}
+      />
+
+      <AddColumnModal
+        isOpen={showAddColumnModal}
+        onClose={() => setShowAddColumnModal(false)}
+        onAddColumn={handleAddColumn}
+        afterColumn={columnToAddAfter}
+      />
+
+      <RemoveColumnModal
+        isOpen={showRemoveColumnModal}
+        onClose={() => setShowRemoveColumnModal(false)}
+        onConfirm={handleRemoveColumn}
+        columnName={columnToRemove}
+      />
     </div>
   );
 }

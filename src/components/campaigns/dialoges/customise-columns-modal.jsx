@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { X, Search } from "lucide-react";
+import { X, Search, ChevronLeft, ChevronRight } from "lucide-react";
 
 const columnData = {
   Ad: [
@@ -76,6 +76,30 @@ export default function CustomiseColumnsModal({ isOpen, onClose, onApply }) {
 
   const removeColumn = (column) => {
     setSelectedColumns((prev) => prev.filter((c) => c !== column));
+  };
+
+  const moveColumnLeft = (column) => {
+    setSelectedColumns((prev) => {
+      const index = prev.indexOf(column);
+      if (index > 0) {
+        const newColumns = [...prev];
+        [newColumns[index - 1], newColumns[index]] = [newColumns[index], newColumns[index - 1]];
+        return newColumns;
+      }
+      return prev;
+    });
+  };
+
+  const moveColumnRight = (column) => {
+    setSelectedColumns((prev) => {
+      const index = prev.indexOf(column);
+      if (index < prev.length - 1) {
+        const newColumns = [...prev];
+        [newColumns[index], newColumns[index + 1]] = [newColumns[index + 1], newColumns[index]];
+        return newColumns;
+      }
+      return prev;
+    });
   };
 
   const handleApply = () => {
@@ -163,15 +187,40 @@ export default function CustomiseColumnsModal({ isOpen, onClose, onApply }) {
               </div>
 
               <div className="space-y-2 max-h-[450px] overflow-y-auto">
-                {selectedColumns.map((column) => (
+                {selectedColumns.map((column, index) => (
                   <div
                     key={column}
                     className="flex items-center justify-between p-2 bg-gray-50 rounded"
                   >
-                    <span className="text-sm text-gray-900">{column}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-gray-900">{column}</span>
+                      <div className="flex items-center gap-1">
+                        {/* Move Left Button - only show if not first column */}
+                        {index > 0 && (
+                          <button
+                            onClick={() => moveColumnLeft(column)}
+                            className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
+                            title="Move left"
+                          >
+                            <ChevronLeft className="w-3 h-3" />
+                          </button>
+                        )}
+                        {/* Move Right Button - only show if not last column */}
+                        {index < selectedColumns.length - 1 && (
+                          <button
+                            onClick={() => moveColumnRight(column)}
+                            className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
+                            title="Move right"
+                          >
+                            <ChevronRight className="w-3 h-3" />
+                          </button>
+                        )}
+                      </div>
+                    </div>
                     <button
                       onClick={() => removeColumn(column)}
                       className="text-gray-400 hover:text-gray-600 transition-colors"
+                      title="Remove column"
                     >
                       <X className="w-4 h-4" />
                     </button>

@@ -23,8 +23,11 @@ function SidebarControls() {
   const isCampaignPage =
     location.pathname.includes("/campaign") ||
     location.pathname.includes("/campaigns") ||
-    location.pathname.includes("/ads") ||
+    (location.pathname.includes("/ads") && !location.pathname.includes("/ads-reporting")) ||
     location.pathname.includes("/ad-sets");
+
+  // Check if current page is overview page
+  const isOverviewPage = location.pathname.includes("/account-overview") || location.pathname === "/";
 
   const handleTabClick = (tab) => {
     setActivityTab(tab);
@@ -47,109 +50,111 @@ function SidebarControls() {
         </div>
         <LoadingModal isLoading={isLoading} />
 
-        {/* Right sidebar with tabs */}
-        <div className="absolute right-0 top-0 bottom-0 w-10 bg-slate-700 flex flex-col items-center py-4 border-l border-slate-600 z-40">
-          {/* Campaign Header - Only visible on campaign pages */}
+        {/* Right sidebar with tabs - Only show on campaign or overview pages */}
+        {(isCampaignPage || isOverviewPage) && (
+          <div className="absolute right-0 top-0 bottom-0 w-10 bg-slate-700 flex flex-col items-center py-4 border-l border-slate-600 z-40">
+            {/* Chart Tab - Only visible on campaign pages */}
+            {isCampaignPage && (
+              <div className="relative group mb-2">
+                <button
+                  onClick={() => openSidebar("chart")}
+                  className={`px-3 text-slate-300 hover:text-white hover:bg-slate-600 rounded-lg transition-colors ${
+                    activeTab === "chart" && isOpen
+                      ? "bg-slate-600 text-white"
+                      : ""
+                  }`}
+                >
+                  <BarChart3 className="w-5 h-5" />
+                </button>
 
-          {/* Chart Tab - Only visible on campaign pages */}
-          {isCampaignPage && (
+                {/* Hover tooltip */}
+                <div className="absolute right-full mr-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+                  <div className="bg-gray-800 text-white text-sm px-3 py-2 rounded-lg shadow-lg whitespace-nowrap">
+                    Performance Charts (Ctrl+C)
+                    <div className="absolute left-full top-1/2 -translate-y-1/2 border-4 border-transparent border-l-gray-800"></div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Edit Tab - Only visible on campaign pages */}
+            {isCampaignPage && (
+              <div className="relative group mb-2">
+                <button
+                  onClick={() => openSidebar("edit")}
+                  className={`px-3 text-slate-300 hover:text-white hover:bg-slate-600 rounded-lg transition-colors ${
+                    activeTab === "edit" && isOpen
+                      ? "bg-slate-600 text-white"
+                      : ""
+                  }`}
+                >
+                  <Edit3 className="w-5 h-5" />
+                </button>
+
+                {/* Hover tooltip */}
+                <div className="absolute right-full mr-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+                  <div className="bg-gray-800 text-white text-sm px-3 py-2 rounded-lg shadow-lg whitespace-nowrap">
+                    Edit Campaigns (Ctrl+E)
+                    <div className="absolute left-full top-1/2 -translate-y-1/2 border-4 border-transparent border-l-gray-800"></div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Activity History Tab - Visible on both campaign and overview pages */}
             <div className="relative group mb-2">
               <button
-                onClick={() => openSidebar("chart")}
+                onClick={() => {
+                  if (isCampaignPage) {
+                    openSidebar("activity");
+                  } else {
+                    handleTabClick("activity");
+                  }
+                }}
                 className={`px-3 text-slate-300 hover:text-white hover:bg-slate-600 rounded-lg transition-colors ${
-                  activeTab === "chart" && isOpen
+                  (isCampaignPage &&
+                    activeTab === "activity" &&
+                    isOpen) ||
+                  (!isCampaignPage &&
+                    activityTab === "activity" &&
+                    isActivitySidebarOpen)
                     ? "bg-slate-600 text-white"
                     : ""
                 }`}
               >
-                <BarChart3 className="w-5 h-5" />
+                <Clock className="w-5 h-5" />
               </button>
 
               {/* Hover tooltip */}
               <div className="absolute right-full mr-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
                 <div className="bg-gray-800 text-white text-sm px-3 py-2 rounded-lg shadow-lg whitespace-nowrap">
-                  Performance Charts (Ctrl+C)
+                  Activity History (Ctrl+H)
                   <div className="absolute left-full top-1/2 -translate-y-1/2 border-4 border-transparent border-l-gray-800"></div>
                 </div>
-              </div>
-            </div>
-          )}
-
-          {/* Edit Tab - Only visible on campaign pages */}
-          {isCampaignPage && (
-            <div className="relative group mb-2">
-              <button
-                onClick={() => openSidebar("edit")}
-                className={`px-3 text-slate-300 hover:text-white hover:bg-slate-600 rounded-lg transition-colors ${
-                  activeTab === "edit" && isOpen
-                    ? "bg-slate-600 text-white"
-                    : ""
-                }`}
-              >
-                <Edit3 className="w-5 h-5" />
-              </button>
-
-              {/* Hover tooltip */}
-              <div className="absolute right-full mr-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
-                <div className="bg-gray-800 text-white text-sm px-3 py-2 rounded-lg shadow-lg whitespace-nowrap">
-                  Edit Campaigns (Ctrl+E)
-                  <div className="absolute left-full top-1/2 -translate-y-1/2 border-4 border-transparent border-l-gray-800"></div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Activity History Tab - Always visible */}
-          <div className="relative group mb-2">
-            <button
-              onClick={() => {
-                if (isCampaignPage) {
-                  openSidebar("activity");
-                } else {
-                  handleTabClick("activity");
-                }
-              }}
-              className={`px-3 text-slate-300 hover:text-white hover:bg-slate-600 rounded-lg transition-colors ${
-                (isCampaignPage &&
-                  activeTab === "activity" &&
-                  isOpen) ||
-                (!isCampaignPage &&
-                  activityTab === "activity" &&
-                  isActivitySidebarOpen)
-                  ? "bg-slate-600 text-white"
-                  : ""
-              }`}
-            >
-              <Clock className="w-5 h-5" />
-            </button>
-
-            {/* Hover tooltip */}
-            <div className="absolute right-full mr-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
-              <div className="bg-gray-800 text-white text-sm px-3 py-2 rounded-lg shadow-lg whitespace-nowrap">
-                {isCampaignPage
-                  ? "Activity History (Ctrl+H)"
-                  : "Activity History (Ctrl+H)"}
-                <div className="absolute left-full top-1/2 -translate-y-1/2 border-4 border-transparent border-l-gray-800"></div>
               </div>
             </div>
           </div>
-        </div>
+        )}
 
-        {/* Activity History Sidebar */}
-        <ActivityHistorySidebar
-          isOpen={isActivitySidebarOpen}
-          onClose={() => setIsActivitySidebarOpen(false)}
-          initialTab={activityTab}
-          showAllTabs={isCampaignPage}
-        />
+        {/* Activity History Sidebar - Only show on overview pages */}
+        {isOverviewPage && (
+          <ActivityHistorySidebar
+            isOpen={isActivitySidebarOpen}
+            onClose={() => setIsActivitySidebarOpen(false)}
+            initialTab={activityTab}
+            showAllTabs={false}
+          />
+        )}
 
-        {/* Campaign Sidebar */}
-        <CampaignSidebar
-          isOpen={isOpen}
-          onClose={closeSidebar}
-          activeTab={activeTab}
-          selectedFieldData={selectedFieldData}
-        />
+        {/* Campaign Sidebar - Only show on campaign pages */}
+        {isCampaignPage && (
+          <CampaignSidebar
+            isOpen={isOpen}
+            onClose={closeSidebar}
+            activeTab={activeTab}
+            selectedFieldData={selectedFieldData}
+          />
+        )}
       </div>
     </div>
   );
