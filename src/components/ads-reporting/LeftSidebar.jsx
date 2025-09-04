@@ -23,11 +23,11 @@ export default function LeftSidebar({ activeView, onViewChange }) {
 
   return (
     <div className={` flex flex-col items-center  transition-all duration-300 ${
-      collapsed ? "w-20" : "w-48"
+      collapsed ? "w-20" : "w-64"
     }`}>
       {/* White Card Container */}
       <div className={`bg-white rounded-md shadow-lg transition-all duration-300 ${
-        collapsed ? "p-2 w-16" : "p-4 w-44"
+        collapsed ? "p-2 w-16" : "p-4 w-60"
       } flex flex-col  space-y-3`}>
 
         {/* Navigation Items */}
