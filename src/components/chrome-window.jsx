@@ -12,6 +12,7 @@ import AppLayout from "@/layouts/AppLayout";
 import AccountOverview from "@/pages/AccountOverview";
 import Campaigns from "@/pages/Campaigns";
 import AdsReporting from "@/pages/AdsReporting";
+import DetailedReport from "@/pages/DetailedReport";
 import Audiences from "@/pages/Audiences";
 import AdvertisingSettings from "@/pages/AdvertisingSettings";
 import BillingPayments from "@/pages/BillingPayments";
@@ -173,6 +174,7 @@ export default function ChromeWindow({ onClose, onMinimize }) {
                 <Route path="account-overview" element={<AccountOverview />} />
                 <Route path="campaigns" element={<Campaigns />} />
                 <Route path="ads-reporting" element={<AdsReporting />} />
+                <Route path="detailed-report" element={<DetailedReport />} />
                 <Route path="audiences" element={<Audiences />} />
                 <Route
                   path="advertising-settings"

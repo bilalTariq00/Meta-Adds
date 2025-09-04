@@ -28,6 +28,9 @@ function SidebarControls() {
 
   // Check if current page is overview page
   const isOverviewPage = location.pathname.includes("/account-overview") || location.pathname === "/";
+  
+  // Check if current page is detailed report page
+  const isDetailedReportPage = location.pathname.includes("/detailed-report");
 
   const handleTabClick = (tab) => {
     setActivityTab(tab);
@@ -36,16 +39,16 @@ function SidebarControls() {
 
   return (
     <div className="h-full w-full flex bg-gradient-to-tl from-green-50 via-blue-50 to-pink-50 relative overflow-hidden">
-      {/* Sidebar */}
+      {/* Sidebar - Always visible */}
       <Sidebar />
 
       {/* Main content area */}
-      <div className="pl-16 pr-4 flex-1 flex flex-col min-w-0 relative">
-        {/* Header */}
-        <Header />
+      <div className={`${isDetailedReportPage ? 'pl-0' : 'pl-16'} pr-4 flex-1 flex flex-col min-w-0 relative`}>
+        {/* Header - Hide for detailed report page */}
+        {!isDetailedReportPage && <Header />}
 
         {/* Page content */}
-        <div className="flex-1 overflow-auto flex justify-center">
+        <div className={`flex-1 ${isDetailedReportPage ? 'overflow-hidden' : 'overflow-auto'} flex justify-center`}>
           <Outlet />
         </div>
         <LoadingModal isLoading={isLoading} />

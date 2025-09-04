@@ -94,7 +94,7 @@ export default function DateRangePicker({
   return (
     <div 
       ref={pickerRef}
-      className={`absolute ${getPositionClasses()} bg-white border border-gray-200 rounded-lg shadow-lg z-50 w-[600px]`}
+      className={`absolute ${getPositionClasses()} bg-white border border-gray-200 rounded-lg shadow-lg z-50 h-[450px] overflow-y-auto w-[600px]`}
     >
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-gray-200">

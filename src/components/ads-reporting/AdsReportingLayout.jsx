@@ -1,16 +1,22 @@
 "use client";
 
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import LeftSidebar from "./LeftSidebar";
 import RightSidebar from "./RightSidebar";
 import MainReportsContainer from "./MainReportsContainer";
 import ChooseLayoutModal from "./modals/ChooseLayoutModal";
 
 export default function AdsReportingLayout() {
+  const navigate = useNavigate();
   const [rightSidebarCollapsed, setRightSidebarCollapsed] = useState(false);
   const [activeView, setActiveView] = useState("reports"); // "reports" or "exports"
   const [showChooseLayoutModal, setShowChooseLayoutModal] = useState(false);
   const [currentLayout, setCurrentLayout] = useState("pivot-table"); // "pivot-table", "trend", "bar-chart"
+
+  const handleCreateReport = () => {
+    navigate("/detailed-report");
+  };
 
   return (
     <div className="h-full w-full flex ">
@@ -25,7 +31,7 @@ export default function AdsReportingLayout() {
         <MainReportsContainer
           activeView={activeView}
           currentLayout={currentLayout}
-          onChooseLayout={() => setShowChooseLayoutModal(true)}
+          onChooseLayout={handleCreateReport}
           onNavigateToExports={() => setActiveView("exports")}
           onNavigateToReports={() => setActiveView("reports")}
         />
