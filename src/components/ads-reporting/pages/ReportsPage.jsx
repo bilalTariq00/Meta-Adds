@@ -1,85 +1,125 @@
 "use client";
 
-import { useState } from "react";
-import { ArrowUpDown, MoreHorizontal, User, Download, Share } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { ArrowUpDown, MoreHorizontal, Download, Share, ChevronUp, ChevronDown, Trash2, Copy } from "lucide-react";
 import PivotTableSection from "../sections/PivotTableSection";
 import TrendSection from "../sections/TrendSection";
 import BarChartSection from "../sections/BarChartSection";
 
-export default function ReportsPage({ searchQuery, selectedReports, onSelectReport, onSelectAll, currentLayout }) {
+export default function ReportsPage({ searchQuery, selectedReports, onSelectReport, onSelectAll, currentLayout, onExport, onDelete, onShare, onDuplicate, reportData, sharedReports }) {
   const [sortColumn, setSortColumn] = useState("lastAccessed");
   const [sortDirection, setSortDirection] = useState("desc");
+  const [showSortDropdown, setShowSortDropdown] = useState(null);
+  const dropdownRef = useRef(null);
 
-  const reports = [
-    {
-      id: "1",
-      name: "Untitled report",
-      account: "1 ad account",
-      lastAccessed: "02/09/2025",
-      edited: "02/09/2025",
-      created: "02/09/2025",
-      creator: "Muhammad Bilal"
-    },
-    {
-      id: "2",
-      name: "Untitled report",
-      account: "1 ad account",
-      lastAccessed: "02/09/2025",
-      edited: "02/09/2025",
-      created: "02/09/2025",
-      creator: "Muhammad Bilal"
-    },
-    {
-      id: "3",
-      name: "Untitled report",
-      account: "1 ad account",
-      lastAccessed: "19/08/2025",
-      edited: "19/08/2025",
-      created: "19/08/2025",
-      creator: "Muhammad Bilal"
-    },
-    {
-      id: "4",
-      name: "Untitled report",
-      account: "1 ad account",
-      lastAccessed: "19/08/2025",
-      edited: "19/08/2025",
-      created: "19/08/2025",
-      creator: "Muhammad Bilal"
-    },
-    {
-      id: "5",
-      name: "Untitled report",
-      account: "1 ad account",
-      lastAccessed: "19/08/2025",
-      edited: "19/08/2025",
-      created: "19/08/2025",
-      creator: "Muhammad Bilal"
+  // Use the reportData prop from parent instead of static data
+  const reportsData = reportData || [];
+
+  // Action handlers - just call parent handlers since we're using static data
+  const handleDelete = () => {
+    // Call parent handler
+    if (onDelete) onDelete();
+  };
+
+  const handleDuplicate = () => {
+    // Call parent handler
+    if (onDuplicate) onDuplicate();
+  };
+
+  const handleExport = () => {
+    const selectedData = reportsData.filter(report => selectedReports.includes(report.id));
+    console.log('Exporting reports:', selectedData);
+    // Call parent handler
+    if (onExport) onExport();
+  };
+
+  const handleShare = () => {
+    const selectedData = reportsData.filter(report => selectedReports.includes(report.id));
+    console.log('Sharing reports:', selectedData);
+    // Call parent handler
+    if (onShare) onShare();
+  };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowSortDropdown(null);
+      }
     }
-  ];
 
-  const handleSort = (column) => {
-    if (sortColumn === column) {
-      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
-    } else {
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleSort = (column, direction = null) => {
+    if (direction) {
+      // Direct sort from dropdown
       setSortColumn(column);
-      setSortDirection("asc");
+      setSortDirection(direction);
+    } else {
+      // Toggle sort on header click
+      if (sortColumn === column) {
+        setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+      } else {
+        setSortColumn(column);
+        setSortDirection("asc");
+      }
     }
+    setShowSortDropdown(null);
+  };
+
+  const handleSortDropdown = (column, event) => {
+    event.stopPropagation();
+    setShowSortDropdown(showSortDropdown === column ? null : column);
   };
 
   const getSortIcon = (column) => {
     if (sortColumn !== column) {
-      return <ArrowUpDown className="w-4 h-4 text-gray-400" />;
+      return (
+        <div className="flex flex-col">
+          <ChevronUp className="w-3 h-3 text-gray-400" />
+          <ChevronDown className="w-3 h-3 text-gray-400 -mt-1" />
+        </div>
+      );
     }
     return sortDirection === "asc" ? 
-      <ArrowUpDown className="w-4 h-4 text-gray-600 rotate-180" /> : 
-      <ArrowUpDown className="w-4 h-4 text-gray-600" />;
+      <ChevronUp className="w-4 h-4 text-gray-600" /> : 
+      <ChevronDown className="w-4 h-4 text-gray-600" />;
   };
+
+  // Sort the reports based on current sort settings
+  const sortedReports = [...reportsData].sort((a, b) => {
+    let aValue = a[sortColumn];
+    let bValue = b[sortColumn];
+    
+    // Handle date sorting
+    if (sortColumn === "lastAccessed" || sortColumn === "edited" || sortColumn === "created") {
+      aValue = new Date(aValue.split('/').reverse().join('-'));
+      bValue = new Date(bValue.split('/').reverse().join('-'));
+    }
+    
+    if (sortDirection === "asc") {
+      return aValue > bValue ? 1 : -1;
+    } else {
+      return aValue < bValue ? 1 : -1;
+    }
+  });
 
   const renderContent = () => {
     switch (currentLayout) {
       case "pivot-table":
-        return <PivotTableSection />;
+        return <PivotTableSection 
+          selectedReports={selectedReports}
+          onSelectReport={onSelectReport}
+          onSelectAll={onSelectAll}
+          reportData={reportsData}
+          onExport={onExport}
+          onDelete={onDelete}
+          onShare={onShare}
+          onDuplicate={onDuplicate}
+          sharedReports={sharedReports}
+        />;
       case "trend":
         return <TrendSection />;
       case "bar-chart":
@@ -87,113 +127,228 @@ export default function ReportsPage({ searchQuery, selectedReports, onSelectRepo
       default:
         return (
           <div className="p-6">
-            {/* Reports Table */}
-            <div className="bg-white rounded-lg border border-gray-200">
+
+
+            {/* Simple Reports Table */}
+            <div className="bg-white border border-gray-200 overflow-x-auto">
               {/* Table Header */}
-              <div className="px-6 py-4 border-b border-gray-200">
-                <div className="grid grid-cols-12 gap-4 text-sm font-medium text-gray-700">
-                  <div className="col-span-1">
+              <div className="px-6 py-3 border-b border-gray-200 bg-gray-50 relative">
+                <div className="flex items-center text-sm font-medium text-gray-700">
+                  <div className="w-8">
                     <input
                       type="checkbox"
-                      checked={selectedReports.length === reports.length}
+                      checked={selectedReports.length === reportsData.length && reportsData.length > 0}
                       onChange={onSelectAll}
                       className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                     />
                   </div>
-                  <div className="col-span-4">
+                  <div className="flex-1 flex items-center justify-between relative">
+                    <span>Report name</span>
                     <button
-                      onClick={() => handleSort("name")}
-                      className="flex items-center space-x-1 hover:text-gray-900"
+                      onClick={(e) => handleSortDropdown("name", e)}
+                      className="flex items-center ml-2"
                     >
-                      <span>Report name</span>
                       {getSortIcon("name")}
                     </button>
+                    {showSortDropdown === "name" && (
+                      <div ref={dropdownRef} className="absolute top-full right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 min-w-[120px]">
+                        <button
+                          onClick={() => handleSort("name", "asc")}
+                          className="w-full px-3 py-2 text-left text-sm hover:bg-gray-50 flex items-center space-x-2"
+                        >
+                          <ChevronUp className="w-4 h-4" />
+                          <span>Ascending</span>
+                        </button>
+                        <button
+                          onClick={() => handleSort("name", "desc")}
+                          className="w-full px-3 py-2 text-left text-sm hover:bg-gray-50 flex items-center space-x-2"
+                        >
+                          <ChevronDown className="w-4 h-4" />
+                          <span>Descending</span>
+                        </button>
+                      </div>
+                    )}
                   </div>
-                  <div className="col-span-2">
+                  <div className="w-32 flex items-center justify-between relative">
+                    <span>Last accessed</span>
                     <button
-                      onClick={() => handleSort("lastAccessed")}
-                      className="flex items-center space-x-1 hover:text-gray-900"
+                      onClick={(e) => handleSortDropdown("lastAccessed", e)}
+                      className="flex items-center ml-2"
                     >
-                      <span>Last accessed</span>
                       {getSortIcon("lastAccessed")}
                     </button>
+                    {showSortDropdown === "lastAccessed" && (
+                      <div ref={dropdownRef} className="absolute top-full right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 min-w-[120px]">
+                        <button
+                          onClick={() => handleSort("lastAccessed", "asc")}
+                          className="w-full px-3 py-2 text-left text-sm hover:bg-gray-50 flex items-center space-x-2"
+                        >
+                          <ChevronUp className="w-4 h-4" />
+                          <span>Ascending</span>
+                        </button>
+                        <button
+                          onClick={() => handleSort("lastAccessed", "desc")}
+                          className="w-full px-3 py-2 text-left text-sm hover:bg-gray-50 flex items-center space-x-2"
+                        >
+                          <ChevronDown className="w-4 h-4" />
+                          <span>Descending</span>
+                        </button>
+                      </div>
+                    )}
                   </div>
-                  <div className="col-span-2">
+                  <div className="w-32 flex items-center justify-between relative">
+                    <span>Edited</span>
                     <button
-                      onClick={() => handleSort("edited")}
-                      className="flex items-center space-x-1 hover:text-gray-900"
+                      onClick={(e) => handleSortDropdown("edited", e)}
+                      className="flex items-center ml-2"
                     >
-                      <span>Edited</span>
                       {getSortIcon("edited")}
                     </button>
+                    {showSortDropdown === "edited" && (
+                      <div ref={dropdownRef} className="absolute top-full right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 min-w-[120px]">
+                        <button
+                          onClick={() => handleSort("edited", "asc")}
+                          className="w-full px-3 py-2 text-left text-sm hover:bg-gray-50 flex items-center space-x-2"
+                        >
+                          <ChevronUp className="w-4 h-4" />
+                          <span>Ascending</span>
+                        </button>
+                        <button
+                          onClick={() => handleSort("edited", "desc")}
+                          className="w-full px-3 py-2 text-left text-sm hover:bg-gray-50 flex items-center space-x-2"
+                        >
+                          <ChevronDown className="w-4 h-4" />
+                          <span>Descending</span>
+                        </button>
+                      </div>
+                    )}
                   </div>
-                  <div className="col-span-2">
+                  <div className="w-32 flex items-center justify-between relative">
+                    <span>Created</span>
                     <button
-                      onClick={() => handleSort("created")}
-                      className="flex items-center space-x-1 hover:text-gray-900"
+                      onClick={(e) => handleSortDropdown("created", e)}
+                      className="flex items-center ml-2"
                     >
-                      <span>Created</span>
                       {getSortIcon("created")}
                     </button>
+                    {showSortDropdown === "created" && (
+                      <div ref={dropdownRef} className="absolute top-full right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 min-w-[120px]">
+                        <button
+                          onClick={() => handleSort("created", "asc")}
+                          className="w-full px-3 py-2 text-left text-sm hover:bg-gray-50 flex items-center space-x-2"
+                        >
+                          <ChevronUp className="w-4 h-4" />
+                          <span>Ascending</span>
+                        </button>
+                        <button
+                          onClick={() => handleSort("created", "desc")}
+                          className="w-full px-3 py-2 text-left text-sm hover:bg-gray-50 flex items-center space-x-2"
+                        >
+                          <ChevronDown className="w-4 h-4" />
+                          <span>Descending</span>
+                        </button>
+                      </div>
+                    )}
                   </div>
-                  <div className="col-span-1"></div>
                 </div>
               </div>
 
               {/* Table Body */}
               <div className="divide-y divide-gray-200">
-                {reports.map((report) => (
-                  <div key={report.id} className="px-6 py-4 hover:bg-gray-50 group">
-                    <div className="grid grid-cols-12 gap-4 items-center">
-                      <div className="col-span-1">
+                {sortedReports.map((report, index) => (
+                  <div key={report.id} className={`px-6 py-3 hover:bg-gray-50 group ${selectedReports.includes(report.id) ? 'bg-blue-50' : ''}`}>
+                    <div className="flex items-center text-sm">
+                      <div className="w-8">
                         <input
                           type="checkbox"
                           checked={selectedReports.includes(report.id)}
-                          onChange={() => onSelectReport(report.id)}
+                          onChange={() => {
+                            console.log('Checkbox clicked for report:', report.id);
+                            onSelectReport(report.id);
+                          }}
                           className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                         />
                       </div>
-                      <div className="col-span-4">
-                        <div className="flex items-center space-x-3">
-                          <div>
-                            <div className="text-sm font-medium text-gray-900">
-                              {report.name}
-                            </div>
-                            <div className="text-sm text-gray-500">
-                              {report.account}
-                            </div>
+                      <div className="flex-1 flex items-center justify-between">
+                        <div>
+                          <div className="font-medium text-gray-900">
+                            {report.name}
                           </div>
-                          <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button className="p-1 hover:bg-gray-200 rounded">
-                              <User className="w-4 h-4 text-gray-600" />
-                            </button>
-                            <button className="p-1 hover:bg-gray-200 rounded">
-                              <Download className="w-4 h-4 text-gray-600" />
-                            </button>
-                            <button className="p-1 hover:bg-gray-200 rounded">
-                              <Share className="w-4 h-4 text-gray-600" />
-                            </button>
-                            <button className="p-1 hover:bg-gray-200 rounded">
+                          <div className="text-sm text-gray-500">
+                            {report.account}
+                          </div>
+                        </div>
+                        
+                        {/* Hover Actions - Show after Report name */}
+                        <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <button 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleExport([report.id]);
+                            }}
+                            className="p-1 hover:bg-gray-200 rounded" 
+                            title="Export"
+                          >
+                            <Download className="w-4 h-4 text-gray-600" />
+                          </button>
+                          <button 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleShare([report.id]);
+                            }}
+                            className="p-1 hover:bg-gray-200 rounded" 
+                            title="Share"
+                          >
+                            <Share className="w-4 h-4 text-gray-600" />
+                          </button>
+                          <div className="relative">
+                            <button 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                // Toggle dropdown logic would go here
+                              }}
+                              className="p-1 hover:bg-gray-200 rounded" 
+                              title="More actions"
+                            >
                               <MoreHorizontal className="w-4 h-4 text-gray-600" />
                             </button>
+                            {/* More Actions Dropdown */}
+                            <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <button 
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDuplicate([report.id]);
+                                }}
+                                className="w-full px-3 py-2 text-left text-sm hover:bg-gray-50 flex items-center space-x-2"
+                              >
+                                <Copy className="w-4 h-4" />
+                                <span>Duplicate</span>
+                              </button>
+                              <button 
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDelete([report.id]);
+                                }}
+                                className="w-full px-3 py-2 text-left text-sm hover:bg-gray-50 flex items-center space-x-2 text-red-600"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                                <span>Delete</span>
+                              </button>
+                            </div>
                           </div>
                         </div>
                       </div>
-                      <div className="col-span-2">
-                        <div className="text-sm text-gray-900">{report.lastAccessed}</div>
+                      <div className="w-32">
+                        <div className="text-gray-900">{report.lastAccessed}</div>
                       </div>
-                      <div className="col-span-2">
-                        <div className="text-sm text-gray-900">{report.edited}</div>
+                      <div className="w-32">
+                        <div className="text-gray-900">{report.edited}</div>
                       </div>
-                      <div className="col-span-2">
-                        <div className="text-sm text-gray-900">{report.created}</div>
+                      <div className="w-32">
+                        <div className="text-gray-900">{report.created}</div>
                         <div className="text-sm text-gray-500">by {report.creator}</div>
                       </div>
-                      <div className="col-span-1">
-                        <button className="p-1 hover:bg-gray-200 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                          <MoreHorizontal className="w-4 h-4 text-gray-600" />
-                        </button>
-                      </div>
+
                     </div>
                   </div>
                 ))}
@@ -205,7 +360,7 @@ export default function ReportsPage({ searchQuery, selectedReports, onSelectRepo
   };
 
   return (
-    <div className="flex-1 overflow-auto">
+    <div className="flex-1 overflow-x-auto overflow-y-auto">
       {renderContent()}
     </div>
   );

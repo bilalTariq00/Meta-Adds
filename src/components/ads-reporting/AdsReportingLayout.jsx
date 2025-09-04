@@ -13,28 +13,32 @@ export default function AdsReportingLayout() {
   const [currentLayout, setCurrentLayout] = useState("pivot-table"); // "pivot-table", "trend", "bar-chart"
 
   return (
-    <div className="h-full w-full flex bg-gray-50">
+    <div className="h-full w-full flex ">
       {/* Left Sidebar */}
       <LeftSidebar
         activeView={activeView}
         onViewChange={setActiveView}
       />
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col min-w-0">
+      {/* Main Content with spacing */}
+      <div className={`flex-1 flex flex-col min-w-0 ${activeView === "reports" ? "ml-4" : ""}`}>
         <MainReportsContainer
           activeView={activeView}
           currentLayout={currentLayout}
           onChooseLayout={() => setShowChooseLayoutModal(true)}
+          onNavigateToExports={() => setActiveView("exports")}
+          onNavigateToReports={() => setActiveView("reports")}
         />
       </div>
 
-      {/* Right Sidebar */}
-      <RightSidebar
-        collapsed={rightSidebarCollapsed}
-        onToggle={() => setRightSidebarCollapsed(!rightSidebarCollapsed)}
-        activeView={activeView}
-      />
+      {/* Right Sidebar - Only show on Reports tab */}
+      {activeView === "reports" && (
+        <RightSidebar
+          collapsed={rightSidebarCollapsed}
+          onToggle={() => setRightSidebarCollapsed(!rightSidebarCollapsed)}
+          activeView={activeView}
+        />
+      )}
 
       {/* Choose Layout Modal */}
       <ChooseLayoutModal

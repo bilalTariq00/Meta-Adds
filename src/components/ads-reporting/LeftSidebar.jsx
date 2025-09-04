@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { FileText, Download, Server } from "lucide-react";
+import { FileText, Download, Server, Sidebar } from "lucide-react";
 
 export default function LeftSidebar({ activeView, onViewChange }) {
   const [collapsed, setCollapsed] = useState(true);
@@ -22,13 +22,13 @@ export default function LeftSidebar({ activeView, onViewChange }) {
   ];
 
   return (
-    <div className={`bg-gradient-to-br from-pink-50 via-blue-50 to-pink-50 flex flex-col items-center py-4 transition-all duration-300 ${
-      collapsed ? "w-16" : "w-48"
+    <div className={` flex flex-col items-center  transition-all duration-300 ${
+      collapsed ? "w-20" : "w-48"
     }`}>
       {/* White Card Container */}
-      <div className={`bg-white rounded-xl shadow-lg transition-all duration-300 ${
-        collapsed ? "p-3 w-12" : "p-4 w-44"
-      } flex flex-col items-center space-y-3`}>
+      <div className={`bg-white rounded-md shadow-lg transition-all duration-300 ${
+        collapsed ? "p-2 w-16" : "p-4 w-44"
+      } flex flex-col  space-y-3`}>
 
         {/* Navigation Items */}
         {sidebarItems.map((item) => {
@@ -62,14 +62,14 @@ export default function LeftSidebar({ activeView, onViewChange }) {
         })}
 
         {/* Server Icon - Toggle Button */}
-        <div className="relative  group w-full">
+        <div className="">
           <button 
             onClick={() => setCollapsed(!collapsed)}
-            className={`rounded-lg flex items-center justify-end transition-colors ${
-              collapsed ? "w-8 h-8 justify-center " : "w-full p-3"
+            className={`rounded-lg flex   transition-colors ${
+              collapsed ? "w-8 h-8 justify-center  items-center p-2  " : "w-full  justify-end items-end p-2 "
             } hover:bg-gray-50`}
           >
-            <Server className={`text-gray-600 ${collapsed ? "w-4 h-4" : "w-5 h-5"}`} />
+            <Sidebar className={`text-gray-600 ${collapsed ? "w-4 h-4 flex justify-center items-center relative left-2" : "w-5 h-5 "}`} />
            
           </button>
           
