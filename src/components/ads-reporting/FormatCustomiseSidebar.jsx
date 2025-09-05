@@ -10,9 +10,12 @@ import {
   MoreHorizontal,
   ArrowUpDown,
   ArrowLeftRight,
+  GripVertical,
+  Info,
 } from "lucide-react";
+import RadioDropdown from "./RadioDropdown";
 
-export default function FormatCustomiseSidebar({ activeTab, onClose }) {
+export default function FormatCustomiseSidebar({ activeTab, onClose, viewType = "pivot-table" }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeSubTab, setActiveSubTab] = useState("breakdowns");
   const [expandedSections, setExpandedSections] = useState({
@@ -58,6 +61,43 @@ export default function FormatCustomiseSidebar({ activeTab, onClose }) {
   const [previewScale, setPreviewScale] = useState("white-green");
   const [isReversed, setIsReversed] = useState(false);
   const [dropdownPositions, setDropdownPositions] = useState({});
+
+  // Trend chart specific state
+  const [selectedBreakdowns, setSelectedBreakdowns] = useState([
+    { id: "campaign", name: "Campaign name", checked: true },
+    { id: "adset", name: "Ad set name", checked: true }
+  ]);
+  const [selectedMetrics, setSelectedMetrics] = useState([
+    { id: "delivery", name: "Delivery", checked: false },
+    { id: "reach", name: "Reach", checked: true },
+    { id: "frequency", name: "Frequency", checked: true },
+    { id: "attribution", name: "Attribution setting", checked: false },
+    { id: "amount", name: "Amount spent", checked: false },
+    { id: "cost", name: "Cost per result", checked: false },
+    { id: "schedule", name: "Schedule", checked: false },
+    { id: "results", name: "Results", checked: false },
+    { id: "donations", name: "Meta donations", checked: false }
+  ]);
+  const [lineSorting, setLineSorting] = useState("reach");
+  const [sortDirection, setSortDirection] = useState("descending");
+  const [lineCount, setLineCount] = useState(6);
+  const [timeInterval, setTimeInterval] = useState("day");
+
+  // Dropdown states for breakdowns and metrics
+  const [showBreakdownsDropdown, setShowBreakdownsDropdown] = useState(false);
+  const [showMetricsDropdown, setShowMetricsDropdown] = useState(false);
+  
+  // Drag and drop states
+  const [draggedItem, setDraggedItem] = useState(null);
+  const [draggedOverItem, setDraggedOverItem] = useState(null);
+  
+  // Dropdown options
+  const metricOptions = [
+    { value: "reach", label: "Reach" },
+    { value: "frequency", label: "Frequency" },
+    { value: "campaign", label: "Campaign name" },
+    { value: "adset", label: "Ad set name" }
+  ];
 
   // Refs for dropdown buttons
   const columnButtonRef = useRef(null);
@@ -157,6 +197,101 @@ export default function FormatCustomiseSidebar({ activeTab, onClose }) {
       customConversions: true,
       settingsMetrics: true,
     });
+  };
+
+  // Trend chart handlers
+  const handleBreakdownToggle = (breakdownId) => {
+    setSelectedBreakdowns(prev => 
+      prev.map(breakdown => 
+        breakdown.id === breakdownId 
+          ? { ...breakdown, checked: !breakdown.checked }
+          : breakdown
+      )
+    );
+  };
+
+  const handleMetricToggle = (metricId) => {
+    setSelectedMetrics(prev => 
+      prev.map(metric => 
+        metric.id === metricId 
+          ? { ...metric, checked: !metric.checked }
+          : metric
+      )
+    );
+  };
+
+  // Reorder functions
+  const moveBreakdown = (fromIndex, toIndex) => {
+    setSelectedBreakdowns(prev => {
+      const newBreakdowns = [...prev];
+      const [movedItem] = newBreakdowns.splice(fromIndex, 1);
+      newBreakdowns.splice(toIndex, 0, movedItem);
+      return newBreakdowns;
+    });
+  };
+
+  const moveMetric = (fromIndex, toIndex) => {
+    setSelectedMetrics(prev => {
+      const newMetrics = [...prev];
+      const [movedItem] = newMetrics.splice(fromIndex, 1);
+      newMetrics.splice(toIndex, 0, movedItem);
+      return newMetrics;
+    });
+  };
+
+  // Remove functions
+  const removeBreakdown = (breakdownId) => {
+    setSelectedBreakdowns(prev => prev.filter(breakdown => breakdown.id !== breakdownId));
+  };
+
+  const removeMetric = (metricId) => {
+    setSelectedMetrics(prev => prev.filter(metric => metric.id !== metricId));
+  };
+
+  // Drag and drop handlers
+  const handleDragStart = (e, itemId, type) => {
+    setDraggedItem({ id: itemId, type });
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleDragOver = (e, itemId, type) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    setDraggedOverItem({ id: itemId, type });
+  };
+
+  const handleDragLeave = () => {
+    setDraggedOverItem(null);
+  };
+
+  const handleDrop = (e, targetItemId, type) => {
+    e.preventDefault();
+    
+    if (!draggedItem || draggedItem.type !== type) return;
+    
+    const sourceIndex = type === 'breakdown' 
+      ? selectedBreakdowns.findIndex(item => item.id === draggedItem.id)
+      : selectedMetrics.findIndex(item => item.id === draggedItem.id);
+    
+    const targetIndex = type === 'breakdown'
+      ? selectedBreakdowns.findIndex(item => item.id === targetItemId)
+      : selectedMetrics.findIndex(item => item.id === targetItemId);
+    
+    if (sourceIndex === -1 || targetIndex === -1 || sourceIndex === targetIndex) return;
+    
+    if (type === 'breakdown') {
+      moveBreakdown(sourceIndex, targetIndex);
+    } else {
+      moveMetric(sourceIndex, targetIndex);
+    }
+    
+    setDraggedItem(null);
+    setDraggedOverItem(null);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedItem(null);
+    setDraggedOverItem(null);
   };
 
   if (activeTab === "format") {
@@ -932,44 +1067,603 @@ export default function FormatCustomiseSidebar({ activeTab, onClose }) {
     );
   }
 
+  // Trend chart customise content
+  if (viewType === "trend" && activeTab === "customise") {
+    return (
+      <div className="w-70 h-full bg-white border-l border-gray-200 flex flex-col rounded-md">
+        {/* Sidebar Header */}
+        <div className="p-4 border-b border-gray-200">
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-semibold text-gray-900">Customise trend chart</h3>
+            <button
+              onClick={onClose}
+              className="p-1 hover:bg-gray-100 rounded"
+            >
+              <X className="w-4 h-4 text-gray-500" />
+            </button>
+          </div>
+        </div>
+
+        {/* Sidebar Content */}
+        <div className="flex-1 h-screen overflow-y-auto p-4 pb-40 space-y-6">
+          {/* Data Section */}
+          <div>
+            <h4 className="text-sm font-semibold text-gray-900 mb-4">Data</h4>
+            
+            {/* Breakdowns */}
+            <div className="mb-6">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <h5 className="text-sm font-medium text-gray-700">Breakdowns (lines)</h5>
+                  <div className="w-3 h-3 rounded-full bg-gray-300 flex items-center justify-center">
+                    <span className="text-xs text-gray-600">i</span>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowBreakdownsDropdown(!showBreakdownsDropdown)}
+                  className="p-1 hover:bg-gray-100 rounded"
+                >
+                  <ArrowUpDown className="w-4 h-4 text-gray-400" />
+                </button>
+              </div>
+
+              {/* Breakdowns Dropdown */}
+              {showBreakdownsDropdown && (
+                <div className="mb-3 bg-white border border-gray-200 rounded-lg shadow-lg p-3">
+                  <div className="space-y-2">
+                    {selectedBreakdowns.map((breakdown, index) => (
+                      <div 
+                        key={breakdown.id} 
+                        draggable
+                        onDragStart={(e) => handleDragStart(e, breakdown.id, 'breakdown')}
+                        onDragOver={(e) => handleDragOver(e, breakdown.id, 'breakdown')}
+                        onDragLeave={handleDragLeave}
+                        onDrop={(e) => handleDrop(e, breakdown.id, 'breakdown')}
+                        onDragEnd={handleDragEnd}
+                        className={`flex items-center gap-2 p-2 hover:bg-gray-50 rounded transition-colors ${
+                          draggedItem?.id === breakdown.id ? 'opacity-50' : ''
+                        } ${
+                          draggedOverItem?.id === breakdown.id && draggedItem?.id !== breakdown.id 
+                            ? 'bg-blue-50 border border-blue-200' 
+                            : ''
+                        }`}
+                      >
+                        <GripVertical className="w-4 h-4 text-gray-400 cursor-move" />
+                        <span className="flex-1 text-sm text-gray-700">{breakdown.name}</span>
+                        <button
+                          onClick={() => removeBreakdown(breakdown.id)}
+                          className="p-1 hover:bg-gray-200 rounded"
+                        >
+                          <X className="w-3 h-3 text-gray-500" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="mt-2 pt-2 border-t border-gray-200">
+                    <div className="text-xs text-gray-500 text-center">
+                      Drag to reorder • Click X to remove
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className="space-y-2">
+                {selectedBreakdowns.map((breakdown) => (
+                  <label key={breakdown.id} className="flex items-center">
+                    <input
+                      type="checkbox"
+                      checked={breakdown.checked}
+                      onChange={() => handleBreakdownToggle(breakdown.id)}
+                      className="custom-checkbox"
+                    />
+                    <span className="ml-2 text-sm text-gray-700">{breakdown.name}</span>
+                  </label>
+                ))}
+              </div>
+              <div className="mt-3 flex items-center gap-2">
+                <input
+                  type="text"
+                  placeholder="Search breakdowns"
+                  className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+                <button className="p-2 text-gray-400 hover:text-gray-600">
+                  <span className="text-lg">+</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Metrics */}
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <h5 className="text-sm font-medium text-gray-700">Metrics (y-axis)</h5>
+                  <div className="w-3 h-3 rounded-full bg-gray-300 flex items-center justify-center">
+                    <span className="text-xs text-gray-600">i</span>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowMetricsDropdown(!showMetricsDropdown)}
+                  className="p-1 hover:bg-gray-100 rounded"
+                >
+                  <ArrowUpDown className="w-4 h-4 text-gray-400" />
+                </button>
+              </div>
+
+              {/* Metrics Dropdown */}
+              {showMetricsDropdown && (
+                <div className="mb-3 bg-white border border-gray-200 rounded-lg shadow-lg p-3">
+                  <div className="space-y-2 max-h-60 overflow-y-auto">
+                    {selectedMetrics.map((metric, index) => (
+                      <div 
+                        key={metric.id} 
+                        draggable
+                        onDragStart={(e) => handleDragStart(e, metric.id, 'metric')}
+                        onDragOver={(e) => handleDragOver(e, metric.id, 'metric')}
+                        onDragLeave={handleDragLeave}
+                        onDrop={(e) => handleDrop(e, metric.id, 'metric')}
+                        onDragEnd={handleDragEnd}
+                        className={`flex items-center gap-2 p-2 hover:bg-gray-50 rounded transition-colors ${
+                          draggedItem?.id === metric.id ? 'opacity-50' : ''
+                        } ${
+                          draggedOverItem?.id === metric.id && draggedItem?.id !== metric.id 
+                            ? 'bg-blue-50 border border-blue-200' 
+                            : ''
+                        }`}
+                      >
+                        <GripVertical className="w-4 h-4 text-gray-400 cursor-move" />
+                        <span className="flex-1 text-sm text-gray-700">{metric.name}</span>
+                        <button
+                          onClick={() => removeMetric(metric.id)}
+                          className="p-1 hover:bg-gray-200 rounded"
+                        >
+                          <X className="w-3 h-3 text-gray-500" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="mt-2 pt-2 border-t border-gray-200">
+                    <div className="text-xs text-gray-500 text-center">
+                      Drag to reorder • Click X to remove
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className="space-y-2">
+                {selectedMetrics.map((metric) => (
+                  <label key={metric.id} className="flex items-center">
+                    <input
+                      type="checkbox"
+                      checked={metric.checked}
+                      onChange={() => handleMetricToggle(metric.id)}
+                      className="custom-checkbox"
+                    />
+                    <span className={`ml-2 text-sm ${metric.checked ? 'text-gray-700' : 'text-gray-400'}`}>
+                      {metric.name}
+                    </span>
+                  </label>
+                ))}
+              </div>
+              <div className="mt-3 flex items-center gap-2">
+                <input
+                  type="text"
+                  placeholder="Search metrics"
+                  className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+                <button className="p-2 text-gray-400 hover:text-gray-600">
+                  <span className="text-lg">+</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Format Section */}
+          <div>
+            <h4 className="text-sm font-semibold text-gray-900 mb-4">Format</h4>
+            
+            {/* Line sorting */}
+            <div className="mb-4">
+              <div className="flex items-center gap-2 mb-2">
+                <h5 className="text-sm font-medium text-gray-700">Line sorting</h5>
+                <div className="w-3 h-3 rounded-full bg-gray-300 flex items-center justify-center">
+                  <span className="text-xs text-gray-600">i</span>
+                </div>
+              </div>
+              <RadioDropdown
+                options={[
+                  { value: "reach", label: "Reach" },
+                  { value: "frequency", label: "Frequency" },
+                  { value: "delivery", label: "Delivery" }
+                ]}
+                selectedValue={lineSorting}
+                onSelect={setLineSorting}
+                placeholder="Select sorting"
+                className="w-full"
+              />
+              <div className="flex mt-2">
+                <button
+                  onClick={() => setSortDirection("ascending")}
+                  className={`flex-1 px-3 py-2 text-xs rounded-l-md border ${
+                    sortDirection === "ascending"
+                      ? "bg-gray-200 text-gray-800 border-gray-300"
+                      : "bg-white text-gray-600 border-gray-300"
+                  }`}
+                >
+                  Ascending
+                </button>
+                <button
+                  onClick={() => setSortDirection("descending")}
+                  className={`flex-1 px-3 py-2 text-xs rounded-r-md border-t border-b border-r ${
+                    sortDirection === "descending"
+                      ? "bg-gray-200 text-gray-800 border-gray-300"
+                      : "bg-white text-gray-600 border-gray-300"
+                  }`}
+                >
+                  Descending
+                </button>
+              </div>
+            </div>
+
+            {/* Line count */}
+            <div className="mb-4">
+              <div className="flex items-center gap-2 mb-2">
+                <h5 className="text-sm font-medium text-gray-700">Line count</h5>
+                <div className="w-3 h-3 rounded-full bg-gray-300 flex items-center justify-center">
+                  <span className="text-xs text-gray-600">i</span>
+                </div>
+              </div>
+              <input
+                type="number"
+                value={lineCount}
+                onChange={(e) => setLineCount(parseInt(e.target.value))}
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+
+            {/* Time interval */}
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <h5 className="text-sm font-medium text-gray-700">Time interval (x-axis)</h5>
+              </div>
+              <div className="flex">
+                <button
+                  onClick={() => setTimeInterval("day")}
+                  className={`flex-1 px-3 py-2 text-xs rounded-l-md border ${
+                    timeInterval === "day"
+                      ? "bg-gray-200 text-gray-800 border-gray-300"
+                      : "bg-white text-gray-600 border-gray-300"
+                  }`}
+                >
+                  Day
+                </button>
+                <button
+                  onClick={() => setTimeInterval("week")}
+                  className={`flex-1 px-3 py-2 text-xs border-t border-b ${
+                    timeInterval === "week"
+                      ? "bg-gray-200 text-gray-800 border-gray-300"
+                      : "bg-white text-gray-600 border-gray-300"
+                  }`}
+                >
+                  Week
+                </button>
+                <button
+                  onClick={() => setTimeInterval("month")}
+                  className={`flex-1 px-3 py-2 text-xs rounded-r-md border-t border-b border-r ${
+                    timeInterval === "month"
+                      ? "bg-gray-200 text-gray-800 border-gray-300"
+                      : "bg-white text-gray-600 border-gray-300"
+                  }`}
+                >
+                  Month
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Bar chart customise content
+  if (viewType === "bar-chart" && activeTab === "customise") {
+    return (
+      <div className="w-70 h-full bg-white border-l border-gray-200 flex flex-col rounded-md">
+        {/* Sidebar Header */}
+        <div className="p-4 ">
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-semibold text-gray-900">Customise bar chart</h3>
+            <button
+              onClick={onClose}
+              className="p-1 hover:bg-gray-100 rounded"
+            >
+              <X className="w-4 h-4 text-gray-500" />
+            </button>
+          </div>
+        </div>
+
+        {/* Sidebar Content */}
+        <div className="flex-1 h-screen overflow-y-auto p-4 pb-40 space-y-6">
+          {/* Data Section */}
+          <div>
+            <h4 className="text-sm font-semibold text-gray-900 mb-4">Data</h4>
+            
+            {/* Breakdowns */}
+            <div className="mb-6">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <h5 className="text-sm font-medium text-gray-700">Breakdowns (bar groups)</h5>
+                  <div className="w-3 h-3 rounded-full bg-gray-300 flex items-center justify-center">
+                    <span className="text-xs text-gray-600">i</span>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowBreakdownsDropdown(!showBreakdownsDropdown)}
+                  className="p-1 hover:bg-gray-100 rounded"
+                >
+                  <ArrowUpDown className="w-4 h-4 text-gray-400" />
+                </button>
+              </div>
+
+              {/* Breakdowns Dropdown */}
+              {showBreakdownsDropdown && (
+                <div className="mb-3 bg-white border border-gray-200 rounded-lg shadow-lg p-3">
+                  <div className="space-y-2">
+                    {selectedBreakdowns.map((breakdown, index) => (
+                      <div 
+                        key={breakdown.id} 
+                        draggable
+                        onDragStart={(e) => handleDragStart(e, breakdown.id, 'breakdown')}
+                        onDragOver={(e) => handleDragOver(e, breakdown.id, 'breakdown')}
+                        onDragLeave={handleDragLeave}
+                        onDrop={(e) => handleDrop(e, breakdown.id, 'breakdown')}
+                        onDragEnd={handleDragEnd}
+                        className={`flex items-center gap-2 p-2 hover:bg-gray-50 rounded transition-colors ${
+                          draggedItem?.id === breakdown.id ? 'opacity-50' : ''
+                        } ${
+                          draggedOverItem?.id === breakdown.id && draggedItem?.id !== breakdown.id 
+                            ? 'bg-blue-50 border border-blue-200' 
+                            : ''
+                        }`}
+                      >
+                        <GripVertical className="w-4 h-4 text-gray-400 cursor-move" />
+                        <span className="flex-1 text-sm text-gray-700">{breakdown.name}</span>
+                        <button
+                          onClick={() => removeBreakdown(breakdown.id)}
+                          className="p-1 hover:bg-gray-200 rounded"
+                        >
+                          <X className="w-3 h-3 text-gray-500" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="mt-2 pt-2 border-t border-gray-200">
+                    <div className="text-xs text-gray-500 text-center">
+                      Drag to reorder • Click X to remove
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className="space-y-2">
+                {selectedBreakdowns.map((breakdown) => (
+                  <label key={breakdown.id} className="flex items-center">
+                    <input
+                      type="checkbox"
+                      checked={breakdown.checked}
+                      onChange={() => handleBreakdownToggle(breakdown.id)}
+                      className="custom-checkbox"
+                    />
+                    <span className="ml-2 text-sm text-gray-700">{breakdown.name}</span>
+                  </label>
+                ))}
+              </div>
+              <div className="mt-3 flex items-center gap-2">
+                <input
+                  type="text"
+                  placeholder="Search breakdowns"
+                  className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+                <button className="p-2 text-gray-400 hover:text-gray-600">
+                  <span className="text-lg">+</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Metrics */}
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <h5 className="text-sm font-medium text-gray-700">Metrics (bars)</h5>
+                  <div className="w-3 h-3 rounded-full bg-gray-300 flex items-center justify-center">
+                    <span className="text-xs text-gray-600">i</span>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowMetricsDropdown(!showMetricsDropdown)}
+                  className="p-1 hover:bg-gray-100 rounded"
+                >
+                  <ArrowUpDown className="w-4 h-4 text-gray-400" />
+                </button>
+              </div>
+
+              {/* Metrics Dropdown */}
+              {showMetricsDropdown && (
+                <div className="mb-3 bg-white border border-gray-200 rounded-lg shadow-lg p-3">
+                  <div className="space-y-2 max-h-60 overflow-y-auto">
+                    {selectedMetrics.map((metric, index) => (
+                      <div 
+                        key={metric.id} 
+                        draggable
+                        onDragStart={(e) => handleDragStart(e, metric.id, 'metric')}
+                        onDragOver={(e) => handleDragOver(e, metric.id, 'metric')}
+                        onDragLeave={handleDragLeave}
+                        onDrop={(e) => handleDrop(e, metric.id, 'metric')}
+                        onDragEnd={handleDragEnd}
+                        className={`flex items-center gap-2 p-2 hover:bg-gray-50 rounded transition-colors ${
+                          draggedItem?.id === metric.id ? 'opacity-50' : ''
+                        } ${
+                          draggedOverItem?.id === metric.id && draggedItem?.id !== metric.id 
+                            ? 'bg-blue-50 border border-blue-200' 
+                            : ''
+                        }`}
+                      >
+                        <GripVertical className="w-4 h-4 text-gray-400 cursor-move" />
+                        <span className="flex-1 text-sm text-gray-700">{metric.name}</span>
+                        <button
+                          onClick={() => removeMetric(metric.id)}
+                          className="p-1 hover:bg-gray-200 rounded"
+                        >
+                          <X className="w-3 h-3 text-gray-500" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="mt-2 pt-2 border-t border-gray-200">
+                    <div className="text-xs text-gray-500 text-center">
+                      Drag to reorder • Click X to remove
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className="space-y-2">
+                {selectedMetrics.map((metric) => (
+                  <label key={metric.id} className="flex items-center">
+                    <input
+                      type="checkbox"
+                      checked={metric.checked}
+                      onChange={() => handleMetricToggle(metric.id)}
+                      className="custom-checkbox"
+                    />
+                    <span className={`ml-2 text-sm ${metric.checked ? 'text-gray-700' : 'text-gray-400'}`}>
+                      {metric.name}
+                    </span>
+                  </label>
+                ))}
+              </div>
+              <div className="mt-3 flex items-center gap-2">
+                <input
+                  type="text"
+                  placeholder="Search metrics"
+                  className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+                <button className="p-2 text-gray-400 hover:text-gray-600">
+                  <span className="text-lg">+</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Format Section */}
+          <div>
+            <h4 className="text-sm font-semibold text-gray-900 mb-4">Format</h4>
+            
+            {/* Bar group sorting */}
+            <div className="mb-4">
+              <div className="flex items-center gap-2 mb-2">
+                <h5 className="text-sm font-medium text-gray-700">Bar group sorting</h5>
+                <div className="w-3 h-3 rounded-full bg-gray-300 flex items-center justify-center">
+                  <span className="text-xs text-gray-600">i</span>
+                </div>
+              </div>
+              <RadioDropdown
+                options={[
+                  { value: "reach", label: "Reach" },
+                  { value: "frequency", label: "Frequency" },
+                  { value: "delivery", label: "Delivery" }
+                ]}
+                selectedValue={lineSorting}
+                onSelect={setLineSorting}
+                placeholder="Select sorting"
+                className="w-full"
+              />
+              <div className="flex mt-2">
+                <button
+                  onClick={() => setSortDirection("ascending")}
+                  className={`flex-1 px-3 py-2 text-xs rounded-l-md border ${
+                    sortDirection === "ascending"
+                      ? "bg-gray-200 text-gray-800 border-gray-300"
+                      : "bg-white text-gray-600 border-gray-300"
+                  }`}
+                >
+                  Ascending
+                </button>
+                <button
+                  onClick={() => setSortDirection("descending")}
+                  className={`flex-1 px-3 py-2 text-xs rounded-r-md border-t border-b border-r ${
+                    sortDirection === "descending"
+                      ? "bg-gray-200 text-gray-800 border-gray-300"
+                      : "bg-white text-gray-600 border-gray-300"
+                  }`}
+                >
+                  Descending
+                </button>
+              </div>
+            </div>
+
+            {/* Bar group count */}
+            <div className="mb-4">
+              <div className="flex items-center gap-2 mb-2">
+                <h5 className="text-sm font-medium text-gray-700">Bar group count</h5>
+                <div className="w-3 h-3 rounded-full bg-gray-300 flex items-center justify-center">
+                  <span className="text-xs text-gray-600">i</span>
+                </div>
+              </div>
+              <input
+                type="number"
+                value={lineCount}
+                onChange={(e) => setLineCount(parseInt(e.target.value))}
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+
+            {/* Chart type */}
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <h5 className="text-sm font-medium text-gray-700">Chart type</h5>
+              </div>
+              <div className="flex">
+                <button
+                  onClick={() => setTimeInterval("vertical")}
+                  className={`flex-1 px-3 py-2 text-xs rounded-l-md border ${
+                    timeInterval === "vertical"
+                      ? "bg-gray-200 text-gray-800 border-gray-300"
+                      : "bg-white text-gray-600 border-gray-300"
+                  }`}
+                >
+                  Vertical
+                </button>
+                <button
+                  onClick={() => setTimeInterval("horizontal")}
+                  className={`flex-1 px-3 py-2 text-xs border-t border-b ${
+                    timeInterval === "horizontal"
+                      ? "bg-gray-200 text-gray-800 border-gray-300"
+                      : "bg-white text-gray-600 border-gray-300"
+                  }`}
+                >
+                  Horizontal
+                </button>
+                <button
+                  onClick={() => setTimeInterval("stacked")}
+                  className={`flex-1 px-3 py-2 text-xs rounded-r-md border-t border-b border-r ${
+                    timeInterval === "stacked"
+                      ? "bg-gray-200 text-gray-800 border-gray-300"
+                      : "bg-white text-gray-600 border-gray-300"
+                  }`}
+                >
+                  Stacked
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (activeTab === "customise") {
     return (
       <>
-        <style jsx>{`
-          .custom-checkbox {
-            appearance: none;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            width: 18px;
-            height: 18px;
-            border: 1px solid #93c5fd;
-            border-radius: 3px;
-            background-color: white;
-            cursor: pointer;
-            position: relative;
-          }
-
-          .custom-checkbox:checked {
-            background-color: white;
-            border-color: #93c5fd;
-          }
-
-          .custom-checkbox:checked::after {
-            content: "✓";
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: #2563eb;
-            font-size: 12px;
-            font-weight: bold;
-          }
-
-          .custom-checkbox:focus {
-            outline: 2px solid #3b82f6;
-            outline-offset: 2px;
-          }
-        `}</style>
         <div className="w-70 h-full pb-36 bg-white border-l border-gray-200 flex flex-col rounded-md ">
           {/* Header */}
           <div className="p-4 ">

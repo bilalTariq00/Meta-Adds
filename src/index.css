@@ -1,1 +1,71 @@
 @import "tailwindcss";
+
+/* Global Custom Checkbox Styling */
+input[type="checkbox"].custom-checkbox {
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 2px solid #d1d5db;
+  background-color: white;
+  border-radius: 3px;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+input[type="checkbox"].custom-checkbox:hover {
+  border-color: #3b82f6;
+}
+
+input[type="checkbox"].custom-checkbox:checked {
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+}
+
+input[type="checkbox"].custom-checkbox:checked::after {
+  content: "✓";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  line-height: 1;
+}
+
+/* Apply custom styling to ALL checkboxes by default */
+input[type="checkbox"] {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  width: 18px !important;
+  height: 18px !important;
+  border: 2px solid #d1d5db !important;
+  background-color: white !important;
+  border-radius: 3px !important;
+  cursor: pointer !important;
+  position: relative !important;
+  transition: all 0.2s ease !important;
+}
+
+input[type="checkbox"]:hover {
+  border-color: #3b82f6 !important;
+}
+
+input[type="checkbox"]:checked {
+  background-color: #3b82f6 !important;
+  border-color: #3b82f6 !important;
+}
+
+input[type="checkbox"]:checked::after {
+  content: "✓" !important;
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  color: white !important;
+  font-size: 12px !important;
+  font-weight: bold !important;
+  line-height: 1 !important;
+}

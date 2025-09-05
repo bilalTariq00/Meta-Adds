@@ -220,6 +220,7 @@ export default function AdsReportingPage() {
             <FormatCustomiseSidebar
               activeTab={activeTab}
               onClose={() => setActiveTab(null)}
+              viewType={viewType}
             />
           </div>
         )}
