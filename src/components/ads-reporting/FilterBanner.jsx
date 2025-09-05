@@ -126,7 +126,7 @@ export default function FilterBanner({
   };
 
   return (
-    <div className="px-2 py-1 mb-6 bg-gray-50 rounded-md">
+    <div className="px-2 py-1 mb-6 bg-white rounded-md">
       <div className="flex items-center gap-4">
         {/* Applied Filters */}
         <div className="flex items-center gap-2 flex-wrap">

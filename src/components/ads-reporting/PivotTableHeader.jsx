@@ -8,7 +8,9 @@ import {
   RotateCcw, 
   MoreHorizontal,
   Table,
-  ArrowLeftRight
+  ArrowLeftRight,
+  TrendingUp,
+  BarChart3
 } from "lucide-react";
 
 export default function PivotTableHeader({ 
@@ -18,7 +20,8 @@ export default function PivotTableHeader({
   onFormatClick,
   onCustomiseClick,
   activeTab = null,
-  onTabChange
+  onTabChange,
+  currentView = "pivot-table"
 }) {
   const [showLayoutDropdown, setShowLayoutDropdown] = useState(false);
   const [showMoreDropdown, setShowMoreDropdown] = useState(false);
@@ -41,13 +44,15 @@ export default function PivotTableHeader({
   }, []);
 
   const layoutOptions = [
-    { id: "pivot-table", label: "Pivot table", description: "View your data in a table format" },
-    { id: "trend", label: "Trend", description: "View your data as a trend over time" },
-    { id: "bar-chart", label: "Bar chart", description: "View your data as a bar chart" },
+    { id: "pivot-table", label: "Pivot table", description: "View your data in a table format", icon: Table },
+    { id: "trend", label: "Trend", description: "View your data as a trend over time", icon: TrendingUp },
+    { id: "bar-chart", label: "Bar chart", description: "View your data as a bar chart", icon: BarChart3 },
   ];
 
+  const currentOption = layoutOptions.find(option => option.id === currentView) || layoutOptions[0];
+
   return (
-    <div className="px-6 py-3 border-b border-gray-200 bg-white">
+    <div className="px-6 py-3 border-b border-gray-200 bg-white rounded-t-md">
       <div className="flex items-center justify-between">
         {/* Left side - Layout and controls */}
         <div className="flex items-center gap-3">
@@ -57,27 +62,42 @@ export default function PivotTableHeader({
               onClick={() => setShowLayoutDropdown(!showLayoutDropdown)}
               className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
             >
-              <Table className="w-4 h-4" />
-              <span className="text-sm font-medium">Pivot Table</span>
+              <currentOption.icon className="w-4 h-4" />
+              <span className="text-sm font-medium">{currentOption.label}</span>
               <ChevronDown className="w-4 h-4" />
             </button>
 
             {showLayoutDropdown && (
               <div className="absolute top-full left-0 mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
                 <div className="p-2">
-                  {layoutOptions.map((option) => (
-                    <button
-                      key={option.id}
-                      onClick={() => {
-                        onLayoutChange(option.id);
-                        setShowLayoutDropdown(false);
-                      }}
-                      className="w-full text-left px-3 py-2 text-sm text-gray-700 rounded hover:bg-gray-50"
-                    >
-                      <div className="font-medium">{option.label}</div>
-                      <div className="text-xs text-gray-500">{option.description}</div>
-                    </button>
-                  ))}
+                  {layoutOptions.map((option) => {
+                    const IconComponent = option.icon;
+                    const isSelected = option.id === currentView;
+                    return (
+                      <button
+                        key={option.id}
+                        onClick={() => {
+                          onLayoutChange(option.id);
+                          setShowLayoutDropdown(false);
+                        }}
+                        className={`w-full text-left px-3 py-2 text-sm rounded ${
+                          isSelected 
+                            ? 'text-blue-700 bg-blue-50' 
+                            : 'text-gray-700 hover:bg-gray-50'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2">
+                          <IconComponent className="w-4 h-4" />
+                          <div>
+                            <div className="font-medium">{option.label}</div>
+                            <div className={`text-xs ${isSelected ? 'text-blue-600' : 'text-gray-500'}`}>
+                              {option.description}
+                            </div>
+                          </div>
+                        </div>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             )}

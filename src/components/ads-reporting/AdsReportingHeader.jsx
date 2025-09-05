@@ -109,7 +109,7 @@ export default function AdsReportingHeader({
           {/* Back Button */}
           <button
             onClick={handleBack}
-            className="flex items-center gap-2 px-3 py-2  rounded-md border border-gray-400 hover:bg-gray-50/70 transition-colors"
+            className="flex items-center gap-2 px-3 py-2  rounded-md border border-gray-400 text-sm hover:bg-gray-50/70 transition-colors"
           >
             <ArrowLeft size={16} className="text-gray-600" />
             <span className="text-sm text-gray-700 whitespace-nowrap">
@@ -248,7 +248,7 @@ export default function AdsReportingHeader({
                           setShowCreatePortfolioModal(true);
                           setShowAccountDropdown(false);
                         }}
-                        className="w-full py-3 text-base text-gray-700 border border-gray-400 hover:bg-gray-50 rounded-lg transition-colors bg-white"
+                        className="w-full py-3 text-base text-gray-700 border border-gray-400 text-sm hover:bg-gray-50 rounded-lg transition-colors bg-white"
                       >
                         Create a business portfolio
                       </button>
@@ -342,7 +342,7 @@ export default function AdsReportingHeader({
           <div className="relative">
             <button
               onClick={onSave}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors whitespace-nowrap"
+              className="flex items-center gap-2 px-4 py-1.5 bg-blue-600 text-white rounded-sm hover:bg-blue-700 transition-colors whitespace-nowrap"
             >
               <Save size={16} />
               Save
@@ -353,7 +353,7 @@ export default function AdsReportingHeader({
           {/* Refresh Button */}
           <button
             onClick={onRefresh}
-            className="flex items-center gap-2 px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors whitespace-nowrap"
+            className="flex items-center gap-2 px-3 py-1.5  border border-gray-400 text-sm  rounded-sm transition-colors whitespace-nowrap"
           >
             <RefreshCw size={16} />
             Refresh
@@ -362,7 +362,7 @@ export default function AdsReportingHeader({
           {/* Share Button */}
           <button
             onClick={onShare}
-            className="flex items-center gap-2 px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors whitespace-nowrap"
+            className="flex items-center gap-2 px-3 py-1.5 border border-gray-400 text-sm  rounded-sm transition-colors whitespace-nowrap"
           >
             <Share size={16} />
             Share
@@ -371,7 +371,7 @@ export default function AdsReportingHeader({
           {/* Export Button */}
           <button
             onClick={onExport}
-            className="flex items-center gap-2 px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors whitespace-nowrap"
+            className="flex items-center gap-2 px-3 py-1.5 border border-gray-400 text-sm  rounded-sm transition-colors whitespace-nowrap"
           >
             <Download size={16} />
             Export
@@ -381,7 +381,7 @@ export default function AdsReportingHeader({
           <div className="relative" ref={moreDropdownRef}>
             <button
               onClick={() => setShowMoreDropdown(!showMoreDropdown)}
-              className="flex items-center gap-2 px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors whitespace-nowrap"
+              className="flex items-center gap-2 px-3 py-2 border border-gray-400 text-sm  rounded-sm transition-colors whitespace-nowrap"
             >
               <MoreHorizontal size={16} />
             </button>
@@ -389,13 +389,13 @@ export default function AdsReportingHeader({
             {showMoreDropdown && (
               <div className="absolute top-full right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
                 <div className="p-2">
-                  <button className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded">
+                  <button className="w-full text-left px-3 py-2 text-sm  hover:bg-gray-50 rounded">
                     Duplicate report
                   </button>
-                  <button className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded">
+                  <button className="w-full text-left px-3 py-2 text-sm  hover:bg-gray-50 rounded">
                     Delete report
                   </button>
-                  <button className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded">
+                  <button className="w-full text-left px-3 py-2 text-sm  hover:bg-gray-50 rounded">
                     Report settings
                   </button>
                 </div>

@@ -6,6 +6,7 @@ import PivotTableSection from "../sections/PivotTableSection";
 import TrendSection from "../sections/TrendSection";
 import BarChartSection from "../sections/BarChartSection";
 
+
 export default function ReportsPage({ searchQuery, selectedReports, onSelectReport, onSelectAll, currentLayout, onExport, onDelete, onShare, onDuplicate, reportData, sharedReports }) {
   const [sortColumn, setSortColumn] = useState("lastAccessed");
   const [sortDirection, setSortDirection] = useState("desc");

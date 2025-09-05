@@ -226,7 +226,7 @@ export default function PivotTable({
   }, 0);
 
   return (
-    <div className="h-full bg-white">
+    <div className="h-fit bg-white rounded-md">
       <div className="flex h-full">
         {/* Fixed Columns (Campaign name, Ad set name) */}
         <div className="flex-shrink-0 flex flex-col h-full bg-gray-50">

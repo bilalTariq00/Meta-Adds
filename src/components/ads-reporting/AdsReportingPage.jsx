@@ -6,6 +6,8 @@ import AdsReportingHeader from "./AdsReportingHeader";
 import FilterBanner from "./FilterBanner";
 import PivotTableHeader from "./PivotTableHeader";
 import PivotTable from "./PivotTable";
+import TrendChart from "./TrendChart";
+import BarChart from "./BarChart";
 import FormatCustomiseSidebar from "./FormatCustomiseSidebar";
 
 export default function AdsReportingPage() {
@@ -16,6 +18,7 @@ export default function AdsReportingPage() {
   const [selectedRows, setSelectedRows] = useState([]);
   const [tableData, setTableData] = useState([]);
   const [activeTab, setActiveTab] = useState(null);
+  const [viewType, setViewType] = useState("pivot-table");
 
   const handleBack = () => {
     if (hasUnsavedChanges) {
@@ -64,7 +67,7 @@ export default function AdsReportingPage() {
   };
 
   const handleLayoutChange = (layout) => {
-    // Add layout change logic here
+    setViewType(layout);
   };
 
   const handleUngroupBreakdown = () => {
@@ -148,36 +151,72 @@ export default function AdsReportingPage() {
             onRemoveFilter={handleRemoveFilter}
           />
 
-          {/* Pivot Table Header */}
-          <PivotTableHeader
-            onLayoutChange={handleLayoutChange}
-            onUngroupBreakdown={handleUngroupBreakdown}
-            onResetColumnWidth={handleResetColumnWidth}
-            onFormatClick={handleFormatClick}
-            onCustomiseClick={handleCustomiseClick}
-            activeTab={activeTab}
-            onTabChange={handleTabChange}
-          />
+          {/* Conditional Header and Content */}
+          {viewType === "pivot-table" && (
+            <>
+              {/* Pivot Table Header */}
+              <PivotTableHeader
+                onLayoutChange={handleLayoutChange}
+                onUngroupBreakdown={handleUngroupBreakdown}
+                onResetColumnWidth={handleResetColumnWidth}
+                onFormatClick={handleFormatClick}
+                onCustomiseClick={handleCustomiseClick}
+                activeTab={activeTab}
+                onTabChange={handleTabChange}
+                currentView={viewType}
+              />
 
-          {/* Pivot Table */}
-          <div className="flex-1 overflow-hidden">
-            <PivotTable
-              data={tableData}
-              onSort={handleSort}
-              onExport={handleRowExport}
-              onShare={handleRowShare}
-              onDelete={handleRowDelete}
-              onDuplicate={handleRowDuplicate}
-              selectedRows={selectedRows}
-              onRowSelect={handleRowSelect}
-              onSelectAll={handleSelectAll}
-            />
-          </div>
+              {/* Pivot Table */}
+              <div className="flex-1 overflow-hidden">
+                <PivotTable
+                  data={tableData}
+                  onSort={handleSort}
+                  onExport={handleRowExport}
+                  onShare={handleRowShare}
+                  onDelete={handleRowDelete}
+                  onDuplicate={handleRowDuplicate}
+                  selectedRows={selectedRows}
+                  onRowSelect={handleRowSelect}
+                  onSelectAll={handleSelectAll}
+                />
+              </div>
+            </>
+          )}
+
+          {viewType === "trend" && (
+            <div className="flex-1 overflow-hidden">
+              <TrendChart
+                data={tableData}
+                onLayoutChange={handleLayoutChange}
+                onUngroupBreakdown={handleUngroupBreakdown}
+                onResetColumnWidth={handleResetColumnWidth}
+                onFormatClick={handleFormatClick}
+                onCustomiseClick={handleCustomiseClick}
+                activeTab={activeTab}
+                onTabChange={handleTabChange}
+              />
+            </div>
+          )}
+
+          {viewType === "bar-chart" && (
+            <div className="flex-1 overflow-hidden">
+              <BarChart
+                data={tableData}
+                onLayoutChange={handleLayoutChange}
+                onUngroupBreakdown={handleUngroupBreakdown}
+                onResetColumnWidth={handleResetColumnWidth}
+                onFormatClick={handleFormatClick}
+                onCustomiseClick={handleCustomiseClick}
+                activeTab={activeTab}
+                onTabChange={handleTabChange}
+              />
+            </div>
+          )}
         </div>
 
         {/* Right Sidebar */}
         {activeTab && (
-          <div className="w-80 flex-shrink-0">
+          <div className="w-70 flex-shrink-0">
             <FormatCustomiseSidebar
               activeTab={activeTab}
               onClose={() => setActiveTab(null)}
