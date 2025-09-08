@@ -247,6 +247,9 @@ export default function Sidebar() {
     );
     if (current) {
       setActiveItem(current.id);
+    } else if (location.pathname === "/detailed-report") {
+      // If we're on detailed-report page, show ads-reporting as active
+      setActiveItem("Ads Reporting");
     }
   }, [location.pathname]);
   return (

@@ -233,17 +233,18 @@ export default function Header() {
       "/account-overview": "Account overview",
       "/campaigns": "Campaigns",
       "/ads-reporting": "Ads Reporting",
+      "/detailed-report": "Ads Reporting", // Show as Ads Reporting when on detailed-report
       "/audiences": "Audiences",
       "/advertising-settings": "Advertising settings",
       "/billing-payments": "Billing & payments",
-      "/events-manager": "Events Manager",
+      "/events-manager": "Events Manager overview",
     };
     return pageMap[currentPath] || "Account overview";
   };
 
   const getHeaderType = () => {
     if (currentPath === "/campaigns") return "campaigns";
-    if (currentPath === "/ads-reporting") return "ads-reporting";
+    if (currentPath === "/ads-reporting" || currentPath === "/detailed-report") return "ads-reporting";
     if (currentPath === "/audiences") return "audiences";
     if (currentPath === "/advertising-settings") return "advertising";
     if (currentPath === "/billing-payments") return "billing";

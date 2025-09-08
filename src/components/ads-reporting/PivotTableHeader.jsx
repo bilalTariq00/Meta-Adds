@@ -21,7 +21,9 @@ export default function PivotTableHeader({
   onCustomiseClick,
   activeTab = null,
   onTabChange,
-  currentView = "pivot-table"
+  currentView = "pivot-table",
+  isGrouped = true,
+  hasColumnWidthsChanged = false
 }) {
   const [showLayoutDropdown, setShowLayoutDropdown] = useState(false);
   const [showMoreDropdown, setShowMoreDropdown] = useState(false);
@@ -103,12 +105,12 @@ export default function PivotTableHeader({
             )}
           </div>
 
-          {/* Ungroup Breakdowns Button */}
+          {/* Group/Ungroup Breakdowns Button */}
           <button
             onClick={onUngroupBreakdown}
             className="px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
           >
-            Ungroup Breakdowns
+            {isGrouped ? "Ungroup Breakdowns" : "Group Breakdowns"}
           </button>
         </div>
 
@@ -117,7 +119,12 @@ export default function PivotTableHeader({
           {/* Reset Column Widths Button */}
           <button
             onClick={onResetColumnWidth}
-            className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+            disabled={!hasColumnWidthsChanged}
+            className={`flex items-center gap-2 px-3 py-2 text-sm border border-gray-300 rounded-md transition-colors ${
+              hasColumnWidthsChanged
+                ? 'text-gray-700 bg-white hover:bg-gray-50'
+                : 'text-gray-400 bg-gray-100 cursor-not-allowed'
+            }`}
           >
             <ArrowLeftRight className="w-4 h-4" />
             Reset Column Widths

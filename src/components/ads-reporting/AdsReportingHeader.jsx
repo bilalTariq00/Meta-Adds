@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
   ArrowLeft,
   Save,
@@ -29,6 +29,7 @@ export default function AdsReportingHeader({
   accountName = "1 Ad Account",
 }) {
   const navigate = useNavigate();
+  const location = useLocation();
   const [showAccountDropdown, setShowAccountDropdown] = useState(false);
   const [showMoreDropdown, setShowMoreDropdown] = useState(false);
   const [showCreatePortfolioModal, setShowCreatePortfolioModal] =
@@ -64,15 +65,19 @@ export default function AdsReportingHeader({
   }, []);
 
   const handleBack = () => {
+    console.log("Back button clicked, hasUnsavedChanges:", hasUnsavedChanges);
+    console.log("Current location:", location.pathname);
     if (hasUnsavedChanges) {
       if (
         window.confirm(
           "You have unsaved changes. Are you sure you want to leave?"
         )
       ) {
+        console.log("Navigating to /ads-reporting");
         navigate("/ads-reporting");
       }
     } else {
+      console.log("Navigating to /ads-reporting");
       navigate("/ads-reporting");
     }
   };

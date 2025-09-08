@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { 
   ChevronLeft, 
   ChevronRight, 
@@ -19,6 +20,7 @@ import {
 } from "lucide-react";
 
 export default function RightSidebar({ collapsed, onToggle, activeView }) {
+  const navigate = useNavigate();
   const [showDropdown, setShowDropdown] = useState(null);
   const [pinnedCards, setPinnedCards] = useState([]);
   const [archivedCards, setArchivedCards] = useState([]);
@@ -132,6 +134,11 @@ export default function RightSidebar({ collapsed, onToggle, activeView }) {
     setPinnedCards(pinnedCards.filter(card => card.id !== cardId));
   };
 
+  const handleViewReport = (templateId) => {
+    // Navigate to detailed report page with template data
+    navigate(`/detailed-report?template=${templateId}`);
+  };
+
   const getVisibleCards = () => {
     const pinned = pinnedCards.map(card => ({ ...card, isPinned: true }));
     const regular = reportTemplates.filter(card => 
@@ -197,7 +204,10 @@ export default function RightSidebar({ collapsed, onToggle, activeView }) {
       </div>
 
       {/* View Report Button */}
-      <button className="w-full px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+      <button 
+        onClick={() => handleViewReport(template.id)}
+        className="w-full px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+      >
         View Report
       </button>
     </div>

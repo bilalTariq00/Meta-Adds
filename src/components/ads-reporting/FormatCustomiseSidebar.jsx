@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import RadioDropdown from "./RadioDropdown";
 
-export default function FormatCustomiseSidebar({ activeTab, onClose, viewType = "pivot-table" }) {
+export default function FormatCustomiseSidebar({ activeTab, onClose, viewType = "pivot-table", onBreakdownChange, onMetricChange, onCreateCustomBreakdown, onCreateCustomMetric, onCreateCustomConversion }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeSubTab, setActiveSubTab] = useState("breakdowns");
   const [expandedSections, setExpandedSections] = useState({
@@ -62,12 +62,47 @@ export default function FormatCustomiseSidebar({ activeTab, onClose, viewType = 
   const [isReversed, setIsReversed] = useState(false);
   const [dropdownPositions, setDropdownPositions] = useState({});
 
-  // Trend chart specific state
-  const [selectedBreakdowns, setSelectedBreakdowns] = useState([
+  // Selected breakdowns and metrics state
+  const [selectedBreakdowns, setSelectedBreakdowns] = useState({
+    "Campaign name": true,
+    "Ad set name": true,
+    "Ad name": false,
+    "Page name": false,
+    "Ad creative": false,
+    "Age": false,
+    "Gender": false,
+    "Country": false,
+    "Region": false,
+    "Platform": false,
+    "Placement": false,
+    "Objective": false,
+    "Day": false,
+    "Month": false
+  });
+
+  const [selectedMetrics, setSelectedMetrics] = useState({
+    "Amount spent": true,
+    "Impressions": true,
+    "Reach": true,
+    "Results": true,
+    "Cost per result": true,
+    "Delivery": true,
+    "Frequency": true,
+    "Link clicks": true,
+    "Post reactions": true,
+    "Post comments": true,
+    "Post shares": true,
+    "CPC (cost per link click)": true,
+    "CPM (cost per 1,000 impressions)": true,
+    "CTR (all)": true
+  });
+
+  // Trend chart specific state (for trend and bar chart views)
+  const [trendBreakdowns, setTrendBreakdowns] = useState([
     { id: "campaign", name: "Campaign name", checked: true },
     { id: "adset", name: "Ad set name", checked: true }
   ]);
-  const [selectedMetrics, setSelectedMetrics] = useState([
+  const [trendMetrics, setTrendMetrics] = useState([
     { id: "delivery", name: "Delivery", checked: false },
     { id: "reach", name: "Reach", checked: true },
     { id: "frequency", name: "Frequency", checked: true },
@@ -199,9 +234,60 @@ export default function FormatCustomiseSidebar({ activeTab, onClose, viewType = 
     });
   };
 
+  // Handler functions for breakdown and metric changes
+  const handleBreakdownChange = (breakdownName, isChecked) => {
+    setSelectedBreakdowns(prev => ({
+      ...prev,
+      [breakdownName]: isChecked
+    }));
+    
+    if (onBreakdownChange) {
+      onBreakdownChange(breakdownName, isChecked);
+    }
+  };
+
+  const handleMetricChange = (metricName, isChecked) => {
+    setSelectedMetrics(prev => ({
+      ...prev,
+      [metricName]: isChecked
+    }));
+    
+    if (onMetricChange) {
+      onMetricChange(metricName, isChecked);
+    }
+  };
+
+  // Create button handlers
+  const handleCreateCustomBreakdown = () => {
+    if (onCreateCustomBreakdown) {
+      onCreateCustomBreakdown();
+    } else {
+      // Default behavior - show alert
+      alert("Create Custom Breakdown functionality would be implemented here");
+    }
+  };
+
+  const handleCreateCustomMetric = () => {
+    if (onCreateCustomMetric) {
+      onCreateCustomMetric();
+    } else {
+      // Default behavior - show alert
+      alert("Create Custom Metric functionality would be implemented here");
+    }
+  };
+
+  const handleCreateCustomConversion = () => {
+    if (onCreateCustomConversion) {
+      onCreateCustomConversion();
+    } else {
+      // Default behavior - show alert
+      alert("Create Custom Conversion functionality would be implemented here");
+    }
+  };
+
   // Trend chart handlers
   const handleBreakdownToggle = (breakdownId) => {
-    setSelectedBreakdowns(prev => 
+    setTrendBreakdowns(prev => 
       prev.map(breakdown => 
         breakdown.id === breakdownId 
           ? { ...breakdown, checked: !breakdown.checked }
@@ -211,7 +297,7 @@ export default function FormatCustomiseSidebar({ activeTab, onClose, viewType = 
   };
 
   const handleMetricToggle = (metricId) => {
-    setSelectedMetrics(prev => 
+    setTrendMetrics(prev => 
       prev.map(metric => 
         metric.id === metricId 
           ? { ...metric, checked: !metric.checked }
@@ -222,7 +308,7 @@ export default function FormatCustomiseSidebar({ activeTab, onClose, viewType = 
 
   // Reorder functions
   const moveBreakdown = (fromIndex, toIndex) => {
-    setSelectedBreakdowns(prev => {
+    setTrendBreakdowns(prev => {
       const newBreakdowns = [...prev];
       const [movedItem] = newBreakdowns.splice(fromIndex, 1);
       newBreakdowns.splice(toIndex, 0, movedItem);
@@ -231,7 +317,7 @@ export default function FormatCustomiseSidebar({ activeTab, onClose, viewType = 
   };
 
   const moveMetric = (fromIndex, toIndex) => {
-    setSelectedMetrics(prev => {
+    setTrendMetrics(prev => {
       const newMetrics = [...prev];
       const [movedItem] = newMetrics.splice(fromIndex, 1);
       newMetrics.splice(toIndex, 0, movedItem);
@@ -241,11 +327,11 @@ export default function FormatCustomiseSidebar({ activeTab, onClose, viewType = 
 
   // Remove functions
   const removeBreakdown = (breakdownId) => {
-    setSelectedBreakdowns(prev => prev.filter(breakdown => breakdown.id !== breakdownId));
+    setTrendBreakdowns(prev => prev.filter(breakdown => breakdown.id !== breakdownId));
   };
 
   const removeMetric = (metricId) => {
-    setSelectedMetrics(prev => prev.filter(metric => metric.id !== metricId));
+    setTrendMetrics(prev => prev.filter(metric => metric.id !== metricId));
   };
 
   // Drag and drop handlers
@@ -270,12 +356,12 @@ export default function FormatCustomiseSidebar({ activeTab, onClose, viewType = 
     if (!draggedItem || draggedItem.type !== type) return;
     
     const sourceIndex = type === 'breakdown' 
-      ? selectedBreakdowns.findIndex(item => item.id === draggedItem.id)
-      : selectedMetrics.findIndex(item => item.id === draggedItem.id);
+      ? trendBreakdowns.findIndex(item => item.id === draggedItem.id)
+      : trendMetrics.findIndex(item => item.id === draggedItem.id);
     
     const targetIndex = type === 'breakdown'
-      ? selectedBreakdowns.findIndex(item => item.id === targetItemId)
-      : selectedMetrics.findIndex(item => item.id === targetItemId);
+      ? trendBreakdowns.findIndex(item => item.id === targetItemId)
+      : trendMetrics.findIndex(item => item.id === targetItemId);
     
     if (sourceIndex === -1 || targetIndex === -1 || sourceIndex === targetIndex) return;
     
@@ -1111,7 +1197,7 @@ export default function FormatCustomiseSidebar({ activeTab, onClose, viewType = 
               {showBreakdownsDropdown && (
                 <div className="mb-3 bg-white border border-gray-200 rounded-lg shadow-lg p-3">
                   <div className="space-y-2">
-                    {selectedBreakdowns.map((breakdown, index) => (
+                    {trendBreakdowns.map((breakdown, index) => (
                       <div 
                         key={breakdown.id} 
                         draggable
@@ -1148,7 +1234,7 @@ export default function FormatCustomiseSidebar({ activeTab, onClose, viewType = 
               )}
 
               <div className="space-y-2">
-                {selectedBreakdowns.map((breakdown) => (
+                {trendBreakdowns.map((breakdown) => (
                   <label key={breakdown.id} className="flex items-center">
                     <input
                       type="checkbox"
@@ -1193,7 +1279,7 @@ export default function FormatCustomiseSidebar({ activeTab, onClose, viewType = 
               {showMetricsDropdown && (
                 <div className="mb-3 bg-white border border-gray-200 rounded-lg shadow-lg p-3">
                   <div className="space-y-2 max-h-60 overflow-y-auto">
-                    {selectedMetrics.map((metric, index) => (
+                    {trendMetrics.map((metric, index) => (
                       <div 
                         key={metric.id} 
                         draggable
@@ -1230,7 +1316,7 @@ export default function FormatCustomiseSidebar({ activeTab, onClose, viewType = 
               )}
 
               <div className="space-y-2">
-                {selectedMetrics.map((metric) => (
+                {trendMetrics.map((metric) => (
                   <label key={metric.id} className="flex items-center">
                     <input
                       type="checkbox"
@@ -1408,7 +1494,7 @@ export default function FormatCustomiseSidebar({ activeTab, onClose, viewType = 
               {showBreakdownsDropdown && (
                 <div className="mb-3 bg-white border border-gray-200 rounded-lg shadow-lg p-3">
                   <div className="space-y-2">
-                    {selectedBreakdowns.map((breakdown, index) => (
+                    {trendBreakdowns.map((breakdown, index) => (
                       <div 
                         key={breakdown.id} 
                         draggable
@@ -1445,7 +1531,7 @@ export default function FormatCustomiseSidebar({ activeTab, onClose, viewType = 
               )}
 
               <div className="space-y-2">
-                {selectedBreakdowns.map((breakdown) => (
+                {trendBreakdowns.map((breakdown) => (
                   <label key={breakdown.id} className="flex items-center">
                     <input
                       type="checkbox"
@@ -1490,7 +1576,7 @@ export default function FormatCustomiseSidebar({ activeTab, onClose, viewType = 
               {showMetricsDropdown && (
                 <div className="mb-3 bg-white border border-gray-200 rounded-lg shadow-lg p-3">
                   <div className="space-y-2 max-h-60 overflow-y-auto">
-                    {selectedMetrics.map((metric, index) => (
+                    {trendMetrics.map((metric, index) => (
                       <div 
                         key={metric.id} 
                         draggable
@@ -1527,7 +1613,7 @@ export default function FormatCustomiseSidebar({ activeTab, onClose, viewType = 
               )}
 
               <div className="space-y-2">
-                {selectedMetrics.map((metric) => (
+                {trendMetrics.map((metric) => (
                   <label key={metric.id} className="flex items-center">
                     <input
                       type="checkbox"
@@ -1719,10 +1805,16 @@ export default function FormatCustomiseSidebar({ activeTab, onClose, viewType = 
                       <div className="px-3 py-2 text-sm font-medium text-gray-900">
                         Create
                       </div>
-                      <button className="w-full px-3 py-2 text-left text-sm hover:bg-gray-50">
+                      <button 
+                        onClick={handleCreateCustomBreakdown}
+                        className="w-full px-3 py-2 text-left text-sm hover:bg-gray-50"
+                      >
                         Custom breakdown
                       </button>
-                      <button className="w-full px-3 py-2 text-left text-sm hover:bg-gray-50">
+                      <button 
+                        onClick={handleCreateCustomMetric}
+                        className="w-full px-3 py-2 text-left text-sm hover:bg-gray-50"
+                      >
                         Custom metric
                       </button>
                       <div className="border-t border-gray-200 my-1"></div>
@@ -1800,70 +1892,17 @@ export default function FormatCustomiseSidebar({ activeTab, onClose, viewType = 
                   </button>
                   {expandedSections.popularBreakdowns && (
                     <div className="space-y-2 ml-4 max-h-60 overflow-y-auto">
-                      <label className="flex items-center">
+                      {Object.entries(selectedBreakdowns).map(([name, isChecked]) => (
+                        <label key={name} className="flex items-center">
                         <input
                           type="checkbox"
                           className="custom-checkbox"
-                          defaultChecked
+                            checked={isChecked}
+                            onChange={(e) => handleBreakdownChange(name, e.target.checked)}
                         />
-                        <span className="ml-2 text-sm">Campaign name</span>
+                          <span className="ml-2 text-sm">{name}</span>
                       </label>
-                      <label className="flex items-center">
-                        <input
-                          type="checkbox"
-                          className="custom-checkbox"
-                          defaultChecked
-                        />
-                        <span className="ml-2 text-sm">Ad set name</span>
-                      </label>
-                      <label className="flex items-center">
-                        <input type="checkbox" className="custom-checkbox" />
-                        <span className="ml-2 text-sm">Ad name</span>
-                      </label>
-                      <label className="flex items-center">
-                        <input type="checkbox" className="custom-checkbox" />
-                        <span className="ml-2 text-sm">Page name</span>
-                      </label>
-                      <label className="flex items-center">
-                        <input type="checkbox" className="custom-checkbox" />
-                        <span className="ml-2 text-sm">Ad creative</span>
-                      </label>
-                      <label className="flex items-center">
-                        <input type="checkbox" className="custom-checkbox" />
-                        <span className="ml-2 text-sm">Age</span>
-                      </label>
-                      <label className="flex items-center">
-                        <input type="checkbox" className="custom-checkbox" />
-                        <span className="ml-2 text-sm">Gender</span>
-                      </label>
-                      <label className="flex items-center">
-                        <input type="checkbox" className="custom-checkbox" />
-                        <span className="ml-2 text-sm">Country</span>
-                      </label>
-                      <label className="flex items-center">
-                        <input type="checkbox" className="custom-checkbox" />
-                        <span className="ml-2 text-sm">Region</span>
-                      </label>
-                      <label className="flex items-center">
-                        <input type="checkbox" className="custom-checkbox" />
-                        <span className="ml-2 text-sm">Platform</span>
-                      </label>
-                      <label className="flex items-center">
-                        <input type="checkbox" className="custom-checkbox" />
-                        <span className="ml-2 text-sm">Placement</span>
-                      </label>
-                      <label className="flex items-center">
-                        <input type="checkbox" className="custom-checkbox" />
-                        <span className="ml-2 text-sm">Objective</span>
-                      </label>
-                      <label className="flex items-center">
-                        <input type="checkbox" className="custom-checkbox" />
-                        <span className="ml-2 text-sm">Day</span>
-                      </label>
-                      <label className="flex items-center">
-                        <input type="checkbox" className="custom-checkbox" />
-                        <span className="ml-2 text-sm">Month</span>
-                      </label>
+                      ))}
                     </div>
                   )}
                 </div>
@@ -1883,7 +1922,10 @@ export default function FormatCustomiseSidebar({ activeTab, onClose, viewType = 
                   </button>
                   {expandedSections.customBreakdowns && (
                     <div className="ml-4">
-                      <button className="flex items-center text-blue-600 hover:text-blue-700">
+                      <button 
+                        onClick={handleCreateCustomBreakdown}
+                        className="flex items-center text-blue-600 hover:text-blue-700"
+                      >
                         <Plus className="w-4 h-4 mr-2" />
                         <span className="text-sm">Create</span>
                       </button>
@@ -2104,98 +2146,17 @@ export default function FormatCustomiseSidebar({ activeTab, onClose, viewType = 
                   </button>
                   {expandedSections.popularMetrics && (
                     <div className="space-y-2 ml-4 max-h-60 overflow-y-auto">
-                      <label className="flex items-center">
+                      {Object.entries(selectedMetrics).map(([name, isChecked]) => (
+                        <label key={name} className="flex items-center">
                         <input
                           type="checkbox"
                           className="custom-checkbox"
-                          defaultChecked
+                            checked={isChecked}
+                            onChange={(e) => handleMetricChange(name, e.target.checked)}
                         />
-                        <span className="ml-2 text-sm">Amount spent</span>
+                          <span className="ml-2 text-sm">{name}</span>
                       </label>
-                      <label className="flex items-center">
-                        <input
-                          type="checkbox"
-                          className="custom-checkbox"
-                          defaultChecked
-                        />
-                        <span className="ml-2 text-sm">Impressions</span>
-                      </label>
-                      <label className="flex items-center">
-                        <input
-                          type="checkbox"
-                          className="custom-checkbox"
-                          defaultChecked
-                        />
-                        <span className="ml-2 text-sm">Reach</span>
-                      </label>
-                      <label className="flex items-center">
-                        <input
-                          type="checkbox"
-                          className="custom-checkbox"
-                          defaultChecked
-                        />
-                        <span className="ml-2 text-sm">Results</span>
-                      </label>
-                      <label className="flex items-center">
-                        <input
-                          type="checkbox"
-                          className="custom-checkbox"
-                          defaultChecked
-                        />
-                        <span className="ml-2 text-sm">Cost per result</span>
-                      </label>
-                      <label className="flex items-center">
-                        <input
-                          type="checkbox"
-                          className="custom-checkbox"
-                          defaultChecked
-                        />
-                        <span className="ml-2 text-sm">Delivery</span>
-                      </label>
-                      <label className="flex items-center">
-                        <input
-                          type="checkbox"
-                          className="custom-checkbox"
-                          defaultChecked
-                        />
-                        <span className="ml-2 text-sm">Frequency</span>
-                      </label>
-                      <label className="flex items-center">
-                        <input
-                          type="checkbox"
-                          className="custom-checkbox"
-                          defaultChecked
-                        />
-                        <span className="ml-2 text-sm">Link clicks</span>
-                      </label>
-                      <label className="flex items-center">
-                        <input
-                          type="checkbox"
-                          className="custom-checkbox"
-                          defaultChecked
-                        />
-                        <span className="ml-2 text-sm">
-                          CPC (cost per link click)
-                        </span>
-                      </label>
-                      <label className="flex items-center">
-                        <input
-                          type="checkbox"
-                          className="custom-checkbox"
-                          defaultChecked
-                        />
-                        <span className="ml-2 text-sm">
-                          CPM (cost per 1,000 impressions)
-                        </span>
-                      </label>
-                      <label className="flex items-center">
-                        <input
-                          type="checkbox"
-                          className="custom-checkbox"
-                          defaultChecked
-                        />
-                        <span className="ml-2 text-sm">CTR (all)</span>
-                      </label>
+                      ))}
                     </div>
                   )}
                 </div>
@@ -2216,9 +2177,12 @@ export default function FormatCustomiseSidebar({ activeTab, onClose, viewType = 
                   {expandedSections.customMetrics && (
                     <div className="ml-4">
                       <div className="text-xs text-gray-500 mb-2">Only you</div>
-                      <button className="flex items-center text-blue-600 hover:text-blue-700">
+                      <button 
+                        onClick={handleCreateCustomMetric}
+                        className="flex items-center text-blue-600 hover:text-blue-700"
+                      >
                         <Plus className="w-4 h-4 mr-2" />
-                        <span className="text-sm">new</span>
+                        <span className="text-sm">Create</span>
                       </button>
                     </div>
                   )}
@@ -3016,7 +2980,10 @@ export default function FormatCustomiseSidebar({ activeTab, onClose, viewType = 
                   </button>
                   {expandedSections.customConversions && (
                     <div className="ml-4">
-                      <button className="flex items-center text-blue-600 hover:text-blue-700">
+                      <button 
+                        onClick={handleCreateCustomConversion}
+                        className="flex items-center text-blue-600 hover:text-blue-700"
+                      >
                         <Plus className="w-4 h-4 mr-2" />
                         <span className="text-sm">Create</span>
                       </button>
