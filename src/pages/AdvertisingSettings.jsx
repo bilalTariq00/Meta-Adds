@@ -42,9 +42,9 @@ export default function AdvertisingSettings() {
       <div className="px-6 py-8 space-y-8 max-w-[85%]">
         {/* Shortcuts Section */}
         <div className="bg-white rounded-lg border border-gray-200">
-          <div className="flex items-center justify-between p-6 border-b border-gray-100">
+          <div className="flex items-center justify-between px-6 py-3 ">
             <div className="flex items-center gap-3">
-            <img src="/images/shortcuts.png" alt="Shortcuts" className="w-6 h-6" />
+            <img src="/images/campaign-structure.png" alt="Shortcuts" className="w-12 h-12" />
               <h2 className="text-lg font-semibold text-gray-900">Shortcuts</h2>
             </div>
             <button className="p-1 hover:bg-gray-100 rounded-full transition-colors">
@@ -98,8 +98,8 @@ export default function AdvertisingSettings() {
         </div>
 
         {/* Your business Section */}
-        <div className=" rounded-lg border border-gray-200">
-          <div className="p-6 border-b border-gray-100">
+        <div className=" rounded-lg ">
+          <div className="p-6 border-b  border-gray-100">
             <h2 className="text-lg font-semibold text-gray-900 mb-2">Your business</h2>
             <p className="text-sm text-gray-600">
               Help us better understand your business so that we can provide recommendations and features that are more relevant.
@@ -109,7 +109,7 @@ export default function AdvertisingSettings() {
           <div className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {/* Account controls */}
-              <div className="p-4 border border-gray-200 rounded-lg hover:border-blue-300 hover:shadow-sm transition-all cursor-pointer group">
+              <div className="p-4 bg-white border border-gray-200 rounded-lg hover:border-blue-300 hover:shadow-sm transition-all cursor-pointer group">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="p-2 bg-gray-100 rounded-lg">
                     <RefreshCw size={20} className="text-gray-600" />
@@ -121,7 +121,7 @@ export default function AdvertisingSettings() {
               </div>
 
               {/* Value rules */}
-              <div className="p-4 border border-gray-200 rounded-lg hover:border-blue-300 hover:shadow-sm transition-all cursor-pointer group">
+              <div className="p-4 bg-white border border-gray-200 rounded-lg hover:border-blue-300 hover:shadow-sm transition-all cursor-pointer group">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="p-2 bg-gray-100 rounded-lg">
                     <Star size={20} className="text-gray-600" />
@@ -133,7 +133,7 @@ export default function AdvertisingSettings() {
               </div>
 
               {/* Meta Verified */}
-              <div className="p-4 border border-gray-200 rounded-lg hover:border-blue-300 hover:shadow-sm transition-all cursor-pointer group">
+              <div className="p-4 bg-white border border-gray-200 rounded-lg hover:border-blue-300 hover:shadow-sm transition-all cursor-pointer group">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="p-2 bg-gray-100 rounded-lg">
                     <CheckCircle size={20} className="text-gray-600" />
@@ -147,7 +147,7 @@ export default function AdvertisingSettings() {
         </div>
 
         {/* Creating ads Section */}
-        <div className=" rounded-lg border border-gray-200">
+        <div className=" rounded-lg ">
           <div className="p-6 border-b border-gray-100">
             <h2 className="text-lg font-semibold text-gray-900 mb-2">Creating ads</h2>
             <p className="text-sm text-gray-600">
@@ -159,7 +159,7 @@ export default function AdvertisingSettings() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {/* Row 1 */}
               {/* Advantage+ creative */}
-              <div className="p-4 border border-gray-200 rounded-lg hover:border-blue-300 hover:shadow-sm transition-all cursor-pointer group">
+              <div className="p-4 bg-white border border-gray-200 rounded-lg hover:border-blue-300 hover:shadow-sm transition-all cursor-pointer group">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="p-2 bg-gray-100 rounded-lg">
                     <Sparkles size={20} className="text-gray-600" />
@@ -171,7 +171,7 @@ export default function AdvertisingSettings() {
               </div>
 
               {/* Audience segments */}
-              <div className="p-4 border border-gray-200 rounded-lg hover:border-blue-300 hover:shadow-sm transition-all cursor-pointer group">
+              <div className="p-4 bg-white border border-gray-200 rounded-lg hover:border-blue-300 hover:shadow-sm transition-all cursor-pointer group">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="p-2 bg-gray-100 rounded-lg">
                     <Users size={20} className="text-gray-600" />
@@ -186,7 +186,7 @@ export default function AdvertisingSettings() {
               </div>
 
               {/* Default beneficiary and payer */}
-              <div className="p-4 border border-gray-200 rounded-lg hover:border-blue-300 hover:shadow-sm transition-all cursor-pointer group">
+              <div className="p-4 bg-white border border-gray-200 rounded-lg hover:border-blue-300 hover:shadow-sm transition-all cursor-pointer group">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="p-2 bg-gray-100 rounded-lg">
                     <Globe size={20} className="text-gray-600" />
@@ -199,7 +199,7 @@ export default function AdvertisingSettings() {
 
               {/* Row 2 */}
               {/* Datasets and pixels */}
-              <div className="p-4 border border-gray-200 rounded-lg hover:border-blue-300 hover:shadow-sm transition-all cursor-pointer group">
+              <div className="p-4 border bg-white border-gray-200 rounded-lg hover:border-blue-300 hover:shadow-sm transition-all cursor-pointer group">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="p-2 bg-gray-100 rounded-lg">
                     <div className="w-5 h-5 border-2 border-gray-400 rounded-full flex items-center justify-center">
@@ -213,7 +213,7 @@ export default function AdvertisingSettings() {
               </div>
 
               {/* Name templates */}
-              <div className="p-4 border border-gray-200 rounded-lg hover:border-blue-300 hover:shadow-sm transition-all cursor-pointer group">
+              <div className="p-4 border bg-white border-gray-200 rounded-lg hover:border-blue-300 hover:shadow-sm transition-all cursor-pointer group">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="p-2 bg-gray-100 rounded-lg">
                     <FileText size={20} className="text-gray-600" />
@@ -225,7 +225,7 @@ export default function AdvertisingSettings() {
               </div>
 
               {/* Social information */}
-              <div className="p-4 border border-gray-200 rounded-lg hover:border-blue-300 hover:shadow-sm transition-all cursor-pointer group">
+              <div className="p-4 border bg-white border-gray-200 rounded-lg hover:border-blue-300 hover:shadow-sm transition-all cursor-pointer group">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="p-2 bg-gray-100 rounded-lg">
                     <Sparkles size={20} className="text-gray-600" />
